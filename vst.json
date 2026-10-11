@@ -1,0 +1,11 @@
+{
+  "name": "StepRunner-8",
+  "vendor": "djokenzi",
+  "uid": "SR-8",
+  "version": 10000,
+  "so": "steprunner8.so",
+  "params": "params.json",
+  "layout": "layout.conf",
+  "art": "html",
+  "_comment": "MIDI generator (docs/PORTING.md classification 0): vst.json/params.json only feed tools/gen_vst.py for params.h + the skin. The plugin is steprunner8.cpp (own VST2 wrapper, ALSA seq MIDI out), built by build.sh."
+}

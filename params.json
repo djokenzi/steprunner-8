@@ -1,0 +1,3187 @@
+{
+ "name": "StepRunner-8",
+ "params": [
+  {
+   "key": "track",
+   "name": "Track",
+   "options": [
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "T8"
+   ],
+   "default": 0
+  },
+  {
+   "key": "page",
+   "name": "Page",
+   "options": [
+    "1-16",
+    "17-32",
+    "33-48",
+    "49-64"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step0",
+   "name": "Step 1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step1",
+   "name": "Step 2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step2",
+   "name": "Step 3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step3",
+   "name": "Step 4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step4",
+   "name": "Step 5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step5",
+   "name": "Step 6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step6",
+   "name": "Step 7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step7",
+   "name": "Step 8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step8",
+   "name": "Step 9",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step9",
+   "name": "Step 10",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step10",
+   "name": "Step 11",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step11",
+   "name": "Step 12",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step12",
+   "name": "Step 13",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step13",
+   "name": "Step 14",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step14",
+   "name": "Step 15",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step15",
+   "name": "Step 16",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "sel",
+   "name": "Edit Step",
+   "min": 1,
+   "max": 16,
+   "default": 1,
+   "display": "int"
+  },
+  {
+   "key": "st_cond",
+   "name": "Condition",
+   "options": [
+    "--",
+    "1ST",
+    "NO 1ST",
+    "1:2",
+    "2:2",
+    "1:3",
+    "2:3",
+    "3:3",
+    "1:4",
+    "2:4",
+    "3:4",
+    "4:4",
+    "1:5",
+    "2:5",
+    "3:5",
+    "4:5",
+    "5:5",
+    "1:6",
+    "2:6",
+    "3:6",
+    "4:6",
+    "5:6",
+    "6:6",
+    "1:7",
+    "2:7",
+    "3:7",
+    "4:7",
+    "5:7",
+    "6:7",
+    "7:7",
+    "1:8",
+    "2:8",
+    "3:8",
+    "4:8",
+    "5:8",
+    "6:8",
+    "7:8",
+    "8:8",
+    "FILL",
+    "NO FILL",
+    "PRE",
+    "NO PRE",
+    "NEI",
+    "NO NEI"
+   ],
+   "default": 0
+  },
+  {
+   "key": "st_prob",
+   "name": "Probability",
+   "min": 0,
+   "max": 100,
+   "default": 100,
+   "display": "int"
+  },
+  {
+   "key": "st_vel",
+   "name": "Velocity",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_len",
+   "name": "Length",
+   "min": 0,
+   "max": 64,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc1",
+   "name": "CC 1",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc2",
+   "name": "CC 2",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc3",
+   "name": "CC 3",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc4",
+   "name": "CC 4",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc5",
+   "name": "CC 5",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_len",
+   "name": "Track Length",
+   "min": 1,
+   "max": 64,
+   "default": 16,
+   "display": "int"
+  },
+  {
+   "key": "trk_speed",
+   "name": "Track Speed",
+   "options": [
+    "1/8x",
+    "1/4x",
+    "1/2x",
+    "3/4x",
+    "1x",
+    "3/2x",
+    "2x"
+   ],
+   "default": 4
+  },
+  {
+   "key": "trk_ch",
+   "name": "MIDI CH",
+   "min": 1,
+   "max": 16,
+   "default": 1,
+   "display": "int"
+  },
+  {
+   "key": "trk_num",
+   "name": "Note",
+   "min": 0,
+   "max": 127,
+   "default": 37,
+   "display": "int"
+  },
+  {
+   "key": "trk_vel",
+   "name": "Track Velocity",
+   "min": 1,
+   "max": 127,
+   "default": 100,
+   "display": "int"
+  },
+  {
+   "key": "trk_gate",
+   "name": "Gate",
+   "min": 1,
+   "max": 64,
+   "default": 4,
+   "display": "int"
+  },
+  {
+   "key": "mute1",
+   "name": "Mute T1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute2",
+   "name": "Mute T2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute3",
+   "name": "Mute T3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute4",
+   "name": "Mute T4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute5",
+   "name": "Mute T5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute6",
+   "name": "Mute T6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute7",
+   "name": "Mute T7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mute8",
+   "name": "Mute T8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "fill",
+   "name": "Fill",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "clr_trk",
+   "name": "Clear Track",
+   "momentary": true
+  },
+  {
+   "key": "clr_step",
+   "name": "Clear Locks",
+   "momentary": true
+  },
+  {
+   "key": "run",
+   "name": "Playhead",
+   "options": [
+    "-",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "default": 0
+  },
+  {
+   "key": "follow",
+   "name": "Follow",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cc_base1",
+   "name": "Unused 1",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_base2",
+   "name": "Unused 2",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_base3",
+   "name": "Unused 3",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_base4",
+   "name": "Unused 4",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_base5",
+   "name": "Unused 5",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "rnd_trig",
+   "name": "Random Steps",
+   "momentary": true
+  },
+  {
+   "key": "rnd_vel",
+   "name": "Random Velocity",
+   "momentary": true
+  },
+  {
+   "key": "rnd_len",
+   "name": "Random Length",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc1",
+   "name": "Random CC 1",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc2",
+   "name": "Random CC 2",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc3",
+   "name": "Random CC 3",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc4",
+   "name": "Random CC 4",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc5",
+   "name": "Random CC 5",
+   "momentary": true
+  },
+  {
+   "key": "rnd_dens",
+   "name": "Random Density",
+   "min": 0,
+   "max": 100,
+   "default": 50,
+   "display": "int"
+  },
+  {
+   "key": "rnd_min",
+   "name": "Random Min",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "rnd_max",
+   "name": "Random Max",
+   "min": 0,
+   "max": 127,
+   "default": 127,
+   "display": "int"
+  },
+  {
+   "key": "cell1",
+   "name": "Cell 1",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell2",
+   "name": "Cell 2",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell3",
+   "name": "Cell 3",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell4",
+   "name": "Cell 4",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell5",
+   "name": "Cell 5",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell6",
+   "name": "Cell 6",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell7",
+   "name": "Cell 7",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell8",
+   "name": "Cell 8",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell9",
+   "name": "Cell 9",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell10",
+   "name": "Cell 10",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell11",
+   "name": "Cell 11",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell12",
+   "name": "Cell 12",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell13",
+   "name": "Cell 13",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell14",
+   "name": "Cell 14",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell15",
+   "name": "Cell 15",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cell16",
+   "name": "Cell 16",
+   "options": [
+    "----",
+    "---T",
+    "--P-",
+    "--PT",
+    "-S--",
+    "-S-T",
+    "-SP-",
+    "-SPT",
+    "E---",
+    "E--T",
+    "E-P-",
+    "E-PT",
+    "ES--",
+    "ES-T",
+    "ESP-",
+    "ESPT",
+    "T---",
+    "T--T",
+    "T-P-",
+    "T-PT",
+    "TS--",
+    "TS-T",
+    "TSP-",
+    "TSPT",
+    "U---",
+    "U--T",
+    "U-P-",
+    "U-PT",
+    "US--",
+    "US-T",
+    "USP-",
+    "USPT",
+    "(unused)"
+   ],
+   "default": 0
+  },
+  {
+   "key": "step_edit",
+   "name": "Step Edit",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "multi",
+   "name": "Multi Select",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "st_pan",
+   "name": "Pan",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "rnd_pan",
+   "name": "Random Pan",
+   "momentary": true
+  },
+  {
+   "key": "track_edit",
+   "name": "Track Edit",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "panel",
+   "name": "Panel",
+   "options": [
+    "LOCKS",
+    "MULTI",
+    "TRACK",
+    "RANDOM",
+    "GLOBAL",
+    "PATTERN",
+    "CCEDIT",
+    "SOURCE"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ptitle",
+   "name": "Panel Title",
+   "options": [
+    "NORMAL",
+    "EDIT",
+    "TRACK",
+    "RANDOM",
+    "EUCLID",
+    "GLOBAL",
+    "PATTERN",
+    "SOURCE",
+    "MAPTRK",
+    "TIMING"
+   ],
+   "default": 0
+  },
+  {
+   "key": "len16",
+   "name": "Length 16",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "len32",
+   "name": "Length 32",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "len48",
+   "name": "Length 48",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "len64",
+   "name": "Length 64",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk1",
+   "name": "Select T1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk2",
+   "name": "Select T2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk3",
+   "name": "Select T3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk4",
+   "name": "Select T4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk5",
+   "name": "Select T5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk6",
+   "name": "Select T6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk7",
+   "name": "Select T7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk8",
+   "name": "Select T8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pg1",
+   "name": "Page 1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pg2",
+   "name": "Page 2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pg3",
+   "name": "Page 3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pg4",
+   "name": "Page 4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "random_edit",
+   "name": "Random Edit",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk_ccbase",
+   "name": "CC Base",
+   "min": 0,
+   "max": 123,
+   "default": 20,
+   "display": "int"
+  },
+  {
+   "key": "euclid_edit",
+   "name": "Euclidian",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "lpanel",
+   "name": "Left Panel",
+   "options": [
+    "RANDOM",
+    "EUCLID",
+    "HIDDEN",
+    "TIMING"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_enable",
+   "name": "Euclid Enable",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_pl1",
+   "name": "Pulse",
+   "min": 0,
+   "max": 64,
+   "default": 4,
+   "display": "int"
+  },
+  {
+   "key": "eu_ro1",
+   "name": "Rotate",
+   "min": 0,
+   "max": 63,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "eu_tro",
+   "name": "TRO",
+   "min": 0,
+   "max": 63,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "eu_pl2",
+   "name": "PL2",
+   "min": 0,
+   "max": 64,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "eu_ro2",
+   "name": "RO2",
+   "min": 0,
+   "max": 63,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "eu_bool",
+   "name": "BOOL",
+   "min": 0,
+   "max": 3,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "eu_discard",
+   "name": "Euclid Discard",
+   "momentary": true
+  },
+  {
+   "key": "eu_commit",
+   "name": "Euclid Commit",
+   "momentary": true
+  },
+  {
+   "key": "pf_prob",
+   "name": "Probability",
+   "min": -100,
+   "max": 0,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_vel",
+   "name": "Velocity",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_len",
+   "name": "Length",
+   "min": -64,
+   "max": 64,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_pan",
+   "name": "Pan",
+   "min": -64,
+   "max": 63,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc1",
+   "name": "CC 1",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc2",
+   "name": "CC 2",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc3",
+   "name": "CC 3",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc4",
+   "name": "CC 4",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc5",
+   "name": "CC 5",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_ctrl",
+   "name": "Perform All",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_commit",
+   "name": "Perform Commit",
+   "momentary": true
+  },
+  {
+   "key": "pf_discard",
+   "name": "Perform Undo",
+   "momentary": true
+  },
+  {
+   "key": "pfx1",
+   "name": "Loop 4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx2",
+   "name": "Loop 2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx3",
+   "name": "Loop 1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx4",
+   "name": "No Locks",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx5",
+   "name": "Random Step",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx6",
+   "name": "Invert Mute",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfx7",
+   "name": "Mute All",
+   "momentary": true
+  },
+  {
+   "key": "pfx8",
+   "name": "Fill",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy1",
+   "name": "Loop 8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy2",
+   "name": "Reverse",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy3",
+   "name": "Half Time",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy4",
+   "name": "Double Time",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy5",
+   "name": "Roll",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy6",
+   "name": "Restart",
+   "momentary": true
+  },
+  {
+   "key": "pfy7",
+   "name": "Scatter",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pfy8",
+   "name": "Pad 8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mstate",
+   "name": "Mute State",
+   "options": [
+    "NONE",
+    "SOME"
+   ],
+   "default": 0
+  },
+  {
+   "key": "global_edit",
+   "name": "Global",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "shuffle",
+   "name": "Shuffle",
+   "min": 50,
+   "max": 80,
+   "default": 50,
+   "display": "int"
+  },
+  {
+   "key": "shuf1",
+   "name": "Shuffle T1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf2",
+   "name": "Shuffle T2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf3",
+   "name": "Shuffle T3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf4",
+   "name": "Shuffle T4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf5",
+   "name": "Shuffle T5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf6",
+   "name": "Shuffle T6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf7",
+   "name": "Shuffle T7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "shuf8",
+   "name": "Shuffle T8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "glob_ch",
+   "name": "Global MIDI CH",
+   "min": 1,
+   "max": 16,
+   "default": 1,
+   "display": "int"
+  },
+  {
+   "key": "shuf_all",
+   "name": "Shuffle All",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "pattern_edit",
+   "name": "Pattern Edit",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "plen16",
+   "name": "Pattern Length 16",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "plen32",
+   "name": "Pattern Length 32",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "plen48",
+   "name": "Pattern Length 48",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "plen64",
+   "name": "Pattern Length 64",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "undo",
+   "name": "Undo",
+   "momentary": true
+  },
+  {
+   "key": "redo",
+   "name": "Redo",
+   "momentary": true
+  },
+  {
+   "key": "copy",
+   "name": "Copy",
+   "momentary": true
+  },
+  {
+   "key": "paste",
+   "name": "Paste",
+   "momentary": true
+  },
+  {
+   "key": "msg",
+   "name": "Message",
+   "min": 0,
+   "max": 301,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "mpad1",
+   "name": "Mute Pad 1",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad2",
+   "name": "Mute Pad 2",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad3",
+   "name": "Mute Pad 3",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad4",
+   "name": "Mute Pad 4",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad5",
+   "name": "Mute Pad 5",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad6",
+   "name": "Mute Pad 6",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad7",
+   "name": "Mute Pad 7",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "mpad8",
+   "name": "Mute Pad 8",
+   "options": [
+    "IDLE",
+    "HIT",
+    "MUTED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_cc117",
+   "name": "CC 117",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pcopy",
+   "name": "Copy Page",
+   "momentary": true
+  },
+  {
+   "key": "ppaste",
+   "name": "Paste Page",
+   "momentary": true
+  },
+  {
+   "key": "shift",
+   "name": "Shift",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_len",
+   "name": "Length",
+   "min": 1,
+   "max": 64,
+   "default": 16,
+   "display": "int"
+  },
+  {
+   "key": "eu_rnd",
+   "name": "Euclid Random",
+   "momentary": true
+  },
+  {
+   "key": "pgst1",
+   "name": "Page 1 State",
+   "options": [
+    "IDLE",
+    "SHOWN",
+    "PLAYING",
+    "SHOWN PLAYING",
+    "HIDDEN"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pgst2",
+   "name": "Page 2 State",
+   "options": [
+    "IDLE",
+    "SHOWN",
+    "PLAYING",
+    "SHOWN PLAYING",
+    "HIDDEN"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pgst3",
+   "name": "Page 3 State",
+   "options": [
+    "IDLE",
+    "SHOWN",
+    "PLAYING",
+    "SHOWN PLAYING",
+    "HIDDEN"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pgst4",
+   "name": "Page 4 State",
+   "options": [
+    "IDLE",
+    "SHOWN",
+    "PLAYING",
+    "SHOWN PLAYING",
+    "HIDDEN"
+   ],
+   "default": 0
+  },
+  {
+   "key": "cc_edit",
+   "name": "Edit CC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccn1",
+   "name": "CC 1 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn2",
+   "name": "CC 2 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn3",
+   "name": "CC 3 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn4",
+   "name": "CC 4 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn5",
+   "name": "CC 5 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_commit",
+   "name": "CC Commit",
+   "momentary": true
+  },
+  {
+   "key": "cc_discard",
+   "name": "CC Discard",
+   "momentary": true
+  },
+  {
+   "key": "ccuse1",
+   "name": "CC 1 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse2",
+   "name": "CC 2 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse3",
+   "name": "CC 3 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse4",
+   "name": "CC 4 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse5",
+   "name": "CC 5 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst1",
+   "name": "Perform State 1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst2",
+   "name": "Perform State 2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst3",
+   "name": "Perform State 3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst4",
+   "name": "Perform State 4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pclear",
+   "name": "Clear State",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccb1",
+   "name": "CC 1 Base",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccb2",
+   "name": "CC 2 Base",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccb3",
+   "name": "CC 3 Base",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccb4",
+   "name": "CC 4 Base",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccb5",
+   "name": "CC 5 Base",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "cc_read",
+   "name": "Read Project",
+   "momentary": true
+  },
+  {
+   "key": "read_all",
+   "name": "Read Project All",
+   "momentary": true
+  },
+  {
+   "key": "srcproj",
+   "name": "Project",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow1",
+   "name": "Target 1",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow2",
+   "name": "Target 2",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow3",
+   "name": "Target 3",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow4",
+   "name": "Target 4",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow5",
+   "name": "Target 5",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcrow6",
+   "name": "Target 6",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "srcsel1",
+   "name": "Read Target 1",
+   "momentary": true
+  },
+  {
+   "key": "srcsel2",
+   "name": "Read Target 2",
+   "momentary": true
+  },
+  {
+   "key": "srcsel3",
+   "name": "Read Target 3",
+   "momentary": true
+  },
+  {
+   "key": "srcsel4",
+   "name": "Read Target 4",
+   "momentary": true
+  },
+  {
+   "key": "srcsel5",
+   "name": "Read Target 5",
+   "momentary": true
+  },
+  {
+   "key": "srcsel6",
+   "name": "Read Target 6",
+   "momentary": true
+  },
+  {
+   "key": "src_prev",
+   "name": "Targets Prev",
+   "momentary": true
+  },
+  {
+   "key": "src_next",
+   "name": "Targets Next",
+   "momentary": true
+  },
+  {
+   "key": "src_cancel",
+   "name": "Read Cancel",
+   "momentary": true
+  },
+  {
+   "key": "scr",
+   "name": "Screen",
+   "options": [
+    "MAIN",
+    "SOURCE"
+   ],
+   "default": 0
+  },
+  {
+   "key": "src_commit",
+   "name": "Read Commit",
+   "momentary": true
+  },
+  {
+   "key": "srchl1",
+   "name": "Target 1 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "srchl2",
+   "name": "Target 2 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "srchl3",
+   "name": "Target 3 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "srchl4",
+   "name": "Target 4 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "srchl5",
+   "name": "Target 5 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "srchl6",
+   "name": "Target 6 Row",
+   "options": [
+    "HIDDEN",
+    "IDLE",
+    "MARKED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "src_map",
+   "name": "Create Default Map",
+   "momentary": true
+  },
+  {
+   "key": "src_fetch",
+   "name": "Fetch CC Values",
+   "momentary": true
+  },
+  {
+   "key": "src_notes",
+   "name": "Fetch Notes",
+   "momentary": true
+  },
+  {
+   "key": "shuf_edit",
+   "name": "Shuffle Edit",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "clr_mode",
+   "name": "Clear Locks Mode",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "lbtn",
+   "name": "Left Buttons",
+   "options": [
+    "ORANGE",
+    "TEAL",
+    "VIOLET",
+    "CLR",
+    "NONE"
+   ],
+   "default": 0
+  },
+  {
+   "key": "src_copy",
+   "name": "Copy Mapping",
+   "momentary": true
+  },
+  {
+   "key": "src_skip",
+   "name": "Skip Backup",
+   "momentary": true
+  },
+  {
+   "key": "bkstep",
+   "name": "Backup Step",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "bigmsg",
+   "name": "Big Message",
+   "options": [
+    "NONE",
+    "NOTSAVED",
+    "NODRUM",
+    "NOTHING",
+    "FAIL",
+    "DONE1",
+    "DONE2",
+    "DONE3",
+    "DONE4",
+    "DONE5",
+    "DONE6",
+    "DONE7",
+    "DONE8",
+    "DONE9",
+    "DONE10",
+    "DONE11",
+    "DONE12",
+    "DONE13",
+    "DONE14",
+    "DONE15",
+    "DONE16",
+    "DONE17",
+    "DONE18",
+    "DONE19",
+    "DONE20",
+    "DONE21",
+    "DONE22",
+    "DONE23",
+    "DONE24",
+    "DONE25",
+    "DONE26",
+    "DONE27",
+    "DONE28",
+    "DONE29",
+    "DONE30",
+    "DONE31",
+    "DONE32",
+    "DONE33",
+    "DONE34",
+    "DONE35",
+    "DONE36",
+    "DONE37",
+    "DONE38",
+    "DONE39",
+    "DONE40",
+    "DONE41",
+    "DONE42",
+    "DONE43",
+    "DONE44",
+    "DONE45",
+    "DONE46",
+    "DONE47",
+    "DONE48"
+   ],
+   "default": 0
+  },
+  {
+   "key": "bigdone",
+   "name": "Big Message Done",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "msg_ok",
+   "name": "Close Message",
+   "momentary": true
+  },
+  {
+   "key": "bkname",
+   "name": "Backup Name",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pst5",
+   "name": "State 5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst6",
+   "name": "State 6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst7",
+   "name": "State 7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pst8",
+   "name": "State 8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat1",
+   "name": "Pattern 1",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat2",
+   "name": "Pattern 2",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat3",
+   "name": "Pattern 3",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat4",
+   "name": "Pattern 4",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat5",
+   "name": "Pattern 5",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat6",
+   "name": "Pattern 6",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat7",
+   "name": "Pattern 7",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat8",
+   "name": "Pattern 8",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat_clear",
+   "name": "Pattern Clear",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat_store",
+   "name": "Pattern Store",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk_fwd",
+   "name": "Forward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "trk_bwd",
+   "name": "Backward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "timing_edit",
+   "name": "Timing",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "tm_left",
+   "name": "Timing Earlier",
+   "momentary": true
+  },
+  {
+   "key": "tm_right",
+   "name": "Timing Later",
+   "momentary": true
+  },
+  {
+   "key": "st_ratch",
+   "name": "Ratchet",
+   "min": 1,
+   "max": 8,
+   "default": 1,
+   "display": "int"
+  },
+  {
+   "key": "rnd_timing",
+   "name": "Random Timing",
+   "momentary": true
+  },
+  {
+   "key": "rnd_ratch",
+   "name": "Random Ratchets",
+   "momentary": true
+  },
+  {
+   "key": "clr_timing",
+   "name": "Clear Timing",
+   "momentary": true
+  },
+  {
+   "key": "clr_ratch",
+   "name": "Clear Ratchets",
+   "momentary": true
+  },
+  {
+   "key": "pst_act",
+   "name": "Active State",
+   "options": [
+    "NONE",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat_fwd",
+   "name": "Pattern Forward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "pat_bwd",
+   "name": "Pattern Backward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "trk_both",
+   "name": "Back and Forth",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat_both",
+   "name": "Pattern Back and Forth",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv1",
+   "name": "Pattern 1 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv2",
+   "name": "Pattern 2 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv3",
+   "name": "Pattern 3 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv4",
+   "name": "Pattern 4 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv5",
+   "name": "Pattern 5 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv6",
+   "name": "Pattern 6 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv7",
+   "name": "Pattern 7 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "patv8",
+   "name": "Pattern 8 Look",
+   "options": [
+    "HIDDEN",
+    "EMPTY",
+    "FULL",
+    "PLAYING",
+    "CUED",
+    "BLINK"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_fwd",
+   "name": "Euclid Forward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_bwd",
+   "name": "Euclid Backward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_both",
+   "name": "Euclid Back and Forth",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_dirv",
+   "name": "Euclid Direction Look",
+   "options": [
+    "HIDDEN",
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "slotv",
+   "name": "Mode Slot Look",
+   "options": [
+    "EUCLID",
+    "TIMING",
+    "HIDDEN"
+   ],
+   "default": 0
+  },
+  {
+   "key": "rtrk",
+   "name": "Random Track Look",
+   "options": [
+    "HIDDEN",
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "T8"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_hum",
+   "name": "Humanize",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_build",
+   "name": "Build",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_echo",
+   "name": "Echo",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_fade",
+   "name": "Fade Out",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_ghost",
+   "name": "Ghost",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_poly",
+   "name": "Poly",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_down",
+   "name": "Downbeat Only",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pat_copy",
+   "name": "Copy Pattern",
+   "momentary": true
+  },
+  {
+   "key": "pat_paste",
+   "name": "Paste Pattern",
+   "momentary": true
+  },
+  {
+   "key": "pat_clrall",
+   "name": "Clear Pattern",
+   "momentary": true
+  },
+  {
+   "key": "ttl",
+   "name": "Panel Title Look",
+   "options": [
+    "HIDDEN",
+    "SETUP",
+    "ST1",
+    "ST2",
+    "ST3",
+    "ST4",
+    "ST5",
+    "ST6",
+    "ST7",
+    "ST8",
+    "RT1",
+    "RT2",
+    "RT3",
+    "RT4",
+    "RT5",
+    "RT6",
+    "RT7",
+    "RT8"
+   ],
+   "default": 0
+  },
+  {
+   "key": "st_rres",
+   "name": "Ratchet Resolution",
+   "options": [
+    "AUTO",
+    "1/16",
+    "1/32",
+    "1/48",
+    "1/64",
+    "1/80"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_alt",
+   "name": "Alt Bar",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "pf_afill",
+   "name": "Auto Fill",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  }
+ ]
+}

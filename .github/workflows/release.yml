@@ -1,0 +1,33 @@
+# Builds StepRunner-8 on GitHub (no Docker needed on your computer), runs the offline test, packages the
+# installable zip with mpc-vst-plugins' tools/release.py and attaches it to a DRAFT release.
+# Start it from the repo's Actions tab: "Release" -> "Run workflow" -> enter the version (e.g. 1.0.0).
+# Test that exact zip on the MPC, then publish the draft (that creates the tag).
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version, e.g. 1.0.0
+        required: true
+      dry_run:
+        description: Build and package only (zip as a run artifact), no draft release
+        type: boolean
+        default: false
+
+jobs:
+  vst:
+    # mpc-vst-plugins pinned to one commit, the same in both places
+    uses: sd88me/mpc-vst-plugins/.github/workflows/vst-release.yml@c16b824ca1500188b17ec73c18c3d1ec59f18103
+    permissions: { contents: write }
+    with:
+      tag: v${{ inputs.version }}
+      version: ${{ inputs.version }}
+      tools_ref: c16b824ca1500188b17ec73c18c3d1ec59f18103
+      vst_dir: .
+      build: bash build.sh
+      host_test: bash test.sh
+      plugin_id: steprunner-8
+      license: MIT
+      about: "StepRunner-8: an 8-track, 64-step sequencer for MPC standalone with step conditions, step and CC locks, patterns, states and performance effects, driving a drum program over MIDI (ALSA port StepRunner-8)."
+      dry_run: ${{ inputs.dry_run }}
