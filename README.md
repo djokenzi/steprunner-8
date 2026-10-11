@@ -6,6 +6,12 @@ MIDI to other tracks (typically a drum program), with step conditions and step a
 
 ![StepRunner-8 on the MPC screen](docs/screenshots/steprunner-8.png)
 
+## Demo video
+
+A short demo, and how to map StepRunner-8 to a drum program:
+
+[![StepRunner-8 demo and mapping walkthrough (YouTube)](https://img.youtube.com/vi/jZ22XHM5tb0/hqdefault.jpg)](https://youtu.be/jZ22XHM5tb0)
+
 ## Features
 
 - 8 tracks × 64 steps (4 pages of 16), notes 36–43 = pads A01–A08 of a drum program by default

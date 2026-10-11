@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.0.0
+Version 1.0.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
@@ -160,7 +160,8 @@ The project must be **saved with StepRunner-8 in it**. Otherwise you see *Save t
 
 ### 3.4 CREATE DEFAULT MAP
 
-Use this to map the CC locks to the pads of a drum program automatically:
+Use this to map the CC locks to the pads of a drum program automatically. The steps are also shown in the
+[demo and mapping video](https://youtu.be/jZ22XHM5tb0).
 
 1. **Save the project.** Saving it under a new name is recommended, rather than overwriting your existing project.
 2. Tap **CREATE DEFAULT MAP**.
