@@ -36,6 +36,16 @@ The full user manual with screenshots is in [docs/MANUAL.md](docs/MANUAL.md).
 Download `StepRunner-8-<version>-mpc-armv7.zip` from [Releases](../../releases) and follow `INSTALL.md` inside the
 zip (it runs `install.sh` on the device as root over SSH; it backs up `MPC.settings` first).
 
+## Demo projects
+
+`StepRunner-8-demo-projects.zip` on the [Releases](../../releases) page holds two MPC projects, already mapped with
+CREATE DEFAULT MAP:
+
+- **DEMO - Drum Synth - empty**: StepRunner-8 driving MPC's Drum Synth.
+- **DEMO - Drum Track - empty**: StepRunner-8 driving an empty Drum Track; load your own samples on pads A01–A08.
+
+Unzip, copy the `.xpj` files to your MPC and open one.
+
 ## Quick start
 
 1. Load StepRunner-8 on a plugin track.
