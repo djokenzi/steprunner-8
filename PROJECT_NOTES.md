@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.0.2 (2026-10-12): a STATE goes back into the pattern it was saved on; not yet tried on the device. v1.0.1: SETUP shows the logo instead of the RND / CLR buttons.
+Status: v1.1.0 (2026-10-12): every PATTERN has its own eight STATEs; not yet tried on the device. v1.0.2 (a STATE goes back into its own pattern) was built but never published; 1.1.0 replaces it. v1.0.1: SETUP shows the logo.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -247,7 +247,23 @@ Parameters are a window onto the pattern. STEPS tab, top to bottom:
 StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.12.0). The whole Trig Seq history
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
 
-### v1.0.2 (2026-10-12)
+### v1.1.0 (2026-10-12)
+- STATE per PATTERN: `Plugin::pst[NPATS][NSTATES]` (was eight for the whole sequencer), `pst_act[NPATS]`. The STATE
+  buttons, `pst_act` and a recall all use the pattern playing (`pat_cur`), so a state can only go back into its own
+  pattern and the 1.0.2 cross-pattern switch is gone (and with it the cue drop: a recall leaves a cued pattern cued).
+  When a pattern comes in (tap or cue) the buttons show its states (getP follows `pat_cur`).
+- New read-only param `pst_pat` (P1..P8, appended; in the told[] list and the effCanBeAutomated exclusions): the
+  PERFORM tab shows "STATES OF / PATTERN n" under CLEAR STATE (layout.conf, text when=pst_pat:Pn).
+- COPY PTN copies the pattern's states into `pstclip`, PASTE PTN replaces the target's states (UNDO does not bring
+  states back). STORE + pattern copies them too. CLEAR + pattern (the playing one or another) deletes them. CLEAR PTN
+  (the PATTERN EDIT button that blanks the steps, undoable) keeps the states.
+- `pat_keep`: a pattern with states stays full even with no steps (`pst_any`).
+- Chunk: `V<pattern><state> ` + the state's lines (was `Q<state> `). Loading still reads `Q` lines: into the pattern
+  of their `W` sub-line (1.0.2) or else the pattern playing; a pattern that only has states gets fresh empty tracks.
+  ChunkSrc copies only the full states under the lock. Memory: 64 states x ~8 KB = ~530 KB more per instance, no CPU
+  cost (states are touched only on a tap). Tests rewritten. vst.json 10100, release.sh 1.1.0.
+
+### v1.0.2 (2026-10-12, built, never published)
 - STATE and PATTERN: a state remembers the pattern it was saved on (`PState::pat`, chunk sub-line `Q<k> W <pattern>`;
   older versions skip it as an unknown track line). Before, a recall wrote the snapshot into whatever pattern was
   playing, so recalling STATE 1 (saved on pattern 2) while on pattern 3 overwrote pattern 3. Now a recall on another

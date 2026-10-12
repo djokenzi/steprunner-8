@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.0.2 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
+Version 1.1.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
@@ -199,14 +199,16 @@ PATTERN EDIT holds the settings of the whole pattern:
 - **SHUFFLE EDIT**: shows the buttons T1–T8 and ALL. Only lit tracks follow the shuffle; all of them do by default.
 - **PATTERN LENGTH 16 / 32 / 48 / 64**: sets the length of all 8 tracks. When tracks get longer, their existing
   pages are copied onto the new, empty pages. Pages that already hold trigs are never overwritten.
-- **COPY PTN / PASTE PTN**: copy the playing pattern and paste it over the playing pattern.
+- **COPY PTN / PASTE PTN**: copy the playing pattern and paste it over the playing pattern. Its eight states go along
+  and replace the states of the pattern you paste into.
 - In PATTERN EDIT the random buttons act on **all 8 tracks**. CLR STEPS and CLR LOCKS still clear only the selected
   track.
 
 ### Patterns 1–8
 
 StepRunner-8 holds 8 patterns. A pattern is everything about the 8 tracks: steps, locks and track settings, plus the
-shuffle. Mutes, the PERFORM pads and the states are not part of a pattern.
+shuffle. Every pattern also has its own eight states (see PERFORM). Mutes and the PERFORM pads are not part of a
+pattern.
 
 | Pattern button | Meaning |
 |---|---|
@@ -220,8 +222,8 @@ How to use the pattern buttons:
 - **Tap a pattern while stopped:** it loads immediately.
 - **Tap a pattern while playing:** it is **cued** and comes in when the playing pattern reaches its end. Tap it again
   to cancel the cue.
-- **STORE + tap a pattern:** saves what is playing into that slot.
-- **CLEAR + tap a pattern:** empties it. STORE and CLEAR stay lit until you tap them again.
+- **STORE + tap a pattern:** saves what is playing into that slot, together with its states.
+- **CLEAR + tap a pattern:** empties it and deletes its states. STORE and CLEAR stay lit until you tap them again.
 - **Editing** always changes the pattern that is playing.
 
 ---
@@ -420,9 +422,9 @@ Locks are never changed: they still play on their steps.
   PERFORM ALL with its knobs, and the effect pads. The button turns orange.
 - **Tap a full STATE:** recalls the snapshot instantly while the music keeps playing. A white frame marks the state used
   last.
-- A state belongs to the pattern it was saved on. Recalled while another pattern plays, it switches back to its own
-  pattern and loads the snapshot there; the pattern that was playing is kept as it was, nothing in it is lost. A pattern
-  you had cued is cancelled. One **UNDO** takes the recall back.
+- **Every pattern has its own eight states.** The buttons always show the states of the pattern that is playing; the
+  text under CLEAR STATE says which one (*STATES OF PATTERN 3*). When another pattern comes in, the buttons switch to
+  its states. A state is recalled into its own pattern, so it never overwrites another pattern.
 - **CLEAR STATE + tap a state:** empties it.
 
 ---

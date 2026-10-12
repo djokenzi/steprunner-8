@@ -1637,7 +1637,7 @@ static void vst_tests() {
         CHECK(a->getP(a, P("pf_ctrl")) == 1.0f && !strcmp(d1, "+20") && !strcmp(d2, "-15") && !strcmp(d3, "+0%") && !strcmp(d4, "-20"), "a state saved with PERFORM ALL on brings it back: %s %s %s, pan %s", d1, d2, d3, d4);
         tap("pst1"); CHECK(a->getP(a, P("pf_ctrl")) == 0.0f, "one saved with it off switches it off");
         { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); const char *c = (const char *)cx;
-          CHECK(strstr(c, "\nQ0 t 0 ") && strstr(c, "\nQ0 s 0 ") && strstr(c, "\nQ1 P 1 0 20 0 -20 0 -15 0 0 0 0\n") && strstr(c, "\nQ7 G ") && !strstr(c, "\nQ2 "), "states are saved with the project");
+          CHECK(strstr(c, "\nV00 t 0 ") && strstr(c, "\nV00 s 0 ") && strstr(c, "\nV01 P 1 0 20 0 -20 0 -15 0 0 0 0\n") && strstr(c, "\nV07 G ") && !strstr(c, "\nV02 "), "states are saved with the project");
           std::string sv(c);
           AEffect *b = VSTPluginMain(host);
           b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
@@ -1659,57 +1659,74 @@ static void vst_tests() {
           CHECK(a->getP(a, P("pst1")) == 0.0f, "an old PERFORM-only state (P line) is dropped"); }
     }
 
-    /* v1.0.2: a STATE goes back into the pattern it was saved on; the pattern playing is kept, not overwritten */
+    /* v1.1.0: every PATTERN has its own eight STATEs; COPY / PASTE PTN and STORE take them along, CLEAR empties them */
     {
         auto tap = [&](const char *k) { a->setP(a, P(k), a->getP(a, P(k)) > 0.5f ? 0.0f : 1.0f); blocks(a, 1, ppb); };
-        auto msg = [&](char *m) { a->d(a, 7, P("msg"), 0, m, 0); return m; };
+        auto press = [&](const char *k) { a->setP(a, P(k), 1.0f); blocks(a, 1, ppb); a->setP(a, P(k), 0.0f); blocks(a, 1, ppb); };
         auto vel = [&](char *d) { a->d(a, 7, P("trk_vel"), 0, d, 0); return d; };
         auto cur = [&](int k) { return (int)lroundf(a->getP(a, P(("patv" + std::to_string(k)).c_str())) * 5) - 1 == 2; };
+        auto on = [&](const char *k) { return a->getP(a, P(k)) == 1.0f; };
+        auto spat = [&]() { return (int)lroundf(a->getP(a, P("pst_pat")) * 7) + 1; };
+        auto act = [&]() { return (int)lroundf(a->getP(a, P("pst_act")) * 8); };
         void *c0 = 0; a->d(a, 23, 0, 0, &c0, 0); std::string keep((char *)c0);
         a->d(a, 24, 0, (intptr_t)keep.size(), (void *)keep.c_str(), 0);
         set_int(a, "pclear", 0); set_int(a, "pat_store", 0); set_int(a, "pat_clear", 0);
-        char d1[64], m[64];
-        CHECK(a->getP(a, P("pst1")) == 0.0f && cur(1), "start: STATE 1 empty, pattern 1 playing");
+        char d1[64];
+        CHECK(!on("pst1") && cur(1) && spat() == 1, "start: pattern 1, its states shown (PATTERN %d), STATE 1 empty", spat());
         set_int(a, "track", 0); set_int(a, "trk_vel", 61); a->setP(a, P("step7"), 1.0f); blocks(a, 1, ppb);
         tap("pst1");
-        tap("pat2"); set_int(a, "trk_vel", 42); a->setP(a, P("step3"), 1.0f); blocks(a, 1, ppb);
-        CHECK(cur(2) && !strcmp(vel(d1), "42"), "pattern 2 made (%s)", d1);
-        tap("pst1");
-        CHECK(cur(1) && !strcmp(vel(d1), "61") && a->getP(a, P("step7")) == 1.0f && !strcmp(msg(m), "Pattern 1 Loaded"),
-              "STATE 1 (saved on pattern 1) recalled on pattern 2: pattern 1 plays, as saved (%s, '%s')", d1, m);
         tap("pat2");
-        CHECK(!strcmp(vel(d1), "42") && a->getP(a, P("step3")) == 1.0f, "pattern 2 kept what it had, not overwritten (%s)", d1);
-        tap("pat1"); set_int(a, "trk_vel", 70); blocks(a, 120, ppb);
-        tap("pat2"); tap("pst1"); CHECK(cur(1) && !strcmp(vel(d1), "61"), "recalled again into pattern 1 (%s)", d1);
-        a->setP(a, P("undo"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("undo"), 0.0f); blocks(a, 1, ppb);
-        CHECK(cur(1) && !strcmp(vel(d1), "70"), "one UNDO: pattern 1 as it was before the recall (%s)", d1);
-        tap("pst1"); CHECK(cur(1) && !strcmp(vel(d1), "61"), "on its own pattern: recalled in place (%s)", d1);
-        {   /* playing: at once, and a cued pattern is dropped */
-            const double pb = 128.0 / 44100.0 * 2.0;
-            const int was = g_ti.flags; g_ti.flags = kPlaying | kTempo | kPpq; g_ti.ppqPos = 0.5;
-            tap("pat2"); blocks(a, (int)(80.0 / pb), pb);
-            CHECK(cur(2) || !strcmp(vel(d1), "42"), "playing pattern 2 (%s)", d1);
-            tap("pat3"); CHECK(!strcmp(msg(m), "Pattern 3 Cued"), "pattern 3 cued ('%s')", m);
-            tap("pst1");
-            CHECK(!strcmp(vel(d1), "61") && !strcmp(msg(m), "Pattern 1 Loaded"), "playing: STATE 1 comes in at once, into pattern 1 (%s, '%s')", d1, m);
-            blocks(a, (int)(80.0 / pb), pb);
-            CHECK(!strcmp(vel(d1), "61") && !a->getP(a, P("pat3")), "the cue was dropped: pattern 3 never came in (%s)", d1);
-            g_ti.flags = was; blocks(a, 1, pb);
-        }
-        tap("pat2");
+        CHECK(cur(2) && spat() == 2 && !on("pst1") && act() == 0, "pattern 2: the buttons show its own states (PATTERN %d): STATE 1 empty, no frame", spat());
+        set_int(a, "trk_vel", 42); a->setP(a, P("step3"), 1.0f); blocks(a, 1, ppb);
+        tap("pst1"); set_int(a, "trk_vel", 43); blocks(a, 1, ppb); tap("pst2");
+        CHECK(on("pst1") && on("pst2") && act() == 2, "pattern 2 saves STATE 1 and 2 of its own");
+        tap("pat1");
+        CHECK(cur(1) && spat() == 1 && on("pst1") && !on("pst2") && act() == 1, "back on pattern 1: its STATE 1 only, framed (%d)", act());
+        set_int(a, "trk_vel", 70); blocks(a, 1, ppb);
+        tap("pst1"); CHECK(cur(1) && !strcmp(vel(d1), "61"), "pattern 1's STATE 1 recalls pattern 1's snapshot (%s)", d1);
+        tap("pat2"); tap("pst1"); CHECK(cur(2) && !strcmp(vel(d1), "42"), "pattern 2's STATE 1 its own (%s)", d1);
+        set_int(a, "pattern_edit", 1);
+        press("pat_copy"); tap("pat5"); press("pat_paste");
+        CHECK(cur(5) && on("pst1") && on("pst2") && !on("pst3"), "COPY PTN / PASTE PTN: pattern 5 got pattern 2's states");
+        tap("pst2"); CHECK(!strcmp(vel(d1), "43"), "and they recall (%s)", d1);
+        set_int(a, "pat_store", 1); tap("pat6"); set_int(a, "pat_store", 0);
+        tap("pat6"); CHECK(cur(6) && on("pst1") && on("pst2"), "STORE: pattern 6 got them too");
+        set_int(a, "pat_clear", 1); tap("pat5"); set_int(a, "pat_clear", 0);
+        tap("pat5"); CHECK(cur(5) && !on("pst1") && !on("pst2"), "CLEAR on another pattern: its states are gone");
+        set_int(a, "pat_clear", 1); tap("pat6"); set_int(a, "pat_clear", 0);
+        tap("pat6"); CHECK(cur(6) && !on("pst1") && !on("pst2"), "CLEAR on the pattern playing: its states are gone");
+        tap("pat2"); CHECK(on("pst1") && on("pst2"), "pattern 2 kept its states");
+        set_int(a, "pattern_edit", 0);
+        { const int was = g_ti.flags; g_ti.flags = kPlaying | kTempo | kPpq; g_ti.ppqPos = 0.5;
+          const double pb = 128.0 / 44100.0 * 2.0;
+          tap("pat1"); blocks(a, (int)(80.0 / pb), pb);
+          CHECK(cur(1) || on("pst1"), "playing: pattern 1 came in");
+          CHECK(on("pst1") && !on("pst2") && spat() == 1, "a cued pattern coming in switches the buttons to its states");
+          g_ti.flags = was; blocks(a, 1, pb); }
+        tap("pat1");
         { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); std::string sv((const char *)cx);
-          CHECK(sv.find("\nQ0 W 0\n") != std::string::npos, "saved with the project: the state's pattern (Q0 W 0)");
-          AEffect *b = VSTPluginMain(host); b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+          CHECK(sv.find("\nV00 t 0 ") != std::string::npos && sv.find("\nV11 G ") != std::string::npos && sv.find("\nQ") == std::string::npos && sv.find("\nV02 ") == std::string::npos,
+                "saved with the project: V<pattern><state> lines, no Q lines");
+          auto open = [&](const std::string &txt) { AEffect *b = VSTPluginMain(host); b->d(b, 24, 0, (intptr_t)txt.size(), (void *)txt.c_str(), 0); return b; };
+          auto bon = [&](AEffect *b, const char *k) { return b->getP(b, P(k)) == 1.0f; };
+          auto btap = [&](AEffect *b, const char *k) { b->setP(b, P(k), b->getP(b, P(k)) > 0.5f ? 0.0f : 1.0f); blocks(b, 1, ppb); };
           char e1[64];
-          b->setP(b, P("pst1"), 0.0f); blocks(b, 1, ppb); b->d(b, 7, P("trk_vel"), 0, e1, 0);
-          CHECK(!strcmp(e1, "61") && lroundf(b->getP(b, P("patv1")) * 5) - 1 == 2, "loaded: it still goes into pattern 1 (%s)", e1);
-          b->setP(b, P("pat2"), 0.0f); blocks(b, 1, ppb); b->d(b, 7, P("trk_vel"), 0, e1, 0);
-          CHECK(!strcmp(e1, "42"), "and pattern 2 is untouched (%s)", e1);
+          AEffect *b = open(sv);
+          CHECK(bon(b, "pst1") && !bon(b, "pst2"), "loaded: pattern 1 plays, its STATE 1");
+          btap(b, "pat2"); CHECK(bon(b, "pst1") && bon(b, "pst2"), "pattern 2's two states loaded too");
+          btap(b, "pst2"); b->d(b, 7, P("trk_vel"), 0, e1, 0); CHECK(!strcmp(e1, "43"), "and recall (%s)", e1);
           b->d(b, 1, 0, 0, 0, 0);
-          std::string old = sv; old.erase(old.find("\nQ0 W 0\n"), 7);
-          b = VSTPluginMain(host); b->d(b, 24, 0, (intptr_t)old.size(), (void *)old.c_str(), 0);
-          b->setP(b, P("pst1"), 0.0f); blocks(b, 1, ppb); b->d(b, 7, P("trk_vel"), 0, e1, 0);
-          CHECK(!strcmp(e1, "61") && lroundf(b->getP(b, P("patv2")) * 5) - 1 == 2, "a state from before 1.0.2 (no W line): into the pattern playing, as before (%s)", e1);
+          std::string old = sv; size_t at;   /* a project of 1.0.1: "Q<k>" lines, for the pattern playing */
+          while ((at = old.find("\nV00 ")) != std::string::npos) old.replace(at, 5, "\nQ0 ");
+          b = open(old);
+          CHECK(bon(b, "pst1"), "an older project's state goes to the pattern playing");
+          btap(b, "pst1"); b->d(b, 7, P("trk_vel"), 0, e1, 0); CHECK(!strcmp(e1, "61"), "and recalls (%s)", e1);
+          b->d(b, 1, 0, 0, 0, 0);
+          old += "Q0 W 2\n";   /* 1.0.2: the pattern it was saved on */
+          b = open(old);
+          CHECK(!bon(b, "pst1"), "a 1.0.2 state (W 2) is not pattern 1's");
+          btap(b, "pat3"); CHECK(bon(b, "pst1"), "it is pattern 3's");
+          btap(b, "pst1"); b->d(b, 7, P("trk_vel"), 0, e1, 0); CHECK(!strcmp(e1, "61"), "and recalls there (%s)", e1);
           b->d(b, 1, 0, 0, 0, 0); }
         a->d(a, 24, 0, (intptr_t)keep.size(), (void *)keep.c_str(), 0);
     }

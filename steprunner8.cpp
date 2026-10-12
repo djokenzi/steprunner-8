@@ -162,6 +162,7 @@ enum {
     P_TTL,                                       /* v2.0: read-only, the right panel's title: HIDDEN, SETUP, ST1..8 (TRACK SETUP), RT1..8 (RANDOM) */
     P_ST_RRES,                                   /* v2.1: RATCHET RESOLUTION of the selected steps (AUTO, 1/16 .. 1/80) */
     P_PF_ALT, P_PF_AFILL,                        /* v2.2: PERFORM pads ALT BAR, AUTO FILL (not saved) */
+    P_PST_PAT,                                   /* v1.1.0: read-only, whose STATEs the PERFORM tab shows: P1..P8 (the pattern playing) */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC, NPF = 9 };
@@ -178,7 +179,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"},
 };
 
 static FILE *g_log;
@@ -271,11 +272,12 @@ struct Plugin {
     Track tclip; bool tclip_ok = false;                /* COPY TRK */
     /* STATE 1..8 (v1.68; v1.36-1.67: four, the PERFORM knobs only): the whole sequencer -- every track's steps, locks and
      * setup (as the undo history keeps it), the shuffle, PERFORM ALL with its knobs, CC 117. Mutes stay live. */
-    struct PState { bool full = false; Snap snap; bool pf_on = false; int off[NPF] = {0}; int cc117 = 0; bool mutes = false; bool fx_ok = false; uint32_t fx = 0; int pat = -1; } pst[NSTATES];   /* mutes: the snap holds the mutes too (v2.4); pat: the pattern it was saved on (v1.0.2; -1: older, it goes into the one playing) */
+    struct PState { bool full = false; Snap snap; bool pf_on = false; int off[NPF] = {0}; int cc117 = 0; bool mutes = false; bool fx_ok = false; uint32_t fx = 0; } pst[NPATS][NSTATES];   /* mutes: the snap holds the mutes too (v2.4). v1.1.0: eight STATEs per PATTERN, [pattern][state]; the buttons show the pattern playing's */
+    PState pstclip[NSTATES]; bool pstclip_ok = false;   /* COPY PTN (v1.1.0): the copied pattern's states go with it */
     /* PATTERN 1..8 (v1.69): the tracks (steps, locks, setup, as the undo history keeps them) and the shuffle */
     struct Pat { bool full = false; Snap snap; } pat[NPATS];
     bool patclear = false, patstore = false;
-    int pst_act = -1;   /* the STATE last saved or recalled, -1: none */
+    int pst_act[NPATS] = {-1, -1, -1, -1, -1, -1, -1, -1};   /* per pattern (v1.1.0): the STATE last saved or recalled, -1: none */
     int pat_cue = -1, pat_cur = 0;   /* the pattern that comes in at the end of the one playing (-1: none); the one playing: always one of the eight (v1.75: the sequencer IS that pattern) */
     bool pclear = false;
     int basedraft[NCC] = {0};                          /* EDIT CC: the base values being edited (value + 1, 0 = off) */
@@ -843,7 +845,8 @@ static int value_of(Plugin *w, int i) {
     if (i >= P_PFY0 && i < P_PFY0 + 8) return w->pfy[i - P_PFY0] ? 1 : 0;
     if (i == P_MSTATE) return w->seq.any_muted() ? 1 : 0;
     if (i == P_MSG) return w->msg;
-    if (pst_slot(i) >= 0) return w->pst[pst_slot(i)].full ? 1 : 0;
+    if (pst_slot(i) >= 0) return w->pst[w->pat_cur][pst_slot(i)].full ? 1 : 0;
+    if (i == P_PST_PAT) return w->pat_cur;
     if (i == P_PCLEAR) return w->pclear ? 1 : 0;
     if (i >= P_PAT0 && i < P_PAT_END) return w->pat[i - P_PAT0].full || i - P_PAT0 == w->pat_cur ? 1 : 0;
     if (i == P_PAT_CLEAR) return w->patclear ? 1 : 0;
@@ -922,7 +925,7 @@ static int value_of(Plugin *w, int i) {
     case P_FOLLOW: return w->follow ? 1 : 0;
     case P_STEP_EDIT: return w->step_edit || (w->euclid_edit && w->rmode == 1) ? 1 : 0;   /* lit in TIMING too (STEP EDIT inside), and in EUCLIDIAN over the step locks */
     case P_TIMING_EDIT: return w->timing_edit ? 1 : 0;
-    case P_PST_ACT: return w->pst_act + 1;
+    case P_PST_ACT: return w->pst_act[w->pat_cur] + 1;
     case P_PATV0: case P_PATV0 + 1: case P_PATV0 + 2: case P_PATV0 + 3: case P_PATV0 + 4: case P_PATV0 + 5: case P_PATV0 + 6: case P_PATV0 + 7: {
         const int k = i - P_PATV0;   /* HIDDEN (another panel), EMPTY, FULL, PLAYING (looks like the step under the play-head), CUED */
         if (value_of(w, P_PANEL) != 5) return 0;
@@ -1347,7 +1350,9 @@ static bool snap_empty(const Snap &s) {
     }
     return true;
 }
-static void pat_keep(Plugin *w) { Plugin::Pat &c = w->pat[w->pat_cur]; hist_take(w, c.snap); c.full = !snap_empty(c.snap); }
+static bool pst_any(const Plugin *w, int p) { for (int j = 0; j < NSTATES; j++) if (w->pst[p][j].full) return true; return false; }
+static void pst_clear_pat(Plugin *w, int p) { for (int j = 0; j < NSTATES; j++) w->pst[p][j] = Plugin::PState(); w->pst_act[p] = -1; }
+static void pat_keep(Plugin *w) { Plugin::Pat &c = w->pat[w->pat_cur]; hist_take(w, c.snap); c.full = !snap_empty(c.snap) || pst_any(w, w->pat_cur); }   /* v1.1.0: one with states stays */
 static void blank_tracks(Snap &b) {   /* no steps (and no Euclidean rhythm); the track setup stays */
     for (int t = 0; t < NTRACKS; t++) { std::memset(b.t[t].st, 0, sizeof b.t[t].st); for (int s2 = 0; s2 < NSTEPS; s2++) b.t[t].st[s2].prob = 100; b.t[t].eu_on = 0; }
 }
@@ -1614,7 +1619,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
     const param_t *p = &PARAMS[i];
     { std::lock_guard<std::mutex> lk(w->lock); if (popup_set(w->open, i, n)) { w->close_frames[i] = 0; return; } }   /* v2.12: the audio thread closes lists under the lock too */
     if (!is_own(i) || i == P_RUN) return;
-    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_EU_DIRV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
+    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_PST_PAT || i == P_EU_DIRV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
     if (i >= P_STEP0 && i < P_STEP0 + 16) {
         /* A tap on a TRIGS cell. The host's toggle flips its own value and sends it, so a value that differs from the real
          * one is a tap; the same value is an echo and changes nothing. STEP EDIT off: the tap flips the trig (and selects the
@@ -1665,9 +1670,14 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                 Snap b; hist_take(w, b); blank_tracks(b); w->seq.restore_from(b.t, true);
                 pat_msg(w, MSG_PAT_CLEARED + k, secs3);
             } else if (pt.full) { pt.full = false; pat_msg(w, MSG_PAT_CLEARED + k, secs3); }
+            pst_clear_pat(w, k);   /* v1.1.0: its states go too */
             if (w->pat_cue == k) w->pat_cue = -1;
         } else if (w->patstore) {
-            if (k != w->pat_cur) { pt.full = true; hist_take(w, pt.snap); if (w->pat_cue == k) w->pat_cue = -1; }
+            if (k != w->pat_cur) {
+                pt.full = true; hist_take(w, pt.snap); if (w->pat_cue == k) w->pat_cue = -1;
+                for (int j = 0; j < NSTATES; j++) w->pst[k][j] = w->pst[w->pat_cur][j];   /* v1.1.0: with its states */
+                w->pst_act[k] = -1;
+            }
             pat_msg(w, MSG_PAT_STORED + k, secs3);
         }
         else if (w->pat_cue == k) {   /* changed the mind: the pattern playing goes on */
@@ -1686,30 +1696,21 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
          * shuffle and PERFORM ALL as they were saved; the play position carries on; v2.4: the mutes too. The recall
          * is a step of the undo history like any edit. */
         std::lock_guard<std::mutex> lk(w->lock);
-        Plugin::PState &ps = w->pst[pst_slot(i)];
+        Plugin::PState &ps = w->pst[w->pat_cur][pst_slot(i)];   /* v1.1.0: the pattern playing's own eight */
         if ((n > 0.5f) == ps.full) return;
         const int slot = pst_slot(i);
-        if (w->pclear) { ps.full = false; if (w->pst_act == slot) w->pst_act = -1; }
+        int &act = w->pst_act[w->pat_cur];
+        if (w->pclear) { ps.full = false; if (act == slot) act = -1; }
         else if (!ps.full) {
-            ps.full = true; w->pst_act = slot;
+            ps.full = true; act = slot;
             hist_take(w, ps.snap);
             for (int t = 0; t < NTRACKS; t++) ps.snap.t[t].mute = w->seq.t[t].mute;   /* v2.4: the mutes as well */
             ps.mutes = true;
             ps.fx = fx_take(w); ps.fx_ok = true;   /* v2.5: the effect pads as well */
             ps.pf_on = w->seq.pf_on;
             for (int k = 0; k < NPF; k++) ps.off[k] = w->seq.pf_on ? w->seq.pf_off[k] : 0;
-            ps.pat = w->pat_cur;   /* v1.0.2: the pattern it belongs to */
         } else {
-            w->pst_act = slot;
-            /* v1.0.2: a state goes back into the pattern it was saved on, at once (playing or not). The one playing is
-             * kept first (pat_load), so it is not overwritten; a cued pattern is dropped. The undo history of the
-             * state's pattern starts from what that pattern held, so one UNDO takes the recall back. */
-            if (w->pat_cue >= 0) { if (w->msg == MSG_PAT_CUED + w->pat_cue) { w->msg = 0; w->msg_frames = 0; } w->pat_cue = -1; }
-            if (ps.pat >= 0 && ps.pat < NPATS && ps.pat != w->pat_cur) {
-                pat_load(w, ps.pat);
-                pat_msg(w, MSG_PAT_LOADED + ps.pat, (int)(3.0f * w->sample_rate));
-                hist_take(w, w->hist_done); w->hist_seen = w->hist_done; w->hist_quiet = 0; w->hist_init = true;
-            }
+            act = slot;   /* a state of the pattern playing goes back into it (v1.1.0: another pattern's are not shown) */
             PfSnap snap(w);
             w->seq.pf_clear();   /* the offsets of now go; the state's own come back below */
             w->seq.restore_from(ps.snap.t, !ps.mutes);   /* v2.4: and its mutes (a state saved before keeps the mutes of now) */
@@ -1766,7 +1767,12 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
              * MIDI channel, note and CC numbers), every other mode = the shown page of the selected track. */
             const int secs2 = (int)(2.0f * w->sample_rate);
             /* v2.0: COPY / PASTE are the page's again in PATTERN EDIT; the whole pattern has its own three buttons there */
-            if (i == P_PAT_COPY) { hist_take(w, w->ptclip); w->ptclip_ok = true; pat_msg(w, MSG_PCOPIED + w->pat_cur, secs2); }
+            if (i == P_PAT_COPY) {
+                hist_take(w, w->ptclip); w->ptclip_ok = true;
+                for (int j = 0; j < NSTATES; j++) w->pstclip[j] = w->pst[w->pat_cur][j];   /* v1.1.0: and its states */
+                w->pstclip_ok = true;
+                pat_msg(w, MSG_PCOPIED + w->pat_cur, secs2);
+            }
             if (i == P_PAT_CLRALL) {   /* CLEAR PTN: no steps on any track of the pattern playing; UNDO takes it back */
                 Snap b; hist_take(w, b); blank_tracks(b); w->seq.restore_from(b.t, true);
                 pat_msg(w, MSG_PAT_CLEARED + w->pat_cur, secs2);
@@ -1777,6 +1783,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                     w->seq.restore_from(w->ptclip.t, true); w->seq.shuffle = w->ptclip.shuffle;
                     if (w->seq.pf_on) std::memcpy(w->seq.pf_bak, w->seq.t, sizeof w->seq.t);
                     snap.send(w);
+                    if (w->pstclip_ok) { for (int j = 0; j < NSTATES; j++) w->pst[w->pat_cur][j] = w->pstclip[j]; w->pst_act[w->pat_cur] = -1; }   /* v1.1.0: the states replace this pattern's (UNDO does not bring them back) */
                     pat_keep(w);
                     pat_msg(w, MSG_PPASTED + w->pat_cur, secs2);
                 }
@@ -1969,7 +1976,7 @@ struct ChunkSrc {
     bool follow = false, step_edit = false;
     std::string ccname[NTRACKS][NCC]; int ccname_cc[NTRACKS][NCC] = {};
     std::string src; uint64_t inst_id = 0;
-    Plugin::PState pst[NSTATES]; Plugin::Pat pat[NPATS];
+    Plugin::PState pst[NPATS][NSTATES]; Plugin::Pat pat[NPATS];
 };
 static void chunk_take(const Plugin *w, ChunkSrc &c) {   /* under the lock */
     c.seq = w->seq;
@@ -1977,7 +1984,7 @@ static void chunk_take(const Plugin *w, ChunkSrc &c) {   /* under the lock */
     c.follow = w->follow; c.step_edit = w->step_edit;
     for (int ti = 0; ti < NTRACKS; ti++) for (int j = 0; j < NCC; j++) { c.ccname[ti][j] = w->ccname[ti][j]; c.ccname_cc[ti][j] = w->ccname_cc[ti][j]; }
     c.src = w->src; c.inst_id = w->inst_id;
-    for (int k = 0; k < NSTATES; k++) c.pst[k] = w->pst[k];
+    for (int p = 0; p < NPATS; p++) for (int k = 0; k < NSTATES; k++) if (w->pst[p][k].full) c.pst[p][k] = w->pst[p][k];   /* only the full ones (the copy is made under the lock) */
     for (int k = 0; k < NPATS; k++) c.pat[k] = w->pat[k];
 }
 static void chunk_write(const ChunkSrc *w, std::string &s) {
@@ -1997,9 +2004,10 @@ static void chunk_write(const ChunkSrc *w, std::string &s) {
     if (!w->src.empty()) s += "S " + w->src + "\n";   /* READ PROJECT target (v1.39.0) */
     { char ib[40]; std::snprintf(ib, sizeof ib, "I %016llx\n", (unsigned long long)w->inst_id); s += ib; }   /* v1.62.0 */
     write_tracks(q->t, s, "");
-    for (int k = 0; k < NSTATES; k++) if (w->pst[k].full) {   /* STATE k+1 (v1.68.0): "Q<k> " + the lines of a project */
-        const Plugin::PState &ps = w->pst[k];
-        const std::string pre = "Q" + std::to_string(k) + " ";
+    for (int pp = 0; pp < NPATS; pp++) for (int k = 0; k < NSTATES; k++) if (w->pst[pp][k].full) {
+        /* STATE k+1 of PATTERN pp+1 (v1.1.0): "V<pp><k> " + the lines of a project (v1.68.0-1.0.2: "Q<k> ", one set of eight) */
+        const Plugin::PState &ps = w->pst[pp][k];
+        const std::string pre = "V" + std::to_string(pp) + std::to_string(k) + " ";
         int m = 0; for (int i = 0; i < NTRACKS; i++) m |= (ps.snap.t[i].shuf ? 1 : 0) << i;
         s += pre + "G " + std::to_string(ps.snap.shuffle) + " " + std::to_string(m) + "\n";
         std::string l = pre + "P " + std::to_string(ps.pf_on ? 1 : 0);
@@ -2007,7 +2015,6 @@ static void chunk_write(const ChunkSrc *w, std::string &s) {
         s += l + " " + std::to_string(ps.cc117) + "\n";
         if (ps.mutes) s += pre + "U 1\n";   /* v2.4: the t lines' mutes are the state's */
         if (ps.fx_ok) s += pre + "E " + std::to_string(ps.fx) + "\n";   /* v2.5: its effect pads (bits of FX_PADS) */
-        if (ps.pat >= 0) s += pre + "W " + std::to_string(ps.pat) + "\n";   /* v1.0.2: the pattern it belongs to (older versions skip the line) */
         write_tracks(ps.snap.t, s, pre);
     }
     s += "W " + std::to_string(w->pat_cur) + "\n";   /* the pattern playing (v1.75.0): the tracks above are it */
@@ -2169,9 +2176,28 @@ static bool chunk_read(Plugin *w, const std::string &s) {
     w->seq.shuffle = 50;   /* projects from before v1.21.0 have no G line */
     hist_reset(w);   /* a loaded project starts a new history */
     w->cc117 = 0; w->shift = false; w->cc_edit = false; w->pclear = false; w->src.clear(); w->src_mode = 0; w->shuf_edit = false; w->clr_mode = false; src_name(w); for (int ti = 0; ti < NTRACKS; ti++) for (int j = 0; j < NCC; j++) w->ccname[ti][j].clear(); w->src_gen++;
-    for (int k = 0; k < NSTATES; k++) w->pst[k] = Plugin::PState();
-    w->pst_act = -1;
-    std::unique_ptr<Seq> stq[NSTATES], ptq[NPATS];   /* the states and patterns as they are read */
+    for (int pp = 0; pp < NPATS; pp++) { pst_clear_pat(w, pp); }
+    w->pstclip_ok = false;
+    std::unique_ptr<Seq> stq[NSTATES], ptq[NPATS], stv[NPATS][NSTATES];   /* the states and patterns as they are read (stq: v1.68.0-1.0.2 "Q" states) */
+    std::unique_ptr<Plugin::PState[]> oldps(new Plugin::PState[NSTATES]);   /* "Q" states: their pattern is known at the end */
+    int qpat[NSTATES]; for (int k = 0; k < NSTATES; k++) qpat[k] = -1;   /* a "Q" state's W sub-line (v1.0.2), -1: the pattern playing */
+    auto state_line = [&](Plugin::PState &ps, std::unique_ptr<Seq> &sq, const std::string &rest, int *qp) {   /* one of a STATE's lines */
+        if (!sq) sq.reset(new Seq());
+        Seq &q = *sq;
+        if (rest.size() > 2 && rest[0] == 'G') {
+            int g0 = 50, g1 = 255;
+            if (std::sscanf(rest.c_str() + 1, "%d %d", &g0, &g1) >= 1) { q.shuffle = (uint8_t)clampi(g0, 50, SHUFFLE_MAX); for (int i = 0; i < NTRACKS; i++) q.t[i].shuf = (g1 >> i) & 1; }
+        } else if (rest.size() > 2 && rest[0] == 'U') { ps.mutes = true;   /* v2.4 */
+        } else if (rest.size() > 2 && rest[0] == 'W' && rest[1] == ' ') { if (qp) *qp = clampi(std::atoi(rest.c_str() + 2), 0, NPATS - 1);   /* v1.0.2 */
+        } else if (rest.size() > 2 && rest[0] == 'E') { unsigned long m = 0; if (std::sscanf(rest.c_str() + 1, "%lu", &m) == 1) { ps.fx = (uint32_t)m; ps.fx_ok = true; }   /* v2.5 */
+        } else if (rest.size() > 2 && rest[0] == 'P') {
+            int o[NPF] = {0}, on = 0, cc = 0;
+            if (std::sscanf(rest.c_str() + 1, "%d %d %d %d %d %d %d %d %d %d %d", &on, &o[0], &o[1], &o[2], &o[3], &o[4], &o[5], &o[6], &o[7], &o[8], &cc) == 11) {
+                ps.pf_on = on != 0; ps.cc117 = clampi(cc, 0, 127);
+                for (int j = 0; j < NPF; j++) ps.off[j] = clampi(o[j], (int)PARAMS[P_PF0 + j].min, (int)PARAMS[P_PF0 + j].max);
+            }
+        } else track_line(q, rest, sb);
+    };
     for (int k = 0; k < NPATS; k++) w->pat[k] = Plugin::Pat();
     w->patclear = w->patstore = false; w->pat_cue = -1; w->pat_cur = 0;
     for (int i = 0; i < NTRACKS; i++) w->seq.t[i].shuf = 1;
@@ -2212,25 +2238,12 @@ static bool chunk_read(Plugin *w, const std::string &s) {
                 for (int i = 0; i < NTRACKS; i++) w->seq.t[i].shuf = (a[1] >> i) & 1;
             }
 
-        } else if (line.size() > 3 && line[0] == 'Q' && line[1] >= '0' && line[1] < '0' + NSTATES && line[2] == ' ') {   /* a STATE's line (v1.68.0) */
+        } else if (line.size() > 3 && line[0] == 'Q' && line[1] >= '0' && line[1] < '0' + NSTATES && line[2] == ' ') {   /* a STATE's line (v1.68.0-1.0.2) */
             const int k = line[1] - '0';
-            const std::string rest = line.substr(3);
-            if (!stq[k]) stq[k].reset(new Seq());
-            Seq &q = *stq[k];
-            Plugin::PState &ps = w->pst[k];
-            if (rest.size() > 2 && rest[0] == 'G') {
-                int g0 = 50, g1 = 255;
-                if (std::sscanf(rest.c_str() + 1, "%d %d", &g0, &g1) >= 1) { q.shuffle = (uint8_t)clampi(g0, 50, SHUFFLE_MAX); for (int i = 0; i < NTRACKS; i++) q.t[i].shuf = (g1 >> i) & 1; }
-            } else if (rest.size() > 2 && rest[0] == 'U') { ps.mutes = true;   /* v2.4 */
-            } else if (rest.size() > 2 && rest[0] == 'W' && rest[1] == ' ') { ps.pat = clampi(std::atoi(rest.c_str() + 2), 0, NPATS - 1);   /* v1.0.2 */
-            } else if (rest.size() > 2 && rest[0] == 'E') { unsigned long m = 0; if (std::sscanf(rest.c_str() + 1, "%lu", &m) == 1) { ps.fx = (uint32_t)m; ps.fx_ok = true; }   /* v2.5 */
-            } else if (rest.size() > 2 && rest[0] == 'P') {
-                int o[NPF] = {0}, on = 0, cc = 0;
-                if (std::sscanf(rest.c_str() + 1, "%d %d %d %d %d %d %d %d %d %d %d", &on, &o[0], &o[1], &o[2], &o[3], &o[4], &o[5], &o[6], &o[7], &o[8], &cc) == 11) {
-                    ps.pf_on = on != 0; ps.cc117 = clampi(cc, 0, 127);
-                    for (int j = 0; j < NPF; j++) ps.off[j] = clampi(o[j], (int)PARAMS[P_PF0 + j].min, (int)PARAMS[P_PF0 + j].max);
-                }
-            } else track_line(q, rest, sb);
+            state_line(oldps[k], stq[k], line.substr(3), &qpat[k]);
+        } else if (line.size() > 4 && line[0] == 'V' && line[1] >= '0' && line[1] < '0' + NPATS && line[2] >= '0' && line[2] < '0' + NSTATES && line[3] == ' ') {   /* v1.1.0 */
+            const int pp = line[1] - '0', k = line[2] - '0';
+            state_line(w->pst[pp][k], stv[pp][k], line.substr(4), nullptr);
         } else if (line.size() >= 3 && line[0] == 'W' && line[1] == ' ') {   /* the pattern playing */
             w->pat_cur = clampi(std::atoi(line.c_str() + 2), 0, NPATS - 1);
         } else if (line.size() > 3 && line[0] == 'Z' && line[1] >= '0' && line[1] < '0' + NPATS && line[2] == ' ') {   /* a PATTERN's line (v1.69.0) */
@@ -2246,7 +2259,16 @@ static bool chunk_read(Plugin *w, const std::string &s) {
     }
     for (int k = 0; k < NPATS; k++) if (ptq[k]) { w->pat[k].full = true; snap_of(*ptq[k], w->pat[k].snap); }
     w->pat[w->pat_cur].full = true;   /* the tracks of the project are it (projects from before v1.75: pattern 1) */
-    for (int k = 0; k < NSTATES; k++) if (stq[k]) { w->pst[k].full = true; snap_of(*stq[k], w->pst[k].snap); if (w->pst[k].mutes) for (int t = 0; t < NTRACKS; t++) w->pst[k].snap.t[t].mute = stq[k]->t[t].mute; }
+    auto state_end = [&](Plugin::PState &ps, const Seq &q) { ps.full = true; snap_of(q, ps.snap); if (ps.mutes) for (int t = 0; t < NTRACKS; t++) ps.snap.t[t].mute = q.t[t].mute; };
+    for (int pp = 0; pp < NPATS; pp++) for (int k = 0; k < NSTATES; k++) if (stv[pp][k]) state_end(w->pst[pp][k], *stv[pp][k]);
+    for (int k = 0; k < NSTATES; k++) if (stq[k]) {   /* an older project's state: into the pattern it was saved on (1.0.2), else the one playing */
+        const int pp = qpat[k] >= 0 ? qpat[k] : w->pat_cur;
+        if (w->pst[pp][k].full) continue;   /* (a V line has it already) */
+        w->pst[pp][k] = oldps[k]; state_end(w->pst[pp][k], *stq[k]);
+    }
+    for (int pp = 0; pp < NPATS; pp++) if (!w->pat[pp].full && pst_any(w, pp)) {   /* a pattern with states is a pattern: no steps, as an empty one comes in */
+        Snap b; hist_take(w, b); fresh_tracks(b); w->pat[pp].snap = b; w->pat[pp].full = true;
+    }
     if (w->seq.playing) for (int i = 0; i < NTRACKS; i++) w->seq.align(w->seq.t[i], w->seq.virt(w->song));
     return true;
 }
@@ -2270,7 +2292,7 @@ static intptr_t dispatcher(AEffect *e, int32_t op, int32_t idx, intptr_t v, void
     case effGetVendorString: copy_str(p, PLUG_VENDOR, 32); return 1;
     case effGetVendorVersion: return PLUG_VERSION;
     case effGetVstVersion: return 2400;
-    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_EU_DIRV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
+    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_PST_PAT && idx != P_EU_DIRV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
     case effGetParamName:
         /* Names are static. On the device (v1.11.0) names that followed the track were shown as they were when the plugin
          * loaded and never refreshed, audioMasterUpdateDisplay or not; so whatever changes goes into the VALUE text

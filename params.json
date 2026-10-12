@@ -3183,6 +3183,21 @@
     "ON"
    ],
    "default": 0
+  },
+  {
+   "key": "pst_pat",
+   "name": "States Pattern",
+   "options": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P8"
+   ],
+   "default": 0
   }
  ]
 }

@@ -176,6 +176,7 @@ trig("pat_copy", "Copy Pattern"); trig("pat_paste", "Paste Pattern"); trig("pat_
 opt("ttl", "Panel Title Look", ["HIDDEN", "SETUP"] + ["ST%d" % k for k in range(1, 9)] + ["RT%d" % k for k in range(1, 9)])   # read-only, v2.0.0
 opt("st_rres", "Ratchet Resolution", ["AUTO", "1/16", "1/32", "1/48", "1/64", "1/80"])   # v2.1.0: hits per step of the RATCHET
 opt("pf_alt", "Alt Bar", onoff); opt("pf_afill", "Auto Fill", onoff)   # v2.2.0 PERFORM pads
+opt("pst_pat", "States Pattern", ["P%d" % k for k in range(1, 9)])   # read-only, v1.1.0: whose STATEs the PERFORM tab shows (the pattern playing)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")
