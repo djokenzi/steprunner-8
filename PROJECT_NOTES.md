@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.0.1 (2026-10-12): SETUP shows the logo instead of the RND / CLR buttons; not yet tried on the device.
+Status: v1.0.2 (2026-10-12): a STATE goes back into the pattern it was saved on; not yet tried on the device. v1.0.1: SETUP shows the logo instead of the RND / CLR buttons.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -246,6 +246,18 @@ Parameters are a window onto the pattern. STEPS tab, top to bottom:
 
 StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.12.0). The whole Trig Seq history
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
+
+### v1.0.2 (2026-10-12)
+- STATE and PATTERN: a state remembers the pattern it was saved on (`PState::pat`, chunk sub-line `Q<k> W <pattern>`;
+  older versions skip it as an unknown track line). Before, a recall wrote the snapshot into whatever pattern was
+  playing, so recalling STATE 1 (saved on pattern 2) while on pattern 3 overwrote pattern 3. Now a recall on another
+  pattern keeps the playing one (`pat_load`), switches to the state's pattern at once (also while playing; no cue) and
+  loads the snapshot there; a cued pattern is dropped (also on the state's own pattern). `pat_load` resets the undo
+  history, so the recall re-seeds `hist_done` from the loaded pattern: one UNDO restores that pattern as it was before
+  the recall. States from before 1.0.2 (`pat = -1`) still go into the pattern playing. Message: "Pattern N Loaded".
+  Tests added. vst.json 10002, release.sh 1.0.2.
+- test.sh works with newer mpc-vst-plugins tools too: their `gen_vst.gen_params` reads the vst.json folder from
+  `sys.argv[1]` (CC 20-35 / NRPN map), so test.sh sets it. Checked against the pinned c16b824 and upstream main (36f3fba).
 
 ### v1.0.1 (2026-10-12)
 - SETUP, TRACK SETUP, RANDOM SETUP and the map list: the left section shows the StepRunner-8 logo (`art/logo.png`,

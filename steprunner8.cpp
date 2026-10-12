@@ -271,7 +271,7 @@ struct Plugin {
     Track tclip; bool tclip_ok = false;                /* COPY TRK */
     /* STATE 1..8 (v1.68; v1.36-1.67: four, the PERFORM knobs only): the whole sequencer -- every track's steps, locks and
      * setup (as the undo history keeps it), the shuffle, PERFORM ALL with its knobs, CC 117. Mutes stay live. */
-    struct PState { bool full = false; Snap snap; bool pf_on = false; int off[NPF] = {0}; int cc117 = 0; bool mutes = false; bool fx_ok = false; uint32_t fx = 0; } pst[NSTATES];   /* mutes: the snap holds the mutes too (v2.4) */
+    struct PState { bool full = false; Snap snap; bool pf_on = false; int off[NPF] = {0}; int cc117 = 0; bool mutes = false; bool fx_ok = false; uint32_t fx = 0; int pat = -1; } pst[NSTATES];   /* mutes: the snap holds the mutes too (v2.4); pat: the pattern it was saved on (v1.0.2; -1: older, it goes into the one playing) */
     /* PATTERN 1..8 (v1.69): the tracks (steps, locks, setup, as the undo history keeps them) and the shuffle */
     struct Pat { bool full = false; Snap snap; } pat[NPATS];
     bool patclear = false, patstore = false;
@@ -1698,8 +1698,18 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
             ps.fx = fx_take(w); ps.fx_ok = true;   /* v2.5: the effect pads as well */
             ps.pf_on = w->seq.pf_on;
             for (int k = 0; k < NPF; k++) ps.off[k] = w->seq.pf_on ? w->seq.pf_off[k] : 0;
+            ps.pat = w->pat_cur;   /* v1.0.2: the pattern it belongs to */
         } else {
             w->pst_act = slot;
+            /* v1.0.2: a state goes back into the pattern it was saved on, at once (playing or not). The one playing is
+             * kept first (pat_load), so it is not overwritten; a cued pattern is dropped. The undo history of the
+             * state's pattern starts from what that pattern held, so one UNDO takes the recall back. */
+            if (w->pat_cue >= 0) { if (w->msg == MSG_PAT_CUED + w->pat_cue) { w->msg = 0; w->msg_frames = 0; } w->pat_cue = -1; }
+            if (ps.pat >= 0 && ps.pat < NPATS && ps.pat != w->pat_cur) {
+                pat_load(w, ps.pat);
+                pat_msg(w, MSG_PAT_LOADED + ps.pat, (int)(3.0f * w->sample_rate));
+                hist_take(w, w->hist_done); w->hist_seen = w->hist_done; w->hist_quiet = 0; w->hist_init = true;
+            }
             PfSnap snap(w);
             w->seq.pf_clear();   /* the offsets of now go; the state's own come back below */
             w->seq.restore_from(ps.snap.t, !ps.mutes);   /* v2.4: and its mutes (a state saved before keeps the mutes of now) */
@@ -1997,6 +2007,7 @@ static void chunk_write(const ChunkSrc *w, std::string &s) {
         s += l + " " + std::to_string(ps.cc117) + "\n";
         if (ps.mutes) s += pre + "U 1\n";   /* v2.4: the t lines' mutes are the state's */
         if (ps.fx_ok) s += pre + "E " + std::to_string(ps.fx) + "\n";   /* v2.5: its effect pads (bits of FX_PADS) */
+        if (ps.pat >= 0) s += pre + "W " + std::to_string(ps.pat) + "\n";   /* v1.0.2: the pattern it belongs to (older versions skip the line) */
         write_tracks(ps.snap.t, s, pre);
     }
     s += "W " + std::to_string(w->pat_cur) + "\n";   /* the pattern playing (v1.75.0): the tracks above are it */
@@ -2211,6 +2222,7 @@ static bool chunk_read(Plugin *w, const std::string &s) {
                 int g0 = 50, g1 = 255;
                 if (std::sscanf(rest.c_str() + 1, "%d %d", &g0, &g1) >= 1) { q.shuffle = (uint8_t)clampi(g0, 50, SHUFFLE_MAX); for (int i = 0; i < NTRACKS; i++) q.t[i].shuf = (g1 >> i) & 1; }
             } else if (rest.size() > 2 && rest[0] == 'U') { ps.mutes = true;   /* v2.4 */
+            } else if (rest.size() > 2 && rest[0] == 'W' && rest[1] == ' ') { ps.pat = clampi(std::atoi(rest.c_str() + 2), 0, NPATS - 1);   /* v1.0.2 */
             } else if (rest.size() > 2 && rest[0] == 'E') { unsigned long m = 0; if (std::sscanf(rest.c_str() + 1, "%lu", &m) == 1) { ps.fx = (uint32_t)m; ps.fx_ok = true; }   /* v2.5 */
             } else if (rest.size() > 2 && rest[0] == 'P') {
                 int o[NPF] = {0}, on = 0, cc = 0;

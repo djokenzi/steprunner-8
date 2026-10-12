@@ -7,7 +7,7 @@ MPC_VST="${MPC_VST:-../..}"
 mkdir -p build
 python3 gen_params.py
 python3 -c "
-import sys, json; sys.path.insert(0, '$MPC_VST/tools')
+import sys, json; sys.path.insert(0, '$MPC_VST/tools'); sys.argv = [sys.argv[0], 'vst.json']   # newer tools read vst.json's folder from argv[1]
 import gen_vst, params, shadow_skin
 cfg = gen_vst.load('vst.json'); pl, _ = params.load('params.json')
 gen_vst.gen_params(cfg, pl + shadow_skin.popup_params('layout.conf', pl), 'build/params.h')"

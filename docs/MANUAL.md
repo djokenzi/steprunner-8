@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.0.1 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
+Version 1.0.2 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
@@ -420,6 +420,9 @@ Locks are never changed: they still play on their steps.
   PERFORM ALL with its knobs, and the effect pads. The button turns orange.
 - **Tap a full STATE:** recalls the snapshot instantly while the music keeps playing. A white frame marks the state used
   last.
+- A state belongs to the pattern it was saved on. Recalled while another pattern plays, it switches back to its own
+  pattern and loads the snapshot there; the pattern that was playing is kept as it was, nothing in it is lost. A pattern
+  you had cued is cancelled. One **UNDO** takes the recall back.
 - **CLEAR STATE + tap a state:** empties it.
 
 ---
