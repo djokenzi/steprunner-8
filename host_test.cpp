@@ -671,8 +671,8 @@ static void vst_tests() {
     const double ppb = (120.0 / 60.0) * (128.0 / 44100.0);
 
     a->d(a, 48, 0, 0, name, 0); a->d(a, 47, 0, 0, disp, 0);   /* effGetProductString, effGetVendorString */
-    CHECK(a->uid == 0x53522D38 && !strcmp(name, "StepRunner-8") && !strcmp(disp, "djokenzi") && a->ver == 10000,
-          "StepRunner-8 v1.0.0: uid 'SR-8', product '%s', vendor '%s', version %d", name, disp, a->ver);
+    CHECK(a->uid == 0x53522D38 && !strcmp(name, "StepRunner-8") && !strcmp(disp, "djokenzi") && a->ver == PLUG_VERSION && PLUG_VERSION >= 10000,
+          "StepRunner-8 v1.x: uid 'SR-8', product '%s', vendor '%s', version %d", name, disp, a->ver);
     a->d(a, 8, P("st_cond"), 0, name, 0); CHECK(!strcmp(name, "Condition"), "param name '%s'", name);
     a->d(a, 7, P("trk_num"), 0, disp, 0); CHECK(!strcmp(disp, "36"), "T1 note '%s'", disp);
     a->d(a, 7, P("st_vel"), 0, disp, 0);  CHECK(!strcmp(disp, "--"), "no velocity lock shows '%s'", disp);
@@ -1543,7 +1543,7 @@ static void vst_tests() {
         auto pr = [&](const char *k) { a->setP(a, P(k), 1.0f); blocks(a, 1, ppb); a->setP(a, P(k), 0.0f); blocks(a, 1, ppb); };
         set_int(a, "track", 0); set_int(a, "page", 0); set_int(a, "timing_edit", 1); blocks(a, 1, ppb);
         CHECK(a->getP(a, P("timing_edit")) == 1.0f && a->getP(a, P("step_edit")) == 1.0f, "TIMING on: its button lit, and STEP EDIT's too (v1.0.0)");
-        CHECK(lroundf(a->getP(a, P("lpanel")) * 3) == 3 && lroundf(a->getP(a, P("ptitle")) * 9) == 9, "the TIMING section on the left, its own title");
+        CHECK(lroundf(a->getP(a, P("lpanel")) * 4) == 3 && lroundf(a->getP(a, P("ptitle")) * 9) == 9, "the TIMING section on the left, its own title");
         set_int(a, "sel", 3); pr("tm_right"); pr("tm_right");
         a->d(a, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "Timing: +2"), "two taps on the right arrow: '%s'", m);
         for (int k = 0; k < 30; k++) pr("tm_left");
@@ -2335,6 +2335,16 @@ static void preset_tests() {
             set_int(f, "timing_edit", 1); CHECK(lit("timing_edit") && lit("step_edit") && one(), "TIMING: STEP EDIT stays lit");
             set_int(f, "global_edit", 1); set_int(f, "random_edit", 1); set_int(f, "random_edit", 0);
             CHECK(lit("global_edit") && !lit("random_edit") && one(), "RANDOM SETUP off: back to SETUP");
+            {   /* v1.0.1: SETUP (and RANDOM SETUP) show the logo on the left, no RND / CLR buttons */
+                set_int(f, "global_edit", 1);
+                const int lp = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                set_int(f, "random_edit", 1);
+                const int lp2 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb2 = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                set_int(f, "pattern_edit", 1);
+                const int lp3 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb3 = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                CHECK(lp == 4 && lb == 4 && lp2 == 4 && lb2 == 4 && lp3 == 0 && lb3 == 0,
+                      "SETUP / RANDOM SETUP: logo, no RND buttons (%d %d, %d %d); PATTERN EDIT: RND / CLR again (%d %d)", lp, lb, lp2, lb2, lp3, lb3);
+            }
             set_int(f, "track_edit", 1);   /* the tests below start from TRACK EDIT */
         }
         {   /* v2.4.0: a STATE holds the mutes too, and keeps them through a save */

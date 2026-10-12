@@ -279,3 +279,8 @@ if os.path.exists(FONT):
 
 if os.path.exists(FONT):   # v1.83.0: RANDOM SETUP in the SETUP panel (opens the random settings)
     btn("RANDOM SETUP", GREY, False, BTN_W=250, BTN_H=44).save("images/rnd_setup.png"); btn("RANDOM SETUP", GREY, True, BTN_W=250, BTN_H=44).save("images/rnd_setup_on.png")
+
+# v1.0.1: the StepRunner-8 logo for the left section on SETUP (art/logo.png is 476x335, the size of the section's frame;
+# 1 px is cropped all round so the frame's own border stays visible)
+_logo = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "art", "logo.png")).convert("RGB")
+_logo.crop((1, 1, _logo.width - 1, _logo.height - 1)).resize((474, 333), Image.LANCZOS).save("images/logo.png")

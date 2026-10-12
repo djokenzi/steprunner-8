@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.0.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
+Version 1.0.1 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
@@ -114,7 +114,7 @@ Tapping a cell **toggles the trig** in PATTERN EDIT, TRACK EDIT, SETUP and EUCLI
 | **FETCH NOTES** | Reads the pad notes from the saved project ([3.3](#33-fetch-notes-and-fetch-cc-values)) |
 | **FETCH CC VALUES** | Reads the pads' current values from the saved project ([3.3](#33-fetch-notes-and-fetch-cc-values)) |
 
-On this screen the random and clear buttons on the left act on the **selected track**.
+The left side of the SETUP screens shows the StepRunner-8 logo; the random and clear buttons are not shown here.
 
 ### 3.1 TRACK SETUP
 
@@ -338,10 +338,10 @@ The values come from *Random Min … Max* in RANDOM SETUP. What the buttons act 
 | Mode | Acts on |
 |---|---|
 | PATTERN EDIT | All 8 tracks, each with its own random settings |
-| TRACK EDIT, SETUP | The selected track |
+| TRACK EDIT | The selected track |
 | STEP EDIT | Only the selected steps (RND STEPS is off) |
 
-In PATTERN EDIT, TRACK EDIT and SETUP the lock buttons change only *Random Density* % of the steps that have a trig.
+In PATTERN EDIT and TRACK EDIT the lock buttons change only *Random Density* % of the steps that have a trig.
 
 - **CLR STEPS**: empties the selected track (trigs, conditions, locks, timing). Its settings stay.
 - **CLR LOCKS**: a switch. While it is lit (red), the buttons turn into CLR VEL, CLR LEN, CLR PAN and CLR CC 1–5.

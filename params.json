@@ -1465,7 +1465,8 @@
     "RANDOM",
     "EUCLID",
     "HIDDEN",
-    "TIMING"
+    "TIMING",
+    "LOGO"
    ],
    "default": 0
   },

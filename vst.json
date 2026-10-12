@@ -2,7 +2,7 @@
   "name": "StepRunner-8",
   "vendor": "djokenzi",
   "uid": "SR-8",
-  "version": 10000,
+  "version": 10001,
   "so": "steprunner8.so",
   "params": "params.json",
   "layout": "layout.conf",

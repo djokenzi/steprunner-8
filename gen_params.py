@@ -71,7 +71,7 @@ opt("random_edit", "Random Edit", onoff)
 num("trk_ccbase", "CC Base", 0, 123, 20)
 # appended v1.12.0: Euclidean generator. EUCLIDIAN is the fourth mode; the eu_* controls belong to the selected track.
 opt("euclid_edit", "Euclidian", onoff)
-opt("lpanel", "Left Panel", ["RANDOM", "EUCLID", "HIDDEN", "TIMING"])          # read-only, for the skin: what the left-hand section shows
+opt("lpanel", "Left Panel", ["RANDOM", "EUCLID", "HIDDEN", "TIMING", "LOGO"])          # read-only, for the skin: what the left-hand section shows
 opt("eu_enable", "Euclid Enable", onoff)                    # ON while the selected track's trigs come from the generator
 num("eu_pl1", "Pulse", 0, 64, 4)
 num("eu_ro1", "Rotate", 0, 63, 0)

@@ -4,8 +4,8 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.0.0 (2026-10-10) = Trig Seq v2.12.0 (tested on the device, all OK) under a new name and a new VST id;
-v1.0.0 itself not yet tried on the device. Offline test passes (`./test.sh`, ASan/UBSan).
+Status: v1.0.1 (2026-10-12): SETUP shows the logo instead of the RND / CLR buttons; not yet tried on the device.
+v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
 
@@ -246,6 +246,14 @@ Parameters are a window onto the pattern. STEPS tab, top to bottom:
 
 StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.12.0). The whole Trig Seq history
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
+
+### v1.0.1 (2026-10-12)
+- SETUP, TRACK SETUP, RANDOM SETUP and the map list: the left section shows the StepRunner-8 logo (`art/logo.png`,
+  476x335 = the frame; gen_cell_imgs.py crops 1 px all round into `images/logo.png`, drawn as a frame picture
+  `when=lpanel:LOGO`) instead of the RND / CLR buttons and the "RANDOM PATTERN / CLEAR PATTERN" title. `lpanel`
+  (read-only) got a fifth option LOGO; `lbtn` is NONE there. Test added. vst.json 10001, release.sh 1.0.1.
+- Manual: SETUP no longer has random buttons; version 1.0.1.
+- Logo replaced (2026-10-12) with the user's second version (subtler bottom line); manual screenshots not retaken.
 
 ### v1.0.0 (2026-10-10) – Trig Seq v2.12.0 renamed
 - New plugin identity: name "StepRunner-8", VST id `SR-8` (0x53522D38; Trig Seq was `TrSq`), version 1.0.0 (vst.json

@@ -905,12 +905,12 @@ static int value_of(Plugin *w, int i) {
     case P_TRK_BWD: return (tr.dir & DIR_PP) == DIR_BWD ? 1 : 0;
     case P_TRK_CCBASE: return tr.ccbase;
     case P_EUCLID_EDIT: return w->euclid_edit ? 1 : 0;
-    case P_LPANEL: return w->timing_edit ? 3 : w->euclid_edit ? 1 : 0;
+    case P_LPANEL: return w->timing_edit ? 3 : w->euclid_edit ? 1 : (w->global_edit || w->random_edit) ? 4 : 0;   /* v1.0.1: SETUP (and its sub-panels) shows the logo, no RND / CLR buttons */
     case P_CLR_MODE: return w->clr_mode ? 1 : 0;
     case P_BKSTEP: return 0;   /* the backup step is gone (v1.64.0) */
     case P_BIGMSG: return w->big;
     case P_BIGDONE: return w->big > BIG_DONE0 ? 1 : 0;
-    case P_LBTN: return w->euclid_edit || w->timing_edit ? 4 : w->clr_mode ? 3 : w->step_edit ? 1 : w->track_edit ? 2 : 0;   /* ORANGE / TEAL / VIOLET / CLR (red) / NONE */
+    case P_LBTN: return w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit ? 4 : w->clr_mode ? 3 : w->step_edit ? 1 : w->track_edit ? 2 : 0;   /* ORANGE / TEAL / VIOLET / CLR (red) / NONE */
     case P_EU_ENABLE: return tr.eu_on ? 1 : 0;
     case P_EU_PL1: return tr.eu_pl1;
     case P_EU_RO1: return tr.eu_ro1;
