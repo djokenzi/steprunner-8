@@ -472,17 +472,17 @@ The MIDI port is **StepRunner-8**. A second StepRunner-8 in the same project use
 
 - Up to 100 undo steps. A knob sweep counts as one step.
 - Covered: steps, locks, track settings, random and clear buttons, pastes, COMMIT and state recalls.
-- Not covered: mutes, effect pads and pattern store/clear.
+- Not covered: mutes, effect pads, pattern store/clear, and the states a PASTE PTN or CLEAR replaces or deletes.
 - Loading another pattern clears the history.
 
 ### Saved with the MPC project
 
-- Saved: all patterns, the states, mutes, the FILL pad, the CREATE DEFAULT MAP target, and the screen you were on.
+- Saved: all patterns with their states, mutes, the FILL pad, the CREATE DEFAULT MAP target, and the screen you were on.
 - Not saved: the undo history, the clipboards and the effect pads.
 
 ### Limits and tips
 
-- 8 tracks, 64 steps per track, 8 patterns, 8 states.
+- 8 tracks, 64 steps per track, 8 patterns, 8 states per pattern (64 in all).
 - Pages do not follow the play-head; watch the bar on the page buttons.
 - 1ST and A:B count from the start of the MPC sequence: start playback from the beginning to hear them as intended.
 - A log for troubleshooting is kept on the MPC in `/tmp/steprunner8.log`.

@@ -21,7 +21,7 @@ A short demo, and how to map StepRunner-8 to a drum program:
 - Euclidean generator per track, random generators for trigs and every lock
 - 8 patterns (cue the next one while playing), pattern length, shuffle, copy / paste of steps, pages, tracks and patterns
 - PERFORM tab: mutes, live effects (loops, fill, humanize, build, echo, ghost notes, fade out …), PERFORM ALL
-  offsets and 8 STATE slots that recall the whole sequencer
+  offsets and 8 STATE slots per pattern that recall the whole sequencer
 - CC locks go back to the pad's own value after the locked step (base values)
 - CREATE DEFAULT MAP writes MIDI Learn mappings for the CC locks into your saved MPC project, so the CC knobs drive the
   pads of a drum program without mapping each one by hand
