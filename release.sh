@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Package the built plugin as one installable zip: dist/StepRunner-8-<version>-mpc-armv7.zip
 # (install.sh / uninstall.sh, the plugin folder, INSTALL.md). Run ./build.sh first.
-#   ./release.sh [version]        default version: 1.1.0
+#   ./release.sh [version]        default version: 1.1.1
 # Uses mpc-vst-plugins' tools/release.py unchanged. MPC_VST = that checkout (default ../..).
 set -euo pipefail
 cd "$(dirname "$0")"
 MPC_VST="$(cd "${MPC_VST:-../..}" && pwd)"
-VERSION="${1:-1.1.0}"
+VERSION="${1:-1.1.1}"
 SKIN="build/skin/djokenzi - VST - StepRunner-8"
 for f in build/steprunner8.so build/pluginlist-entry.xml "$SKIN/Plugin Skins/TUI.json"; do
   [ -e "$f" ] || { echo "missing $f: run ./build.sh first" >&2; exit 1; }

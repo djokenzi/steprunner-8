@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.1.0 (2026-10-12): every PATTERN has its own eight STATEs; not yet tried on the device. v1.0.2 (a STATE goes back into its own pattern) was built but never published; 1.1.0 replaces it. v1.0.1: SETUP shows the logo.
+Status: v1.1.1 (2026-10-13): low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -246,6 +246,19 @@ Parameters are a window onto the pattern. STEPS tab, top to bottom:
 
 StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.12.0). The whole Trig Seq history
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
+
+### v1.1.1 (2026-10-13)
+- Low-RAM skin, after a user report: opening the plugin window added about 25-30% RAM on the MPC. MPC decodes every
+  picture of the skin when the window opens. The 1.1.0 skin had 1244 pictures, 110 of them full-screen, about 385 MB
+  decoded (RGBA). Most were the 48 "N VALUES MAPPED" messages: each a full-screen button, and the skin tool writes a
+  button's on and off picture separately even when they are the same file.
+  - The DONE message is now one full-screen button `big_done_bg` (`when=bigdone:ON`, a title band with no text) plus a
+    small button per count (`big_done_t1..48`, 880x86, cut from the full picture so it lies exactly over the band,
+    `when=bigmsg:DONEn`, also `key=msg_ok`). gen_cell_imgs.py makes them; `images/big_done1..48.png` are gone.
+  - `skin_dedupe.py` (run by build.sh after gen_vst.py) keeps one file per picture content, points the skin JSON at it
+    (plain text replacement of the quoted names) and deletes the copies: 707 copies removed.
+  - Result: 539 pictures, 10 full-screen, about 61 MB decoded. The plugin binary and its behaviour are unchanged.
+- vst.json 10101, release.sh 1.1.1.
 
 ### v1.1.0 (2026-10-12)
 - STATE per PATTERN: `Plugin::pst[NPATS][NSTATES]` (was eight for the whole sequencer), `pst_act[NPATS]`. The STATE

@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.1.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
+Version 1.1.1 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a

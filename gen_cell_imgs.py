@@ -205,6 +205,7 @@ Image.new("RGBA", (440, 38), (255, 255, 255, 1)).save("images/src_hit.png")
 Image.new("RGBA", (1280, 628), (255, 255, 255, 1)).save("images/hit_full.png")   # see-through, whole screen: a tap outside the CONDITION list closes it
 # The big message (v1.64.0): over the whole PROGRAM tab (1280 x 628, the tab's area), the tab dimmed around a box with a
 # coloured title band. One picture per message; the DONE ones per count (1..48). v2.7.0: no backup line (no backup since v2.0).
+DONE_TITLE = (200, 70, 1080, 156)   # the DONE title's box in the big picture: x0, y0, x1, y1 (layout: y + 86)
 if os.path.exists(FONT):
     BOLD = FONT.replace("SemiBold", "Bold")
     def big(name, head, lines, col, done=False):
@@ -227,9 +228,15 @@ if os.path.exists(FONT):
     big("nodrum", "NO DRUM TRACK", ["The project has no drum track to map.", "Add a drum program, save it and try again."], RED)
     big("nothing", "NOTHING NEW TO MAP", ["Every CC or pad parameter is mapped already.", "The project was not changed."], AMBER)
     big("fail", "PROJECT NOT WRITTEN", ["The project could not be written.", "The project was not changed."], RED)
+    # v1.1.1 (low RAM): MPC decodes every skin picture when the window opens, and 48 full-screen DONE pictures (x2: on and
+    # off) were most of it. Now one shared DONE picture with an empty title band (big_done_bg) plus a small title picture
+    # per count (big_done_t1..48), cut from the full picture so it lies exactly over the band.
+    DONE_LINES = ["Please close the project and open it again.", "Do not save it first, or the map is lost."]
+    big("done_bg", "", DONE_LINES, BTN_GREEN, True)
     for n in range(1, 49):   # v1.93.0: up to 48 (6 per track)
-        big("done%d" % n, "%d VALUE%s MAPPED" % (n, "" if n == 1 else "S"),
-            ["Please close the project and open it again.", "Do not save it first, or the map is lost."], BTN_GREEN, True)
+        big("done_tmp", "%d VALUE%s MAPPED" % (n, "" if n == 1 else "S"), DONE_LINES, BTN_GREEN, True)
+        Image.open("images/big_done_tmp.png").convert("RGB").crop(DONE_TITLE).save("images/big_done_t%d.png" % n, optimize=True)
+    os.remove("images/big_done_tmp.png")
 
 # PATTERN EDIT: CLEAR / STORE, TIMING (the PATTERN 1..8 cells are the patc pictures further down)
 if os.path.exists(FONT):

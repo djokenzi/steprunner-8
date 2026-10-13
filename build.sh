@@ -18,6 +18,7 @@ python3 gen_params.py
 docker build -q -t mpc-vst-html-art "$MPC_VST/tools/html_art" >/dev/null
 docker run --rm -u "$U" -e HOME=/tmp -v "$PWD":/w -v "$MPC_VST":/mv:ro -w /w mpc-vst-html-art \
   python3 /mv/tools/gen_vst.py vst.json
+for d in build/skin/*/"Plugin Skins"; do python3 skin_dedupe.py "$d"; done   # v1.1.1: identical pictures share one file (less RAM on the MPC)
 cp "$MPC_VST/wrapper/popup.h" build/
 
 # 2. the plugin (armhf, glibc 2.31 (bullseye) so it loads on MPC OS 2.x (2.32) and 3.x (2.39))
