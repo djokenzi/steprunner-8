@@ -71,3 +71,9 @@ Developer notes are in `PROJECT_NOTES.md`; the history (it started as "Trig Seq"
 ## License
 
 MIT, see [LICENSE](LICENSE). Community software, not affiliated with or endorsed by Akai Professional.
+
+## Support
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PP5SH6BWF8WW8)
+
+If StepRunner-8 is useful in your MPC workflow, you can support further development with a donation. Thanks! 🙏
