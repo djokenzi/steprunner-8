@@ -74,6 +74,6 @@ MIT, see [LICENSE](LICENSE). Community software, not affiliated with or endorsed
 
 ## Support
 
-[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PP5SH6BWF8WW8)
+StepRunner-8 is free and developed in my spare time. If it's earned a place in your MPC workflow and you enjoy using it, a small donation helps keep new features coming.
 
-If StepRunner-8 is useful in your MPC workflow, you can support further development with a donation. Thanks! 🙏
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PP5SH6BWF8WW8)
