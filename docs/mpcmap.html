@@ -438,7 +438,10 @@ function srUse(i){   // load the CC numbers and channel of instance i into CC se
   const sr=S.sr[i];
   if(!sr){CC_SRC=CC_DEF;CH_SRC=CH_DEF;ccSet(CC_DEF);chSet(CH_DEF);msg($('srinfo'),'No StepRunner-8 in this project: StepRunner-8 default CC numbers are used.','');return}
   CC_SRC=sr.cc;CH_SRC=sr.ch.map(c=>c+1);ccSet(sr.cc);
-  chSet(sr.ch.map(c=>c+1));const chs=[...new Set(sr.ch)];
+  chSet(sr.ch.map(c=>c+1));srInfo(i);
+}
+function srInfo(i){   // the message above CC setup, from the instances as they are now (also after Apply changed a channel)
+  const sr=S.sr[i];if(!sr)return;const chs=[...new Set(sr.ch)];
   let txt=`CC numbers and MIDI channels read from ${sr.plugin} on track "${sr.name}" (`+(chs.length===1?`channel ${chs[0]+1}`:`channels ${sr.ch.map(c=>c+1).join(', ')}`)+').';
   let cls='ok';
   if(S.sr.length>1)txt=`${S.sr.length} StepRunner-8 instances in this project. `+txt;
@@ -582,7 +585,7 @@ function tsApply(){
     const st=srWithCh(sr,doCh?chs:null,doNt?notes:null);
     const sp=st&&spanOf(S.text,['data','tracks',sr.ti,'program','plugin','plugin','state']);
     if(sp){S.pend['state'+sr.ti]=[sp[0],sp[1],JSON.stringify(st)];sr.state=st;
-      if(doCh){sr.ch=chs.map(c=>c-1);CH_SRC=[...chs];srFill();$('srinst').value=S.sr.indexOf(sr)}}
+      if(doCh){sr.ch=chs.map(c=>c-1);CH_SRC=[...chs];srFill();$('srinst').value=S.sr.indexOf(sr);srInfo(S.sr.indexOf(sr))}}
     else if(st){extra.push(`could not find the state of ${sr.name}; it was not changed`);warn=true}
     if(!st||sp){
       if(doCh)extra.push(`${sr.name} sends on `+([...new Set(chs)].length===1?`channel ${chs[0]}`:`channels ${chs.join(', ')}`));
