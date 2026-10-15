@@ -131,8 +131,6 @@ input[type=checkbox]{accent-color:var(--acc)}
       <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="autofill"> Auto-fill the column from the first chosen parameter (e.g. "1 Tune" → "2 Tune", "3 Tune"…; "BD Tune" → "SN Tune", "LT Tune"…)</label>
       <span class="info" id="afinfo"></span>
     </div>
-    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="setsr" checked> Set this StepRunner-8 to send on these MIDI channels</label>
-    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="setnote" checked> <span id="notelbl">Set StepRunner-8 track notes to the program's pads</span></label>
     <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="setin" checked> Target track receives MIDI only from this StepRunner-8 (its port and channel)</label>
   </div>
   <div class="row" style="margin-top:14px">
@@ -423,7 +421,7 @@ function spanOf(text,path){
   ws();return [i,scan(text,i)];
 }
 const progNotes=()=>{const t=S&&S.trk.find(x=>x.name===$('track').value);return t?t.notes:[36,37,38,39,40,41,42,43]};
-function noteLbl(){$('notelbl').textContent=`Set StepRunner-8 track notes to the program's pads A01–A08 (notes ${progNotes().join(', ')})`}
+function noteLbl(){}
 const srPort=sr=>sr.slot?`StepRunner-8 ${sr.slot+1} MIDI Out`:'StepRunner-8 MIDI Out';
 function srRoute(sr,ch){   // MPC remembers MIDI inputs by name; the id is the ALSA client:port (taken from the project when known)
   const name=srPort(sr),known=S.trk.map(t=>t.route&&t.route.inputPort).find(p=>p&&p.deviceName===name&&p.deviceId);
@@ -580,7 +578,7 @@ function tsApply(){
   const pl=n=>n===1?'':'s';
   const extra=[];let warn=byTarget>0;
   const sr=S.sr[+$('srinst').value],chs=[0,1,2,3,4,5,6,7].map(chv);
-  const doCh=$('setsr').checked,doNt=$('setnote').checked,notes=progNotes();
+  const doCh=true,doNt=true,notes=progNotes();   // StepRunner-8 always gets the channels from CC setup and the program's pad notes
   if(sr&&(doCh||doNt)){
     const st=srWithCh(sr,doCh?chs:null,doNt?notes:null);
     const sp=st&&spanOf(S.text,['data','tracks',sr.ti,'program','plugin','plugin','state']);

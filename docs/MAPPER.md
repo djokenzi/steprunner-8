@@ -156,18 +156,21 @@ Below the knobs are the options, then the **Apply to project** button.
 ![Options and the result of Apply](mapper/07-apply.png)
 
 - **Auto-fill the column…** (plugin tracks only): see [Auto-fill](#auto-fill).
-- **Set this StepRunner-8 to send on these MIDI channels:** writes the channels from CC setup into StepRunner-8 in the
-  project: the playing pattern and all stored patterns and states. Without this, the mappings would listen on a
-  channel StepRunner-8 does not send on.
-- **Set StepRunner-8 track notes to the program's pads A01–A08:** sets the note of each StepRunner-8 track to the
-  note of pads A01–A08 of the target track. The notes are read from the project and shown next to the checkbox.
-  Drum programs normally use notes 36–43. Plugin instruments use notes **0–7** for their first eight pads.
 - **Target track receives MIDI only from this StepRunner-8 (its port and channel):** sets the target track's MIDI
   input to StepRunner-8's port (`StepRunner-8 MIDI Out`; a second instance is `StepRunner-8 2 MIDI Out`) and to
   its channel. If the eight tracks use different channels, the input is set to all channels.
 
 Click **Apply to project**. For every knob with a parameter, the Mapper creates a mapping from that track's channel
-and CC to the chosen parameter. Before adding them, it removes:
+and CC to the chosen parameter. It also sets up the chosen StepRunner-8 instance in the project, so it matches the
+mappings:
+
+- **MIDI channels:** StepRunner-8 sends on the channels from CC setup, in the playing pattern and in all stored
+  patterns and states.
+- **Notes:** each StepRunner-8 track plays the note of its pad (T1 → A01 … T8 → A08) on the target track. The notes
+  are read from the project. Drum programs normally use notes 36–43; plugin instruments use notes **0–7** for their
+  first eight pads.
+
+Before adding the new mappings, it removes:
 
 - older mappings on the same target track that use the same channel and CC numbers, and
 - older mappings that point at the same parameter from another channel or CC (for example from another StepRunner-8
@@ -215,8 +218,8 @@ The rest of the project is left exactly as it was.
 - **"No parameter list for plugin …"**: only the plugins listed in [section 5](#5-mapping-a-plugin-instrument) have
   built-in parameter lists.
 - **Firmware warning**: the project was saved on a firmware other than 3.9.1.2. Test on a copy.
-- **A knob does nothing**: check in CC setup that the channel matches the channel StepRunner-8 sends on, or tick
-  *Set this StepRunner-8 to send on these MIDI channels*. Also check that the step actually has a CC lock.
+- **A knob does nothing**: check that the step actually has a CC lock, and that the right StepRunner-8 instance and
+  target track were chosen when you clicked Apply.
 - **Two StepRunner-8 instances move the same parameter**: they send the same CC on the same channel. Give each
   instance its own MIDI channel and apply again.
 - **"Save over original" is greyed out**: the browser cannot write to files, or the file was dragged in. Use
