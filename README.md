@@ -39,7 +39,8 @@ Map StepRunner-8's CC locks to any drum pad or plugin parameter in your browser,
   - [User guide](docs/MAPPER.md)
     
 See it in action in the demo video on YouTube: 
-  - [![StepRunner-8 MPC Mapper demo](https://img.youtube.com/vi/wTp898KZE78/hqdefault.jpg)](https://www.youtube.com/watch?v=wTp898KZE78)
+
+[![StepRunner-8 MPC Mapper demo](https://img.youtube.com/vi/wTp898KZE78/hqdefault.jpg)](https://www.youtube.com/watch?v=wTp898KZE78)
 
 ## Install
 
