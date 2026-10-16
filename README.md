@@ -38,6 +38,8 @@ Map StepRunner-8's CC locks to any drum pad or plugin parameter in your browser,
   - [Open the Mapper](https://djokenzi.github.io/steprunner-8/mpcmap.html)
   - [User guide](docs/MAPPER.md)
 
+    [![StepRunner-8 MPC Mapper demo](https://img.youtube.com/vi/wTp898KZE78/hqdefault.jpg)](https://www.youtube.com/watch?v=wTp898KZE78)
+
 ## Install
 
 Download `StepRunner-8-<version>-mpc-armv7.zip` from [Releases](../../releases) and follow `INSTALL.md` inside the
