@@ -2,6 +2,7 @@
 
 **StepRunner-8 MPC Mapper** is a small editor that runs in your web browser:
 **[open the StepRunner-8 MPC Mapper](https://djokenzi.github.io/steprunner-8/mpcmap.html)**. Nothing to install.
+See it in action in the [demo video on YouTube](https://www.youtube.com/watch?v=wTp898KZE78).
 
 It writes MIDI Learn
 mappings straight into a saved MPC project (`.xpj`). With those mappings, the CC locks of StepRunner-8 control
