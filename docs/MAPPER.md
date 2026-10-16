@@ -83,8 +83,8 @@ You can map a different parameter on every pad, for example Tuning on the kick a
 
 ![Drum program with auto-fill](mapper/03-drum.png)
 
-To map the same parameter on all eight pads, tick **Auto-fill the column from the first chosen parameter** (below the
-table) and pick the parameter in the first row: the pads below get the same parameter. For example, *Filter Cutoff*
+To map the same parameter on all eight pads, just pick it in the first row: **Auto-fill** (on by default, below the
+table) gives the pads below the same parameter. For example, *Filter Cutoff*
 on A01 fills A02–A08 with *Filter Cutoff*, each pad on its own track's CC. See [Auto-fill](#auto-fill) for details.
 
 The **Pan knob** column is mapped to each pad's **Pan [517]** by default. Choose *—* to leave a cell unmapped.
@@ -110,9 +110,9 @@ Parameter lists are built in for these plugins: **DrumSynth**, **6W6**, **8W8**,
 
 ### Auto-fill
 
-Auto-fill works for drum programs and plugin instruments. Tick **Auto-fill the column from the first chosen
-parameter** (below the table), then pick a parameter in the first row of a column. The Mapper fills in the rows below
-it:
+Auto-fill works for drum programs and plugin instruments. **Auto-fill the column from the first chosen parameter**
+(below the table) is on by default: pick a parameter in the first row of a column, and the Mapper fills in the rows
+below it:
 
 - **Drum program:** the same parameter on the pads below (*Filter Cutoff* on A01 → *Filter Cutoff* on A02–A08).
 
@@ -125,8 +125,9 @@ usually goes "kick tune, snare tune, tom tune…":
   `BD Tune` → `SN Tune`, `LT Tune`, `MT Tune`… (9W9).
 
 Auto-fill starts from the first chosen cell of a column and overwrites the cells below it. Rows where no matching
-parameter is found are left empty. A line under the checkbox says how many rows were filled. Ticking the box when
-columns already have a first value fills those columns at once. You can still change any cell by hand afterwards.
+parameter is found are left empty. A line under the checkbox says how many rows were filled. You can still change any cell by
+hand afterwards. To fill cells one by one without auto-fill, untick the box; ticking it again fills the columns that
+already have a first value at once.
 
 ## 6. CC setup
 
