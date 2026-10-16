@@ -115,9 +115,9 @@ input[type=checkbox]{accent-color:var(--acc)}
     <label class="wide">Program<select id="track"></select></label>
   </div>
   <div id="drum">
-    <div class="row" style="margin:12px 0 0">
+    <div class="row" style="margin:12px 0 0" hidden>
       <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:13px">Knob targets
-        <select id="drmode"><option value="same">same parameter on all 8 tracks</option><option value="per">different parameter per track</option></select></label>
+        <select id="drmode"><option value="per">different parameter per track</option></select></label>
     </div>
     <div class="knobs" id="knobs"></div>
     <div id="drgridw" hidden><div class="tw" style="margin-top:12px"><table id="drgrid"></table></div></div>
@@ -128,7 +128,7 @@ input[type=checkbox]{accent-color:var(--acc)}
   </div>
   <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
     <div id="afrow" hidden style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-      <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="autofill"> Auto-fill the column from the first chosen parameter (e.g. "1 Tune" → "2 Tune", "3 Tune"…; "BD Tune" → "SN Tune", "LT Tune"…)</label>
+      <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="autofill"> <span id="aflbl">Auto-fill the column from the first chosen parameter</span></label>
       <span class="info" id="afinfo"></span>
     </div>
     <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="setin" checked> Target track receives MIDI only from this StepRunner-8 (its port and channel)</label>
@@ -502,21 +502,24 @@ function afSeq(i0,count){
   for(let i=i0+1;i<names.length&&out.length<count;i++){const x=names[i]||'',q=x.indexOf(' ');if(q<0)continue;const w=x.slice(0,q);if(x.slice(q)===rest&&!seen.has(w)){seen.add(w);out.push(i)}}
   return out;
 }
+const afP=()=>isPlug()?'pg':'dk';   // which table auto-fill works on
 function autofill(t0,k){
   if(!$('autofill').checked)return;
-  const v=$('pg'+t0+'_'+k).value;if(!v)return;
-  for(let t=0;t<t0;t++)if($('pg'+t+'_'+k).value)return;   // only from the first chosen cell of the column
-  const seq=afSeq(+v-4096,7-t0);let found=0;
-  for(let j=0;j<7-t0;j++){const i=seq[j];const el=$('pg'+(t0+1+j)+'_'+k);el.value=i!==undefined&&i>=0?String(4096+i):'';if(el.value)found++}
+  const P=afP(),v=$(P+t0+'_'+k).value;if(!v)return;
+  for(let t=0;t<t0;t++)if($(P+t+'_'+k).value)return;   // only from the first chosen cell of the column
+  let found=0;
+  if(P==='dk'){for(let t=t0+1;t<8;t++){$('dk'+t+'_'+k).value=v;found++}}   // drum program: the same parameter on the pads below
+  else{const seq=afSeq(+v-4096,7-t0);
+  for(let j=0;j<7-t0;j++){const i=seq[j];const el=$('pg'+(t0+1+j)+'_'+k);el.value=i!==undefined&&i>=0?String(4096+i):'';if(el.value)found++}}
   $('afinfo').textContent=`Knob column ${k<5?k+1:'Pan'}: filled ${found} of ${7-t0} tracks below T${t0+1}.`;
 }
-$('autofill').addEventListener('change',()=>{if(!$('autofill').checked)return;for(const k of KN)for(let t=0;t<8;t++)if($('pg'+t+'_'+k)&&$('pg'+t+'_'+k).value){autofill(t,k);break}tsPreview()});
+$('autofill').addEventListener('change',()=>{if(!$('autofill').checked)return;const P=afP();for(const k of KN)for(let t=0;t<8;t++)if($(P+t+'_'+k)&&$(P+t+'_'+k).value){autofill(t,k);break}tsPreview()});
 // ---- drum program, "different parameter per track": one list per track and knob (pad = A01..A08 as T1..T8)
 const DR_OPTS='<option value="">—</option>'+GROUPS.map((g,gi)=>`<optgroup label="${g}">${PARAMS.filter(p=>pgrp(p[0])===gi).map(p=>`<option value="${p[0]}">${esc(p[1])} [${p[0]}]</option>`).join('')}</optgroup>`).join('');
 $('drgrid').innerHTML='<thead><tr><th>Track</th>'+[1,2,3,4,5].map(k=>`<th class="kh"><span class="dial"></span>CC knob ${k}</th>`).join('')+'<th class="kh"><span class="dial"></span>Pan knob</th></tr></thead><tbody>'+
   [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1} · ${padName(t)}</td>`+KN.map(k=>`<td><select id="dk${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${DR_OPTS}</select><span class="cc" id="dkc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
-for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).addEventListener('change',tsPreview);
-const perTrack=()=>$('drmode').value==='per';
+for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).addEventListener('change',()=>{autofill(t,k);tsPreview()});
+const perTrack=()=>true;   // drum programs: always one parameter per track and knob (auto-fill copies it down)
 const dkVals=()=>[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>$('dk'+t+'_'+k).value));
 function drShow(){$('knobs').hidden=perTrack();$('drgridw').hidden=!perTrack()}
 $('drmode').addEventListener('change',()=>{
@@ -525,7 +528,9 @@ $('drmode').addEventListener('change',()=>{
   drShow();tsPreview();
 });
 function tsMode(){
-  const pl=isPlug();$('drum').hidden=pl;$('plug').hidden=!pl;$('afrow').hidden=!pl;$('afrow').style.display=pl?'flex':'none';if(!pl)drShow();
+  const pl=isPlug();$('drum').hidden=pl;$('plug').hidden=!pl;$('afrow').hidden=false;$('afrow').style.display='flex';if(!pl)drShow();
+  $('aflbl').textContent=pl?'Auto-fill the column from the first chosen parameter (e.g. "1 Tune" → "2 Tune", "3 Tune"…; "BD Tune" → "SN Tune", "LT Tune"…)'
+    :'Auto-fill the column from the first chosen parameter (the same parameter on the pads below: A01 Filter Cutoff → A02…A08 Filter Cutoff)';$('afinfo').textContent='';
   if(pl){
     const name=S.plug[$('track').value],known=!!PLUG[name];
     msg($('plugnote'),known?`Plugin ${name}: ${PLUG[name].filter(Boolean).length} parameters. Pick a parameter per knob for each StepRunner-8 track.`:`No parameter list for plugin "${name}". A probe project for it is needed, as for the others.`,known?'':'warn');
@@ -549,7 +554,7 @@ function tsFromProject(){ // fill the knobs from what the project already has
   }
   const v=dkVals(),same=KN.every(k=>v.every(r=>r[k]===v[0][k]));
   for(const k of KN)$('kn'+k).value=v[0][k];
-  $('drmode').value=same?'same':'per';drShow();
+  $('drmode').value='per';drShow();
   tsPreview();
 }
 function tsApply(){

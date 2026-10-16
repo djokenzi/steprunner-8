@@ -77,15 +77,17 @@ The rest of the section changes with the kind of target track you pick.
 StepRunner-8 track **T1** plays pad **A01**, T2 plays A02, and so on up to T8 and A08. Each track has five CC knobs
 and a pan knob, and each knob sends its own CC number.
 
-### Same parameter on all 8 tracks
+When the target is a drum program, you get a table with one row per StepRunner-8 track and its pad (T1 · A01 …
+T8 · A08) and one column per knob. Pick a pad parameter in each cell. Under each menu is the CC number that knob sends.
+You can map a different parameter on every pad, for example Tuning on the kick and Filter Cutoff on the hi-hat.
 
-With **Knob targets: same parameter on all 8 tracks**, you get one card per knob. Pick a pad parameter for the knob,
-and it is mapped on all eight pads A01–A08, each pad on its own track's CC. Under each menu you can see which CC
-goes to which pad.
+![Drum program with auto-fill](mapper/03-drum.png)
 
-![Drum program, same parameter on all tracks](mapper/03-drum-same.png)
+To map the same parameter on all eight pads, tick **Auto-fill the column from the first chosen parameter** (below the
+table) and pick the parameter in the first row: the pads below get the same parameter. For example, *Filter Cutoff*
+on A01 fills A02–A08 with *Filter Cutoff*, each pad on its own track's CC. See [Auto-fill](#auto-fill) for details.
 
-The **PAN KNOB** is mapped to the pad's **Pan [517]** by default. Choose *— not mapped —* to leave a knob out.
+The **Pan knob** column is mapped to each pad's **Pan [517]** by default. Choose *—* to leave a cell unmapped.
 
 The parameter list is grouped the way the MPC shows it in MIDI Learn:
 
@@ -95,13 +97,6 @@ The parameter list is grouped the way the MPC shows it in MIDI Learn:
   MIDI Learn menu. They may or may not have an effect.
 
 The number in brackets is the MPC's internal parameter ID.
-
-### Different parameter per track
-
-Choose **Knob targets: different parameter per track** to pick the parameter for every track and knob separately,
-for example Tuning on the kick and Filter Cutoff on the hi-hat. The table starts from what the cards had.
-
-![Drum program, different parameter per track](mapper/04-drum-per-track.png)
 
 ## 5. Mapping a plugin instrument
 
@@ -115,9 +110,14 @@ Parameter lists are built in for these plugins: **DrumSynth**, **6W6**, **8W8**,
 
 ### Auto-fill
 
-Most drum plugins have the same parameter for each of their instruments, so a column usually goes "kick tune,
-snare tune, tom tune…". Tick **Auto-fill the column from the first chosen parameter** (below the table), then pick a
-parameter in the first row of a column. The Mapper fills in the rows below it:
+Auto-fill works for drum programs and plugin instruments. Tick **Auto-fill the column from the first chosen
+parameter** (below the table), then pick a parameter in the first row of a column. The Mapper fills in the rows below
+it:
+
+- **Drum program:** the same parameter on the pads below (*Filter Cutoff* on A01 → *Filter Cutoff* on A02–A08).
+
+Most drum plugins have the same parameter for each of their instruments, so for a **plugin instrument** a column
+usually goes "kick tune, snare tune, tom tune…":
 
 - If the name has a number, the number counts up: `Slot 1 Tune` → `Slot 2 Tune` … `Slot 8 Tune` (TR-MPC),
   `1 Tune` → `2 Tune` … (DrumSynth).
@@ -155,7 +155,7 @@ Below the knobs are the options, then the **Apply to project** button.
 
 ![Options and the result of Apply](mapper/07-apply.png)
 
-- **Auto-fill the column…** (plugin tracks only): see [Auto-fill](#auto-fill).
+- **Auto-fill the column…**: see [Auto-fill](#auto-fill).
 - **Target track receives MIDI only from this StepRunner-8 (its port and channel):** sets the target track's MIDI
   input to StepRunner-8's port (`StepRunner-8 MIDI Out`; a second instance is `StepRunner-8 2 MIDI Out`) and to
   its channel. If the eight tracks use different channels, the input is set to all channels.
