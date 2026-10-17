@@ -294,7 +294,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
   by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). It follows the panel that shows the
   buttons (`panel` TRACK or PATTERN), so it works under EUCLIDIAN too; nothing in STEP EDIT.
-- The step cells are green in EUCLIDIAN even while no generator is on (they took the PATTERN EDIT orange before).
+- The step cells are green only while a generator runs; in EUCLIDIAN with none on they take the colour of the mode under
+  it (`rmode`: STEP EDIT teal, TRACK EDIT violet, PATTERN EDIT orange; before they always took the orange).
+- Arrows: `navv` (read-only NONE / RIGHT / LEFT) dims the arrow with no page that way (`nav_left_dim` / `nav_right_dim`).
+- RND CC 6 / RND CC 7 (`rnd_cc6`, `rnd_cc7`, appended; Seq::R_CC0 + 5 / 6) on page 1 in a row of their own (cy 409)
+  under RND CC 3-5, in every mode colour; CLR CC 6 / 7 with CLR LOCKS lit. CLR STEPS / CLR LOCKS moved to cy 474, over
+  the section's bottom edge (the owner tidies that in the layout editor).
 - CC 6 and CC 7 per track: `NCC` 7 (data), `NCC_V1` 5 (the CC BASE block, the saved step bytes, the CC 1-5
   parameters, which stay where they are). Default numbers 46 + track / 54 + track (`CC67_DEFAULT`, `Track::tix`): LSB
   slots of the undefined controllers 14..29; with CC 1-5 and pan, 64 different numbers on one channel, none of the
@@ -305,6 +310,10 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   `sends`), 8 mappings a track, so DONE goes to 64 (`bigmsg` DONE49..64, `big_done_t49..64`); FETCH CC VALUES reads
   all seven. No CC 6 / 7 in TRACK SETUP (numbers) yet; RND buttons for them neither. Velocity is not a pad parameter
   in the project (Level is), so FETCH cannot read it; tracks start at 100.
+  - FETCH CC VALUES used each mapping's `controlValue`; a pad's pan changed on the MPC (and saved) still read as the
+    centre (user, 2026-10-17). Now a mapping of one of CREATE DEFAULT MAP's pad parameters (`PAD_PRM`: Tuning, Cutoff,
+    Resonance, Send 1-4, Pan) takes the pad's own value from its drum track (`xpj_pad_values`, `xpj_pad_read`, shared
+    with CREATE DEFAULT MAP). FETCH reads the saved project file: changes on the MPC count only once the project is saved.
   - STEP LOCKS VELOCITY / PAN with no lock rest on the track's velocity / pan (panb) as the CC knobs do on their base,
     text in brackets, the same "stays at --" rule (`rest_dash` / `rest_turn`, bits REST_VEL / REST_PAN of cc_rest).
   - Layout: STEP LOCKS and TRACK VALUES in six columns 120 px apart (CONDITION / BACK, VEL, PAN, LEN, PROB, CC 1;

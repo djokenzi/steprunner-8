@@ -3472,6 +3472,26 @@
    "max": 127,
    "default": 0,
    "display": "int"
+  },
+  {
+   "key": "rnd_cc6",
+   "name": "Random CC 6",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cc7",
+   "name": "Random CC 7",
+   "momentary": true
+  },
+  {
+   "key": "navv",
+   "name": "Arrows Look",
+   "options": [
+    "NONE",
+    "RIGHT",
+    "LEFT"
+   ],
+   "default": 0
   }
  ]
 }

@@ -82,12 +82,18 @@ if os.path.exists(FONT):
             pts = [(cx - hw, cy), (cx + hw, cy - hh), (cx + hw, cy + hh)] if left else [(cx + hw, cy), (cx - hw, cy - hh), (cx - hw, cy + hh)]
             d.polygon(pts, fill=((28, 26, 23) if on else (143, 136, 120)) + (255,))
             im.resize((72, BH), Image.LANCZOS).save("images/%s_%s.png" % (nm, "on" if on else "off"))
+    for nm, left in (("nav_left", True), ("nav_right", False)):   # v1.2.0: no page that way: a dim arrow
+        im = seg(False, "", 72).resize((72 * SS, BH * SS), Image.LANCZOS); d = ImageDraw.Draw(im)
+        cx, cy, hw, hh = 36 * SS, BH * SS / 2, 6 * SS, 8 * SS
+        pts = [(cx - hw, cy), (cx + hw, cy - hh), (cx + hw, cy + hh)] if left else [(cx + hw, cy), (cx - hw, cy - hh), (cx - hw, cy + hh)]
+        d.polygon(pts, fill=(58, 55, 50, 255))
+        im.resize((72, BH), Image.LANCZOS).save("images/%s_dim.png" % nm)
 else:
     print("warning: %s not found, images/step_edit_*.png left as they are (set MPC_VST)" % FONT, file=sys.stderr)
 # RND / CLR buttons, 132 x 39, text baked in: one pair (released, pressed) per colour.
 BTN_W, BTN_H = 132, 39
 BUTTONS = [("rnd_trig", "RND STEPS"), ("rnd_vel", "RND VEL"), ("rnd_len", "RND LEN"), ("rnd_pan", "RND PAN"), ("rnd_cc1", "RND CC 1"), ("rnd_cc2", "RND CC 2"),
-           ("rnd_cc3", "RND CC 3"), ("rnd_cc4", "RND CC 4"), ("rnd_cc5", "RND CC 5"), ("clr_step", "CLR LOCKS"), ("clr_trk", "CLR STEPS")]
+           ("rnd_cc3", "RND CC 3"), ("rnd_cc4", "RND CC 4"), ("rnd_cc5", "RND CC 5"), ("rnd_cc6", "RND CC 6"), ("rnd_cc7", "RND CC 7"), ("clr_step", "CLR LOCKS"), ("clr_trk", "CLR STEPS")]
 def btn(text, col, pressed, ink=(253, 243, 234), BTN_W=BTN_W, BTN_H=BTN_H, size=15):   # size: v1.2.0
     if pressed: col = tuple(min(255, int(c * 1.3) + 20) for c in col)
     im = Image.new("RGBA", (BTN_W * SS, BTN_H * SS), (0, 0, 0, 0))

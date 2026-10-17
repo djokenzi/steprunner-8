@@ -176,6 +176,8 @@ enum {
     P_TRK_CC0, P_TRK_CC_END = P_TRK_CC0 + NCC,   /* v1.2.0: the track's CC base values (ccb, 0 = none) */
     P_SHIFT_L = P_TRK_CC_END, P_SHIFT_R,         /* v1.2.0: SHIFT: the track (TRACK EDIT) or the pattern (PATTERN EDIT) one step earlier / later */
     P_ST_CC6, P_ST_CC7, P_PF_CC6, P_PF_CC7,      /* v1.2.0: CC 6 / CC 7: their step locks and PERFORM ALL knobs */
+    P_RND_CC6, P_RND_CC7,                        /* v1.2.0: RND CC 6 / 7 (page 2 of the left section) */
+    P_NAVV,                                      /* v1.2.0: read-only, which arrow has a page: NONE / RIGHT / LEFT */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC_V1, NPF = 9 };   /* parameter counts: the RND buttons, the PERFORM knobs P_PF0.. (CC 6 / 7: P_PF_CC6 / 7) */
@@ -192,7 +194,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC0 + NCC - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC0 + NCC - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"}, {P_RND_CC6, "rnd_cc6"}, {P_RND_CC7, "rnd_cc7"}, {P_NAVV, "navv"},
 };
 
 static FILE *g_log;
@@ -610,6 +612,7 @@ static bool xpj_num(const std::string &s, size_t from, size_t to, const char *ke
  * CC number, value 0..127. */
 /* All mappings of the newest saved project, and its name. false: no readable project. */
 static void xpj_scan_text(const std::string &js, std::vector<XEntry> &out);
+static void xpj_pad_values(const std::string &js, std::vector<XEntry> &es);   /* v1.2.0, below */
 static bool xpj_scan(Who &w, std::string &proj, std::vector<XEntry> &out) {
     std::string best = xpj_pick_ours(w), js;
     out.clear();
@@ -618,6 +621,7 @@ static bool xpj_scan(Who &w, std::string &proj, std::vector<XEntry> &out) {
     proj = best.substr(sl == std::string::npos ? 0 : sl + 1);
     if (proj.size() > 4) proj.resize(proj.size() - 4);
     xpj_scan_text(js, out);
+    xpj_pad_values(js, out);   /* v1.2.0: a pad parameter's value is the pad's own, not the mapping's controlValue */
     return true;
 }
 /* The MIDI learn entries of a project text. */
@@ -764,8 +768,53 @@ static int xpj_pad_note(const std::string &js, const std::vector<XTrack> &tracks
  * History: v1.43-1.44 and 1.46-1.47 wrote a "<name>-MAPPED.xpj" copy instead; it either lost the samples (MPC looks
  * for them under the copy's name) or needed the whole data folder copied, so the user chose this.
  * xpj_map_text only adds them to the text `js`: the number added, -2 if there is no such drum track. */
+/* CREATE DEFAULT MAP's pad parameters, in CC order (CC 1-7, then pan): MPC's MIDI learn ids. v1.2.0: CC 6 / 7 = Send 3 / 4 */
+static const struct { int id; const char *name; } PAD_PRM[NCC + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {524, "Send 3"}, {525, "Send 4"}, {517, "Pan"}};
+/* the pad object js[at..e]: its values 0..1 in PAD_PRM order */
+static void xpj_pad_read(const std::string &js, size_t at, size_t e, double *val) {
+    double c = 1.0, r = 0.0, ct = 0.0, ft = 0.0;
+    xpj_num(js, at, e, "\"filterCutoff\"", c); xpj_num(js, at, e, "\"filterResonance\"", r);
+    xpj_num(js, at, e, "\"coarseTune\"", ct); xpj_num(js, at, e, "\"fineTune\"", ft);   /* the pad's own (first in its object) */
+    /* Tuning as 0..1: -36..+36 semitones (an assumption: 0 = the middle, 0.5; not checked against MPC's own value) */
+    double tn = (ct + ft / 100.0 + 36.0) / 72.0; tn = tn < 0.0 ? 0.0 : tn > 1.0 ? 1.0 : tn;
+    val[0] = tn; val[1] = c; val[2] = r; val[3] = val[4] = val[5] = val[6] = 0.0; val[NCC] = 0.5;
+    { size_t mx = js.find("\"mixable\"", at); double pv = 0.5;   /* the pad's pan, 0..1 (0.5 = the centre) */
+      if (mx != std::string::npos && mx < e && xpj_num(js, mx, e, "\"pan\"", pv) && pv >= 0.0 && pv <= 1.0) val[NCC] = pv; }
+    size_t sd = js.find("\"sends\"", at), sb = sd == std::string::npos || sd > e ? std::string::npos : js.find('[', sd);
+    if (sb != std::string::npos && sb < e) {
+        const char *p = js.c_str() + sb + 1;
+        for (int j = 0; j < 4; j++) { char *q; double v = std::strtod(p, &q); if (q == p) break; val[3 + j] = v; p = q; while (*p == ',' || *p == '\n' || *p == ' ' || *p == '\r') p++; }   /* Send 1-4 */
+    }
+}
+/* v1.2.0 FETCH CC VALUES: a mapping of a pad parameter (one of PAD_PRM) takes the pad's own value from its drum track
+ * (the mapping's controlValue need not follow a parameter changed on the pad: a user report, 2026-10-17). */
+static void xpj_pad_values(const std::string &js, std::vector<XEntry> &es) {
+    std::vector<std::pair<std::string, std::vector<std::pair<size_t, size_t>>>> pads;   /* drum track -> its pad objects */
+    for (XEntry &e : es) {
+        int k = -1;
+        for (int j = 0; j <= NCC; j++) if (PAD_PRM[j].id == e.param) k = j;
+        if (k < 0 || e.inst < 0) continue;
+        const std::vector<std::pair<size_t, size_t>> *list = nullptr;
+        for (auto &pt : pads) if (pt.first == e.tgt) list = &pt.second;
+        if (!list) {
+            std::vector<std::pair<size_t, size_t>> v;
+            for (const XTrack &t : xpj_tracks(js)) if (t.name == e.tgt) {
+                size_t ins = js.find("\"instruments\"", js.find("\"drum\"", t.a));
+                size_t arr = ins == std::string::npos ? ins : js.find('[', ins), end = arr == std::string::npos ? arr : xpj_close(js, arr);
+                if (end == std::string::npos) break;
+                for (size_t at = js.find('{', arr); at != std::string::npos && at < end; ) { size_t c = xpj_close(js, at); if (c == std::string::npos) break; v.push_back({at, c}); at = js.find('{', c); }
+                break;
+            }
+            pads.push_back({e.tgt, v}); list = &pads.back().second;
+        }
+        if (e.inst >= (int)list->size()) continue;
+        double val[NCC + 1];
+        xpj_pad_read(js, (*list)[(size_t)e.inst].first, (*list)[(size_t)e.inst].second, val);
+        e.val = clampi((int)std::lround(val[k] * 127.0), 0, 127);
+    }
+}
 static int xpj_map_text(const Seq &seq, const std::string &track, std::string &js) {
-    static const struct { int id; const char *name; } PRM[NCC + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {524, "Send 3"}, {525, "Send 4"}, {517, "Pan"}};   /* v1.2.0: CC 6 / 7 = Send 3 / 4 */   /* + Pan (v1.93: the track's PAN_CC) */   /* v1.87.0: the pad's Send 1/2 are 522/523 (MPC's MIDI learn MIXER group: Level 518, Pan 517, Pad Mute 526, Pad Solo 527, Send 1-4 522-525); 91/92 (v1.71-1.86) were not found by MPC, which showed the row as the entry before */
+    const auto &PRM = PAD_PRM;   /* + Pan (v1.93: the track's PAN_CC) */   /* v1.87.0: the pad's Send 1/2 are 522/523 (MPC's MIDI learn MIXER group: Level 518, Pan 517, Pad Mute 526, Pad Solo 527, Send 1-4 522-525); 91/92 (v1.71-1.86) were not found by MPC, which showed the row as the entry before */
     std::vector<XEntry> have;
     xpj_scan_text(js, have);
     size_t ins = std::string::npos;
@@ -778,19 +827,7 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
     for (int k = 0; k < NTRACKS && at != std::string::npos && at < arr_end; k++) {
         size_t e = xpj_close(js, at);
         if (e == std::string::npos) break;
-        double c = 1.0, r = 0.0, ct = 0.0, ft = 0.0;
-        xpj_num(js, at, e, "\"filterCutoff\"", c); xpj_num(js, at, e, "\"filterResonance\"", r);
-        xpj_num(js, at, e, "\"coarseTune\"", ct); xpj_num(js, at, e, "\"fineTune\"", ft);   /* the pad's own (first in its object) */
-        /* Tuning as 0..1: -36..+36 semitones (an assumption: 0 = the middle, 0.5; not checked against MPC's own value) */
-        double tn = (ct + ft / 100.0 + 36.0) / 72.0; tn = tn < 0.0 ? 0.0 : tn > 1.0 ? 1.0 : tn;
-        val[k][0] = tn; val[k][1] = c; val[k][2] = r; val[k][3] = val[k][4] = val[k][5] = val[k][6] = 0.0; val[k][NCC] = 0.5;
-        { size_t mx = js.find("\"mixable\"", at); double pv = 0.5;   /* the pad's pan, 0..1 (0.5 = the centre) */
-          if (mx != std::string::npos && mx < e && xpj_num(js, mx, e, "\"pan\"", pv) && pv >= 0.0 && pv <= 1.0) val[k][NCC] = pv; }
-        size_t sd = js.find("\"sends\"", at), sb = sd == std::string::npos || sd > e ? std::string::npos : js.find('[', sd);
-        if (sb != std::string::npos && sb < e) {
-            const char *p = js.c_str() + sb + 1;
-            for (int j = 0; j < 4; j++) { char *q; double v = std::strtod(p, &q); if (q == p) break; val[k][3 + j] = v;   /* Send 1-4 (3 / 4 since v1.2.0) */ p = q; while (*p == ',' || *p == '\n' || *p == ' ' || *p == '\r') p++; }
-        }
+        xpj_pad_read(js, at, e, val[k]);
         pad[k] = true;
         at = js.find('{', e);
     }
@@ -877,7 +914,7 @@ static int value_of(Plugin *w, int i) {
     if (i >= P_STEP0 && i < P_STEP0 + 16) return tr.st[w->page * 16 + (i - P_STEP0)].on ? 1 : 0;
     if (i >= P_CELL0 && i < P_CELL0 + 16) {
         int k = i - P_CELL0, idx = w->page * 16 + k;
-        return (tr.st[idx].on ? 1 : 0) + ((w->seq.playing && tr.cur == idx) ? 2 : 0) + ((((w->selmask >> k) & 1) && w->step_edit) ? 4 : 0)   /* the selected step is outlined in STEP EDIT only (v1.57.0) */ + (tr.eu_on || w->euclid_edit ? 24 : w->step_edit ? 8 : w->track_edit ? 16 : 0)   /* v1.2.0: green in EUCLIDIAN even with both generators off */   /* v2.8.0: TRACK EDIT violet again */   /* a track that comes from the Euclidean generator is green in every mode */;
+        return (tr.st[idx].on ? 1 : 0) + ((w->seq.playing && tr.cur == idx) ? 2 : 0) + ((((w->selmask >> k) & 1) && w->step_edit) ? 4 : 0)   /* the selected step is outlined in STEP EDIT only (v1.57.0) */ + (tr.eu_on ? 24 : w->step_edit || (w->euclid_edit && w->rmode == 1) ? 8 : w->track_edit || (w->euclid_edit && w->rmode == 2) ? 16 : 0)   /* v1.2.0: green only while a generator runs; EUCLIDIAN otherwise in the colour of the mode under it */   /* v2.8.0: TRACK EDIT violet again */   /* a track that comes from the Euclidean generator is green in every mode */;
     }
     if (i >= P_MUTE0 && i < P_MUTE0 + NTRACKS) return w->seq.t[i - P_MUTE0].mute ? 1 : 0;
     if (pf_k(i) >= 0) return w->seq.pf_on ? w->seq.pf_off[pf_k(i)] : 0;
@@ -915,6 +952,7 @@ static int value_of(Plugin *w, int i) {
     if (i == P_PF_CC117) return 0;   /* retired v1.72.0: no knob, nothing sent */
     if (i == P_SHIFT) return w->shift ? 1 : 0;
     if (i == P_EU_LEN) return tr.eu_len ? tr.eu_len : tr.len;
+    if (i == P_NAVV) return lmode(w) < 0 ? 0 : w->lpage[lmode(w)] ? 2 : 1;   /* v1.2.0 */
     if (i == P_TRK_PAN) return tr.panb;   /* v1.2.0 TRACK VALUES */
     if (i == P_TRK_PROB) return 100 - tr.pcut;
     if (i >= P_TRK_CC0 && i < P_TRK_CC_END) return tr.ccb[i - P_TRK_CC0];
@@ -1740,7 +1778,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
     const param_t *p = &PARAMS[i];
     { std::lock_guard<std::mutex> lk(w->lock); if (popup_set(w->open, i, n)) { w->close_frames[i] = 0; return; } }   /* v2.12: the audio thread closes lists under the lock too */
     if (!is_own(i) || i == P_RUN) return;
-    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_PST_PAT || i == P_EU_DIRV || i == P_EU_DIRV2 || i == P_EU_OPV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
+    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_PST_PAT || i == P_EU_DIRV || i == P_EU_DIRV2 || i == P_EU_OPV || i == P_NAVV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
     if (i >= P_STEP0 && i < P_STEP0 + 16) {
         /* A tap on a TRIGS cell. The host's toggle flips its own value and sends it, so a value that differs from the real
          * one is a tap; the same value is an echo and changes nothing. STEP EDIT off: the tap flips the trig (and selects the
@@ -2015,8 +2053,8 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
             if (i == P_PF_COMMIT || i == P_PF_DISCARD) for (int k = 0; k < NPF_ALL; k++) w->raw[pf_param(k)] = -1.0f;   /* knobs back to the middle */
             if (i == P_CLR_STEP) for (int k = 0; k < 16; k++) if ((w->selmask >> k) & 1) w->seq.clear_locks(w->track, w->page * 16 + k);
             /* every press stirs the clock into the generators' RNG, so two sessions never give the same series */
-            if (i == P_RND_PAN || (i >= P_RND0 && i < P_RND0 + NRND)) w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
-            int what = i == P_RND_PAN ? (int)Seq::R_PAN : (i >= P_RND0 && i < P_RND0 + NRND) ? i - P_RND0 : -1;
+            if (i == P_RND_PAN || i == P_RND_CC6 || i == P_RND_CC7 || (i >= P_RND0 && i < P_RND0 + NRND)) w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
+            int what = i == P_RND_PAN ? (int)Seq::R_PAN : i == P_RND_CC6 ? Seq::R_CC0 + 5 : i == P_RND_CC7 ? Seq::R_CC0 + 6 : (i >= P_RND0 && i < P_RND0 + NRND) ? i - P_RND0 : -1;
             if (what >= 0 && w->clr_mode) {   /* CLR LOCKS lit: the button takes its lock out instead (the selected steps in STEP EDIT, else the whole track) */
                 Track &ct = w->seq.t[w->track];
                 if (what != Seq::R_TRIG) for (int k = 0; k < NSTEPS; k++) {
@@ -2479,7 +2517,7 @@ static intptr_t dispatcher(AEffect *e, int32_t op, int32_t idx, intptr_t v, void
     case effGetVendorString: copy_str(p, PLUG_VENDOR, 32); return 1;
     case effGetVendorVersion: return PLUG_VERSION;
     case effGetVstVersion: return 2400;
-    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_PST_PAT && idx != P_EU_DIRV && idx != P_EU_DIRV2 && idx != P_EU_OPV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
+    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_PST_PAT && idx != P_EU_DIRV && idx != P_EU_DIRV2 && idx != P_EU_OPV && idx != P_NAVV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
     case effGetParamName:
         /* Names are static. On the device (v1.11.0) names that followed the track were shown as they were when the plugin
          * loaded and never refreshed, audioMasterUpdateDisplay or not; so whatever changes goes into the VALUE text

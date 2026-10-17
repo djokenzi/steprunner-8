@@ -1060,7 +1060,7 @@ static void vst_tests() {
         set_int(a, "euclid_edit", 1);
         CHECK(a->getP(a, P("step_edit")) == 1.0f && OPT3("lpanel") == 1 && OPT3("ptitle") == 4 && OPT3("panel") == 0,
               "EUCLIDIAN on: left section = generator, step locks stay on the right, STEP EDIT stays lit (v1.0.0)");
-        CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) / 8 == 3, "EUCLIDIAN, not enabled: the cells are green too (v1.2.0; the normal colour before)");
+        CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) / 8 == 1, "EUCLIDIAN over STEP EDIT, not enabled: the cells keep STEP EDIT's colour (green only while a generator runs)");
         a->setP(a, P("eu_enable"), 1.0f);
         CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) >= 24, "enabled: cells in the Euclidean colour");
         set_int(a, "euclid_edit", 0);
@@ -2199,7 +2199,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             else empty += cs != "--" || rs != "1" || rr != "AUTO";
         }
         { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); for (int k = 0; k < 16; k++) { if (k % 2 == 0) tm += micro_in(sv, 0, k) != 0; else empty += micro_in(sv, 0, k) != 0; } }
-        CHECK(cond >= 6 && rt >= 5 && tm >= 6 && !empty, "page 2: conditions (%d of 8), ratchets (%d of 8) and timing (%d of 8) on the trigs; empty steps untouched (%d)", cond, rt, tm, empty);
+        CHECK(cond >= 6 && rt >= 3 && tm >= 6 && !empty, "page 2: conditions (%d of 8), ratchets (%d of 8) and timing (%d of 8) on the trigs; empty steps untouched (%d)", cond, rt, tm, empty);
         CHECK(OPTC("lbtn") == 5, "still page 2 after a trip through STEP EDIT");
         set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: page 2 reads CLR COND / CLR TIMING / CLR RATCHETS");
         pr("rnd_cond"); pr("rnd_timing"); pr("rnd_ratch");
@@ -2296,7 +2296,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "step_edit", 1); pr("shift_right"); CHECK(on(1, 0), "STEP EDIT: nothing");
         set_int(c, "pattern_edit", 1); pr("undo"); CHECK(on(0, 0) && on(1, 1), "UNDO takes a SHIFT back");
         set_int(c, "track", 1); set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
-        { const int cs = (int)lroundf(c->getP(c, P("cell1")) * (PARAMS[P("cell1")].nopts - 1)); CHECK(cs / 8 == 3, "EUCLIDIAN, both generators off: the cells are green (state %d)", cs); }
+        { const int cs = (int)lroundf(c->getP(c, P("cell1")) * (PARAMS[P("cell1")].nopts - 1)); CHECK(cs / 8 == 2, "EUCLIDIAN over TRACK EDIT, both generators off: the cells are violet, not green (state %d)", cs); }
         pr("shift_right");
         CHECK(on(1, 2) && !on(1, 1) && on(0, 0), "EUCLIDIAN (over TRACK EDIT), both generators off: SHIFT moves the track as in TRACK EDIT");
         set_int(c, "track", 1);   /* on() leaves T1 selected */
@@ -2417,6 +2417,25 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         t0.pcut = 0; size_t n100 = run(s, 4.0, st, -1).size();
         CHECK(n0 == 0 && n100 == 16 && n50 > 100 && n50 < 156 && nl == 16, "track PROB: 0 %% %d trigs, 100 %% %d, 50 %% %d of 256, NO LOCKS %d", (int)n0, (int)n100, (int)n50, (int)nl);
     }
+    {   /* v1.2.0: the arrows look dim where there is no page; RND CC 6 / 7 */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        set_int(c, "pattern_edit", 1); CHECK(OPTC("navv") == 1, "page 1: only the right arrow goes somewhere (%d)", OPTC("navv"));
+        pr("nav_right"); CHECK(OPTC("navv") == 2, "page 2: only the left one (%d)", OPTC("navv"));
+        set_int(c, "global_edit", 1); CHECK(OPTC("navv") == 0, "SETUP: no pages, both dim");
+        set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1); CHECK(OPTC("navv") == 0, "EUCLIDIAN: both dim");
+        set_int(c, "track_edit", 1); pr("nav_right");
+        c->setP(c, P("step0"), 1.0f); c->setP(c, P("step4"), 1.0f);
+        set_int(c, "rnd_dens", 100); set_int(c, "rnd_min", 30); set_int(c, "rnd_max", 40); pr("rnd_cc6"); pr("rnd_cc7");
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); c->d(c, 7, P("st_cc6"), 0, d, 0); const int v6 = atoi(d);
+        c->d(c, 7, P("st_cc7"), 0, d, 0); const int v7 = atoi(d);
+        CHECK(v6 >= 30 && v6 <= 40 && v7 >= 30 && v7 <= 40, "TRACK EDIT: RND CC 6 / RND CC 7 (page 1, their own row) wrote locks in 30..40 (%d %d)", v6, v7);
+        set_int(c, "track_edit", 1); set_int(c, "clr_mode", 1); pr("rnd_cc6"); set_int(c, "clr_mode", 0);
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); c->d(c, 7, P("st_cc6"), 0, d, 0); std::string c6(d); c->d(c, 7, P("st_cc7"), 0, d, 0);
+        CHECK(c6.find("--") != std::string::npos && atoi(d) >= 30, "CLR CC 6: the CC 6 locks go, CC 7 stays ('%s', '%s')", c6.c_str(), d);
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     {   /* v1.2.0: page 2 in STEP EDIT: the selected steps only, trig or not */
         AEffect *c = VSTPluginMain(host);
         char d[64];
@@ -2433,14 +2452,19 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             hit2 += get(2, "st_cond") != "--" || get(2, "st_ratch") != "1";
             other += get(5, "st_cond") != "--" || get(5, "st_ratch") != "1";
         }
-        set_int(c, "sel", 3); pr("rnd_timing");
-        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        void *cx = 0; std::string sv;
+        for (int r = 0; r < 20; r++) {   /* a random offset can be 0 (1 in 47): until one is not */
+            set_int(c, "sel", 3); pr("rnd_timing");
+            cx = 0; c->d(c, 23, 0, 0, &cx, 0); sv = (char *)cx;
+            if (micro_in(sv, 0, 2) != 0) break;
+        }
         CHECK(hit3 >= 5 && hit2 >= 5 && !other && micro_in(sv, 0, 2) != 0 && micro_in(sv, 0, 1) == 0, "page 2 in STEP EDIT: the selected step, trig (%d of 6) or not (%d of 6), and timing on step 3 only; an unselected step untouched (%d)", hit3, hit2, other);
+        set_int(c, "sel", 2); set_int(c, "st_ratch", 3);   /* step 2 surely holds something (its random values may all be empty) */
         set_int(c, "sel", 3); set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: CLR COND / CLR TIMING / CLR RATCHETS");
         pr("rnd_cond"); pr("rnd_ratch"); pr("rnd_timing");
         const std::string c3 = get(3, "st_cond"), r3 = get(3, "st_ratch"), c2 = get(2, "st_cond"), r2 = get(2, "st_ratch");
         cx = 0; c->d(c, 23, 0, 0, &cx, 0); sv = (char *)cx;
-        CHECK(c3 == "--" && r3 == "1" && micro_in(sv, 0, 2) == 0 && (c2 != "--" || r2 != "1"), "CLR in STEP EDIT: step 3 cleared (%s, %s, timing %d), step 2 (not selected) keeps its values (%s, %s)", c3.c_str(), r3.c_str(), micro_in(sv, 0, 2), c2.c_str(), r2.c_str());
+        CHECK(c3 == "--" && r3 == "1" && micro_in(sv, 0, 2) == 0 && r2 == "3", "CLR in STEP EDIT: step 3 cleared (%s, %s, timing %d), step 2 (not selected) keeps its values (%s, %s)", c3.c_str(), r3.c_str(), micro_in(sv, 0, 2), c2.c_str(), r2.c_str());
         set_int(c, "clr_mode", 0); set_int(c, "timing_edit", 1); CHECK(OPTC("lbtn") == 4, "TIMING: its own section, no page 2");
         set_int(c, "timing_edit", 0); CHECK(OPTC("lbtn") == 8, "TIMING off: back to STEP EDIT page 2");
         pr("nav_left"); CHECK(OPTC("lbtn") == 1, "left arrow: STEP EDIT page 1");
@@ -2541,6 +2565,15 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         { char c6[64], pn[64]; set_int(c, "step_edit", 1); set_int(c, "sel", 2); c->d(c, 7, P("st_cc6"), 0, c6, 0); c->d(c, 7, P("st_pan"), 0, pn, 0);
           CHECK(strstr(c6, "(") && pn[0] == '(', "STEP LOCKS after FETCH: CC 6 '%s' (Send 3), pan '%s' (the pad's), in brackets: no lock", c6, pn);
           set_int(c, "global_edit", 1); }
+        {   /* v1.2.0: the pad's own pan, not the mapping's controlValue: pad A01 panned to 0.25 in the saved project, mapping left as it was */
+            const int rc2 = system("python3 -I -c \"import gzip,json;f='build/map/a/cctest1.xpj';t=gzip.open(f).read().decode();i=t.index('{');d=json.loads(t[i:]);"
+                                   "tr=[x for x in d['data']['tracks'] if x.get('name')=='Drum 001'][0];tr['program']['drum']['instruments'][0]['mixable']['pan']=0.25;"
+                                   "gzip.open(f,'wb').write((t[:i]+json.dumps(d,indent=1)).encode())\"");
+            pr("src_fetch");
+            char pn[64]; set_int(c, "step_edit", 1); set_int(c, "track", 0); set_int(c, "sel", 2); c->d(c, 7, P("st_pan"), 0, pn, 0);
+            CHECK(rc2 == 0 && !strcmp(pn, "(L32)"), "FETCH CC VALUES reads the pad's own pan (A01 at 0.25 in the project, its mapping unchanged): '%s'", pn);
+            set_int(c, "global_edit", 1);
+        }
         {   /* v1.93: the pads' pan comes along (cctest1: A02 in the centre, 0.5 -> 64, saved as 65) */
             static char *ch2; int n2 = (int)c->d(c, 23, 0, 0, &ch2, 0); std::string sv(ch2, n2);
             size_t at = sv.find("\nA 1 ");

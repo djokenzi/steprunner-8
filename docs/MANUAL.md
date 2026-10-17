@@ -68,7 +68,7 @@ Along the top are the mode buttons: **STEP EDIT**, **TRACK EDIT**, **PATTERN EDI
   - nothing in PATTERN EDIT and SETUP.
 - The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In PATTERN EDIT, TRACK EDIT and
   STEP EDIT they switch the left section between its two pages (see [TRACK EDIT](#5-track-edit)). Each mode keeps
-  its own page. In the other modes they do nothing yet.
+  its own page. An arrow with no page in its direction is dim. In the other modes both are dim and do nothing.
 
 ### Left section and right panel
 
@@ -276,7 +276,7 @@ first. The page stays as it is when you switch modes.
 | **RND TIMING** | A random timing offset (up to ±23/24 of a step) |
 | **RND RATCHETS** | A random number of hits (1–8) and Ratchet Resolution (AUTO with one hit) |
 
-Page 2 ignores *Random Density*: every trig gets a new value. Steps without a trig are not changed. CLR STEPS and
+RND COND / TIMING / RATCHETS ignore *Random Density*: every trig gets a new value. Steps without a trig are not changed. CLR STEPS and
 CLR LOCKS stay on page 2. With CLR LOCKS lit the buttons read **CLR COND / CLR TIMING / CLR RATCHETS** and clear that
 setting from the whole track.
 
@@ -354,7 +354,7 @@ Tap **EUCLIDIAN** in TRACK EDIT. It generates evenly spread rhythms on the selec
 
 | Control | What it does |
 |---|---|
-| **ENABLE A / B** | On: that generator writes the track's trigs (cells turn green). With both off, your previous trigs come back. |
+| **ENABLE A / B** | On: that generator writes the track's trigs (cells turn green; with no generator on they keep the colour of the mode under EUCLIDIAN). With both off, your previous trigs come back. |
 | **Pulse A / B** | Number of hits (0–64) |
 | **Rotate A / B** | Shifts that rhythm by steps |
 | **Length A / B** | Length of that rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
@@ -387,7 +387,7 @@ The left section on the PROGRAM tab holds the random and clear buttons:
 | **RND VEL** | Velocity locks |
 | **RND LEN** | Length locks |
 | **RND PAN** | Pan locks |
-| **RND CC 1–5** | Locks of that CC |
+| **RND CC 1–7** | Locks of that CC (CC 6 / CC 7 in their own row) |
 
 The values come from *Random Min … Max* in RANDOM SETUP. What the buttons act on depends on the mode:
 
@@ -400,7 +400,7 @@ The values come from *Random Min … Max* in RANDOM SETUP. What the buttons act 
 In PATTERN EDIT and TRACK EDIT the lock buttons change only *Random Density* % of the steps that have a trig.
 
 - **CLR STEPS**: empties the selected track (trigs, conditions, locks, timing). Its settings stay.
-- **CLR LOCKS**: a switch. While it is lit (red), the buttons turn into CLR VEL, CLR LEN, CLR PAN and CLR CC 1–5.
+- **CLR LOCKS**: a switch. While it is lit (red), the buttons turn into CLR VEL, CLR LEN, CLR PAN and CLR CC 1–7.
   Each removes that lock from the selected steps (STEP EDIT) or from the whole selected track (other modes). Tap
   CLR LOCKS again to switch it off.
 
@@ -501,6 +501,9 @@ Locks are never changed: they still play on their steps.
 All 64 numbers are different, so all eight tracks can share one MIDI channel. None of them is a controller MPC or a
 MIDI device acts on by itself (bank select, modulation, volume, pan, expression, pedals, RPN/NRPN, channel mode).
 CC 6 and CC 7 have no number in TRACK SETUP yet. CREATE DEFAULT MAP maps them to the pad's Send 3 and Send 4.
+
+FETCH CC VALUES reads the **saved** project: after changing a pad on the MPC (pan, cutoff, sends …), save the project,
+then tap FETCH CC VALUES. For the pad parameters CREATE DEFAULT MAP maps, it reads the pad's own value.
 
 All tracks start on MIDI channel 1 with velocity 100, gate 1 step, length 16 and speed 1X.
 
