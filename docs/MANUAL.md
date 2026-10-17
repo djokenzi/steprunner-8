@@ -1,6 +1,6 @@
 # StepRunner-8 — User Manual
 
-Version 1.1.1 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
+Version 1.2.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb0)
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
@@ -66,6 +66,7 @@ Along the top are the mode buttons: **STEP EDIT**, **TRACK EDIT**, **PATTERN EDI
   - **TIMING** in STEP EDIT;
   - **EUCLIDIAN** in TRACK EDIT;
   - nothing in PATTERN EDIT and SETUP.
+- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. They have no function yet.
 
 ### Left section and right panel
 
@@ -295,7 +296,7 @@ Tap **TIMING** in STEP EDIT. Steps are selected exactly as in STEP EDIT, and the
 | **◀ SHIFT LEFT / SHIFT RIGHT ▶** | Moves the selected steps 1/24 of a step earlier or later (up to ±23/24) |
 | **Ratchet** | 1–8 hits on the step |
 | **Ratchet Resolution** | AUTO spreads the hits over the step. 1/16 … 1/80 give a fixed spacing (1–5 hits per step); extra hits continue over the following steps. |
-| **RND TIMING / RND RATCHETS** | Random offset / random number of hits on the selected steps |
+| **RND TIMING / RND RATCHETS** | Random offset / random number of hits and Ratchet Resolution on the selected steps (one hit: AUTO) |
 | **CLR TIMING / CLR RATCHETS** | Back on the grid / back to one hit |
 
 Tap **TIMING** again to go back to STEP EDIT.
@@ -381,7 +382,7 @@ The effect pads act on all 8 tracks and are violet while on.
 
 | Pad | Effect |
 |---|---|
-| **HUMANIZE** | Random small timing and velocity changes |
+| **STOP CC** | No CC messages go out while it is on (CC locks, base values, pan, PERFORM ALL); notes keep playing. Switched off, every track sends its base values and pan again on its next step. |
 | **ECHO** | Every note repeats 3 times, an 8th note apart, getting quieter |
 | **GHOST** | Every empty step plays a quiet ghost note |
 | **FADE OUT** | Fades all tracks to silence over one bar |

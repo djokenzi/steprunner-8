@@ -1559,7 +1559,20 @@ static void vst_tests() {
           b->d(b, 7, P("st_ratch"), 0, r1, 0); CHECK(!strcmp(r1, "4"), "and loaded ('%s')", r1);
           b->d(b, 1, 0, 0, 0, 0); }
         pr("rnd_ratch"); pr("rnd_timing");
+        set_int(a, "pf_stopcc", 1); CHECK(a->getP(a, P("pf_stopcc")) == 1.0f, "STOP CC pad lit (v1.2.0)");
+        set_int(a, "pf_stopcc", 0); CHECK(a->getP(a, P("pf_stopcc")) == 0.0f, "and off");
+        pr("nav_left"); pr("nav_right");
+        CHECK(a->getP(a, P("nav_left")) == 0.0f && a->getP(a, P("nav_right")) == 0.0f && a->getP(a, P("timing_edit")) == 1.0f, "the arrow buttons: momentary, change nothing yet");
         a->d(a, 7, P("st_ratch"), 0, r1, 0); CHECK(atoi(r1) >= 1 && atoi(r1) <= 8, "RND RATCHETS: 1..8 ('%s')", r1);
+        {   /* v1.2.0: RND RATCHETS draws the RESOLUTION too (AUTO with one hit) */
+            char rr[64]; int nonauto = 0, bad = 0;
+            for (int k = 0; k < 60; k++) {
+                pr("rnd_ratch"); a->d(a, 7, P("st_ratch"), 0, r1, 0); a->d(a, 7, P("st_rres"), 0, rr, 0);
+                if (strcmp(rr, "AUTO")) nonauto++;
+                if (!strcmp(r1, "1") && strcmp(rr, "AUTO")) bad++;
+            }
+            CHECK(nonauto > 10 && !bad, "RND RATCHETS: the resolution is drawn too (%d of 60 not AUTO), AUTO with one hit (%d wrong)", nonauto, bad);
+        }
         set_int(a, "st_ratch", 5); pr("tm_right"); pr("clr_ratch"); pr("clr_timing");
         a->d(a, 7, P("st_ratch"), 0, r1, 0); a->d(a, 7, P("msg"), 0, m, 0);
         CHECK(!strcmp(r1, "1") && !strcmp(m, " "), "CLR RATCHETS / CLR TIMING: one hit, on the grid ('%s', '%s')", r1, m);
@@ -1993,6 +2006,15 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         CHECK(w.size() == 3 && v[0] == 127 && v[1] == 90 && v[2] == 64 && fabs(w[2] - 2.25) < 0.01, "two locks in a row: 127, 90, then 64 on step 10 (%d messages)", (int)w.size());
         t.ccb[0] = 0; v.clear(); w = run(s, 4.0, st, cc, &v);
         CHECK(w.size() == 2 && v[0] == 127 && v[1] == 90, "no base value: the locks only, as before (%d messages)", (int)w.size());
+        /* v1.2.0 STOP CC: no CC at all while it is lit, the notes play on; off: the base value goes out on the next step */
+        t.ccb[0] = 1 + 64; t.st[8].on = 0; t.st[8].cc[0] = 0; t.panb = 1 + 30; t.st[3].pan = 1 + 100;
+        s.set_stop_cc(true);
+        { const size_t ncc = run(s, 4.0, st, -1).size(), nn = run(s, 4.0, 0x90 | (t.ch & 15), -1).size();
+          CHECK(ncc == 0 && nn == 14, "STOP CC: no CC (locks, base, pan), every note (14 trigs) (%d CC, %d notes)", (int)ncc, (int)nn); }
+        s.set_stop_cc(false); v.clear(); w = run(s, 4.0, st, cc, &v);
+        CHECK(w.size() == 3 && v[0] == 64 && w[0] < 0.01 && v[1] == 127 && v[2] == 64, "STOP CC off: base 64 at once on step 1, then lock and base as before (%d messages)", (int)w.size());
+        s.set_stop_cc(true); s.set_stop_cc(false); std::vector<int> pv; run(s, 1.0, st, PAN_CC[0], &pv);
+        CHECK(pv.size() == 2 && pv[0] == 30 && pv[1] == 100, "and the pan rest too, then the pan lock (%d messages)", (int)pv.size());
     }
     /* the wrapper: BASE knobs in EDIT CC, saved with the project, READ PROJECT */
     setenv("STEPRUNNER_XPJ_ROOT", "testdata", 1);

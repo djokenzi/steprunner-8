@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141414'/%3E%3Cpath d='M17.2 46.8 A21 21 0 1 1 46.8 46.8' fill='none' stroke='%233a3a3a' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M17.2 46.8 A21 21 0 1 1 46.8 17.2' fill='none' stroke='%23e8322b' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='13' fill='%232a2a2a'/%3E%3Cline x1='32' y1='32' x2='39.8' y2='24.2' stroke='%23fff' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>StepRunner-8 MPC Mapper</title>
+<style>
+:root{--bg:#f4f3ef;--panel:#fff;--ink:#1c1b19;--mute:#6b6862;--line:#dcd9d1;--acc:#c8421f;--acc-ink:#fff;--ok:#2c7a4b;--warn:#a86400;--chip:#eeece6}
+@media (prefers-color-scheme:dark){:root{--bg:#161514;--panel:#201f1d;--ink:#ece9e2;--mute:#9a968d;--line:#35332f;--acc:#ff6a3d;--acc-ink:#1a0d08;--ok:#6fcf97;--warn:#f0b354;--chip:#2a2926}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:20px;margin:0 0 2px;letter-spacing:.02em}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin:0 0 12px}
+.sub{color:var(--mute);margin:0 0 18px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+button{font:inherit;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:7px 13px;border-radius:7px;cursor:pointer}
+button.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+.sub a{color:var(--acc);font-weight:600}
+a.donate{display:inline-block;background:#00457C;color:#fff;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:12px;padding:9px 16px;border-radius:6px;text-decoration:none}a.donate:hover{background:#00376a}a.donate:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.x{padding:2px 8px;border-radius:5px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+input.bad{border-color:var(--acc);color:var(--acc)}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end}
+.wide{grid-column:span 2}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--mute)}
+.drop.over{border-color:var(--acc);color:var(--ink)}
+.info{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--mute)}
+.msg{margin-top:10px;font-size:13px}.msg.ok{color:var(--ok)}.msg.err{color:var(--acc)}.msg.warn{color:var(--warn)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td input{width:64px;padding:3px 6px}
+.tag{font-size:11px;padding:1px 7px;border-radius:99px;background:var(--chip);color:var(--mute)}
+.tag.new{background:var(--acc);color:var(--acc-ink)}.tag.dup{color:var(--warn)}
+.empty{color:var(--mute);padding:14px 0}
+[hidden]{display:none!important}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.tree{border:1px solid var(--line);border-radius:9px;padding:12px}
+.tree h3{margin:0 0 10px;font-size:11px;letter-spacing:.12em;color:var(--acc)}
+.lvl{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.lvl>span{font-size:12px;color:var(--mute);min-width:62px}
+.lvl select,.lvl input{flex:1;min-width:70px}
+.lvl.l2{margin-left:14px}.lvl.l3{margin-left:28px}.lvl.l4{margin-left:42px}
+.lvl.l2,.lvl.l3,.lvl.l4{border-left:2px solid var(--line);padding-left:10px}
+.lvl.off{opacity:.4}
+.path{margin-top:12px;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;overflow-wrap:anywhere}
+.knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.knob{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.knob b{font-size:12px;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.dial{width:22px;height:22px;border-radius:50%;border:2px solid var(--acc);position:relative;flex:none}
+th.kh{white-space:nowrap}th.kh .dial{display:inline-block;vertical-align:middle;width:16px;height:16px;margin-right:6px}th.kh .dial:after{top:1px;height:6px}
+.dial:after{content:"";position:absolute;left:50%;top:2px;width:2px;height:8px;margin-left:-1px;background:var(--acc);border-radius:1px}
+.knob select{width:100%}
+.knob .info{line-height:1.6;white-space:normal}
+#pgrid select,#dgrid select,#drgrid select{max-width:150px;width:100%}#pgrid td,#pgrid th,#dgrid td,#dgrid th,#drgrid td,#drgrid th{padding:4px 5px}#dgrid tr.all td{background:var(--chip)}#pgrid .cc,#dgrid .cc,#drgrid .cc{display:block;font-size:10px;color:var(--mute);font-family:ui-monospace,Consolas,monospace}
+#ccgrid tr.chrow td{border-bottom:2px solid var(--line)}#ccgrid td,#ccgrid th{padding:4px 5px}#ccgrid input{width:58px;padding:4px 6px}
+.ccsetup{margin-top:14px;border:1px solid var(--line);border-radius:9px;padding:10px 12px}.ccsetup summary{font-weight:600;color:var(--ink)}
+summary{cursor:pointer;color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+
+:root{--bg:#eef0f3;--panel:#fff;--ink:#16181c;--mute:#646b76;--line:#e1e4e9;--acc:#e8322b;--acc-ink:#fff;--ok:#1f8a4c;--warn:#b26a00;--chip:#f2f4f7}
+body{background:var(--bg)}
+.hero{background:#121316;color:#fff;padding:34px 0 70px;margin-bottom:-46px}
+.hero .in{max-width:1060px;margin:0 auto;padding:0 16px}
+.hero h1{font-size:30px;font-weight:800;letter-spacing:-.01em;margin:0}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero .sub{color:#a9adb5;margin:6px 0 0}
+.hero .sub a{color:#ff6b63}
+main{max-width:1060px;padding-top:0}
+section{border:none;border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.07);margin-bottom:18px}
+h2{color:var(--ink);font-size:13px;letter-spacing:.12em}
+input,select{background:#fff;border-color:#d5d9e0;border-radius:9px;padding:8px 10px}
+input:focus,select:focus{outline:3px solid rgba(232,50,43,.18);border-color:var(--acc)}
+button{background:#fff;border-color:#d5d9e0;border-radius:9px;padding:8px 14px}
+button.primary{border-radius:9px;padding:10px 20px;box-shadow:0 4px 12px rgba(232,50,43,.25)}
+.knob{border:none;background:var(--chip);border-radius:12px}
+.drop{background:#f7f8fa;border-color:#d5d9e0;border-radius:14px}
+.ccsetup{background:#fafbfc}
+input[type=checkbox]{accent-color:var(--acc)}
+.suprow{display:flex;align-items:center;justify-content:space-between;gap:16px 28px;flex-wrap:wrap}.suprow p{flex:1 1 420px}.suprow a.donate{flex:none;margin-left:auto}
+.hero h1.brand{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.hero .brand .logo{font-size:38px;font-weight:800;font-style:italic;letter-spacing:-.01em;line-height:1}
+.hero .brand .logo em{color:var(--acc);font-style:italic}
+.hero .brand .tool{font-size:13px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:#a9adb5}
+.hero .sub{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="hero"><div class="in"><h1 class="brand"><span class="logo">StepRunner<em>-8</em></span><span class="tool">MPC Mapper</span></h1>
+<p class="sub">StepRunner-8 → drum program or plugin: MIDI Learn mappings written straight into an .xpj project. · <a href="https://github.com/djokenzi/steprunner-8/blob/main/docs/MAPPER.md" target="_blank" rel="noopener">User guide</a> · <a href="https://www.youtube.com/watch?v=wTp898KZE78" target="_blank" rel="noopener">Watch the demo video</a></p>
+</div></div>
+<main>
+
+<section>
+  <h2>1 · Project</h2>
+  <div class="drop" id="drop">
+    <div class="row" style="justify-content:center">
+      <button class="primary" id="open">Open .xpj</button>
+      <span>or drop the file here</span>
+    </div>
+    <input type="file" id="file" accept=".xpj" hidden>
+  </div>
+  <div class="info" id="info" style="margin-top:10px"></div>
+  <div class="msg" id="loadmsg"></div>
+</section>
+
+<section id="tsSec" hidden>
+  <h2>2 · StepRunner-8 knobs</h2>
+  <div class="grid" style="margin-bottom:10px">
+    <label class="wide">StepRunner-8 instance<select id="srinst"></select></label>
+    <label>MIDI channel<input id="tsch2" type="number" min="1" max="16" value="1" placeholder="mixed" aria-label="MIDI channel for all tracks"></label>
+  </div>
+  <div class="grid">
+    <label class="wide">Program<select id="track"></select></label>
+  </div>
+  <div id="drum">
+    <div class="row" style="margin:12px 0 0" hidden>
+      <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:13px">Knob targets
+        <select id="drmode"><option value="per">different parameter per track</option></select></label>
+    </div>
+    <div class="knobs" id="knobs"></div>
+    <div id="drgridw" hidden><div class="tw" style="margin-top:12px"><table id="drgrid"></table></div></div>
+  </div>
+  <div id="plug" hidden>
+    <div class="msg" id="plugnote"></div>
+    <div class="tw"><table id="pgrid"></table></div>
+  </div>
+  <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+    <div id="afrow" hidden style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+      <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="autofill" checked> <span id="aflbl">Auto-fill the column from the first chosen parameter</span></label>
+      <span class="info" id="afinfo"></span>
+    </div>
+    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="setin" checked> Target track receives MIDI only from this StepRunner-8 (its port and channel)</label>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button class="primary" id="tsApply">Apply to project</button>
+  </div>
+  <div class="msg" id="tsmsg"></div>
+</section>
+
+<section id="ccSec" hidden>
+  <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+    <h2 style="margin:0">3 · CC setup</h2>
+    <label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:13px">MIDI channel
+      <input id="tsch" type="number" min="1" max="16" value="1" style="width:70px" placeholder="mixed" aria-label="MIDI channel for all tracks"></label>
+  </div>
+  <div class="msg" id="srinfo" style="margin-top:0"></div>
+  <details id="ccsetup" class="ccsetup"><summary>Show CC numbers and channels</summary>
+    <div class="tw" style="margin-top:10px"><table id="ccgrid"></table></div>
+    <div class="row" style="margin-top:10px">
+      <button id="tsReset">Read CCs and channels from project</button>
+      <button id="tsDefault">Use default CCs</button>
+      <span class="info">Default = StepRunner-8 factory numbers, MIDI channel 1 (CC BASE 20, 25, 85, 102, 107, 112, 14, 80; Pan 30, 31, 90, 117, 118, 119, 3, 9)</span>
+    </div>
+  </details>
+</section>
+
+<section id="listSec" hidden>
+  <h2>4 · Mappings in project <span id="count"></span></h2>
+  <details id="maplist" class="ccsetup" style="margin-top:0"><summary>Show mappings</summary>
+    <div class="row" style="justify-content:flex-end;margin:8px 0">
+      <button id="clear">Clear all</button>
+    </div>
+    <div class="tw"><table><thead><tr><th>Track</th><th>Source</th><th>Parameter</th><th>ID</th><th>Channel</th><th>CC</th><th></th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="empty" id="empty">No mappings.</div>
+  </details>
+</section>
+
+<section id="saveSec" hidden>
+  <h2>5 · Save</h2>
+  <div class="row">
+    <button class="primary" id="saveOver">Save over original</button>
+    <button id="saveAs">Download as new file</button>
+    <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px"><input type="checkbox" id="bak" checked> download a backup of the original first (.bak)</label>
+  </div>
+  <div class="msg" id="savemsg"></div>
+</section>
+<section id="support" hidden>
+  <h2>6 · Support</h2>
+  <div class="suprow">
+    <p style="margin:0">StepRunner-8 is free and developed in my spare time. If it's earned a place in your MPC workflow and you enjoy using it, a small donation helps keep new features coming.</p>
+    <a class="donate" href="https://www.paypal.com/ncp/payment/PP5SH6BWF8WW8" target="_blank" rel="noopener">Donate with PayPal</a>
+  </div>
+</section>
+</main>
+<script>
+const PARAMS=[[518, "Level", 0.7079457640647888], [517, "Pan", 0.5], [526, "Pad Mute", 0.0], [527, "Pad Solo", 0.0], [522, "Send 1", 0.0], [523, "Send 2", 0.0], [524, "Send 3", 0.0], [525, "Send 4", 0.0], [132, "Pad X Position", 0.5], [133, "Pad Y Position", 0.5], [513, "Tuning", 0.5], [514, "Filter Cutoff", 1.0], [515, "Filter Resonance", 0.0], [516, "Filter Env Depth", 0.0], [519, "Amp Env Attack", 0.0], [520, "Amp Env Decay", 0.04724409431219101], [521, "Amp Env Release", 0.0], [528, "Amp Env Hold", 0.0], [529, "Amp Env Sustain", 1.0], [531, "Filter Env Attack", 0.0], [532, "Filter Env Hold", 0.0], [533, "Filter Env Decay", 0.04724409431219101], [534, "Filter Env Sustain", 1.0], [535, "Filter Env Release", 0.0], [537, "Amp Env Attack Curve", 0.375], [538, "Amp Env Decay Curve", 0.375], [539, "Amp Env Release Curve", 0.375], [540, "Filter Env Attack Curve", 0.375], [541, "Filter Env Decay Curve", 0.375], [542, "Filter Env Release Curve", 0.375], [543, "Pitch Env Attack", 0.0], [544, "Pitch Env Hold", 0.0], [545, "Pitch Env Decay", 0.04724409431219101], [546, "Pitch Env Sustain", 1.0], [547, "Pitch Env Release", 0.0], [548, "Pitch Env Decay Mode", 1.0], [549, "Pitch Env Attack Curve", 0.375], [550, "Pitch Env Decay Curve", 0.375], [551, "Pitch Env Release Curve", 0.375], [552, "Pitch Env Depth", 0.5], [553, "Pitch Env Type", 1.0], [621, "Ramp 1 Time", 0.0], [622, "Ramp 2 Time", 0.0], [623, "Note Counter 1 Size", 0.0], [637, "Note Counter 2 Size", 0.0], [990, "Layer 1 Play Offset", 0.0], [991, "Layer 2 Play Offset", 0.0], [992, "Layer 3 Play Offset", 0.0], [993, "Layer 4 Play Offset", 0.0], [994, "Layer 5 Play Offset", 0.0], [995, "Layer 6 Play Offset", 0.0], [996, "Layer 7 Play Offset", 0.0], [997, "Layer 8 Play Offset", 0.0], [998, "Velocity Scaling", 1.0], [1000, "DrumFX 1", 0.0], [1001, "DrumFX 2", 0.0], [1002, "DrumFX 3", 0.0], [1003, "DrumFX 4", 0.0], [1004, "DrumFX 5", 0.0], [1005, "DrumFX 6", 0.0], [1006, "DrumFX 7", 0.0], [1007, "DrumFX 8", 0.0], [1009, "DrumFX Type1", 0.0], [1010, "DrumFX Type2", 0.692307710647583], [1011, "DrumFX Type3", 0.07692307978868484], [1012, "DrumFX Type4", 0.1538461595773697], [1013, "DrumFX Type5", 0.23076924681663513], [1014, "DrumFX Type6", 0.5384615659713745], [1015, "DrumFX Type7", 0.3076923191547394], [1016, "DrumFX Type8", 1.0], [1039, "Layer 1 Level", 1.0], [1040, "Layer 1 Sample Pan", 0.5], [1043, "Layer 1 Semi Tune", 0.5], [1044, "Layer 1 Fine Tune", 0.5], [1047, "Layer 2 Level", 1.0], [1048, "Layer 2 Sample Pan", 0.5], [1051, "Layer 2 Semi Tune", 0.5], [1052, "Layer 2 Fine Tune", 0.5], [1055, "Layer 3 Level", 1.0], [1056, "Layer 3 Sample Pan", 0.5], [1059, "Layer 3 Semi Tune", 0.5], [1060, "Layer 3 Fine Tune", 0.5], [1063, "Layer 4 Level", 1.0], [1064, "Layer 4 Sample Pan", 0.5], [1067, "Layer 4 Semi Tune", 0.5], [1068, "Layer 4 Fine Tune", 0.5], [1079, "Vel To Filter Attack", 0.0], [1080, "Velocity To Filter Depth", 0.0], [1081, "Vel To Filter Cutoff", 0.0], [1082, "Filter Type", 0.0], [1084, "LFO To Pitch", 0.0], [1085, "LFO To Filter", 0.0], [1086, "LFO To Amp", 0.0], [1087, "LFO To Pan", 0.0], [1088, "LFO Wave", 0.0], [1089, "LFO Rate", 0.5], [1090, "LFO Sync", 0.0], [1092, "Velocity To Pitch", 0.0], [1093, "Velocity To Amp Attack", 0.0], [1094, "Velocity To Amp", 1.0], [1095, "Velocity To Pan", 0.0], [1096, "Velocity to Start", 0.0], [1118, "Layer 1 Slice", 0.0], [1119, "Layer 2 Slice", 0.0], [1120, "Layer 3 Slice", 0.0], [1121, "Layer 4 Slice", 0.0], [1138, "Layer 1 Reverse", 0.0], [1139, "Layer 2 Reverse", 0.0], [1140, "Layer 3 Reverse", 0.0], [1141, "Layer 4 Reverse", 0.0], [1142, "Layer 1 Offset", 0.5], [1143, "Layer 2 Offset", 0.5], [1144, "Layer 3 Offset", 0.5], [1145, "Layer 4 Offset", 0.5], [1167, "Layer 1 Loop Xfade", 0.0], [1168, "Layer 2 Loop Xfade", 0.0], [1169, "Layer 3 Loop Xfade", 0.0], [1170, "Layer 4 Loop Xfade", 0.0], [1171, "Layer 1 Loop Xfade Type", 0.0], [1172, "Layer 2 Loop Xfade Type", 0.0], [1173, "Layer 3 Loop Xfade Type", 0.0], [1174, "Layer 4 Loop Xfade Type", 0.0], [1178, "Layer 1 Slice Tail Length", 0.0], [1179, "Layer 2 Slice Tail Length", 0.0], [1180, "Layer 3 Slice Tail Length", 0.0], [1181, "Layer 4 Slice Tail Length", 0.0], [1182, "Layer 1 Slice Tail Start", 0.0], [1183, "Layer 2 Slice Tail Start", 0.0], [1184, "Layer 3 Slice Tail Start", 0.0], [1185, "Layer 4 Slice Tail Start", 0.0], [1186, "Layer 1 Pitch Random", 0.0], [1187, "Layer 2 Pitch Random", 0.0], [1188, "Layer 3 Pitch Random", 0.0], [1189, "Layer 4 Pitch Random", 0.0], [1190, "Layer 1 Level Random", 0.0], [1191, "Layer 2 Level Random", 0.0], [1192, "Layer 3 Level Random", 0.0], [1193, "Layer 4 Level Random", 0.0], [1194, "Layer 1 Pan Random", 0.0], [1195, "Layer 2 Pan Random", 0.0], [1196, "Layer 3 Pan Random", 0.0], [1197, "Layer 4 Pan Random", 0.0], [1198, "Layer 1 Offset Random", 0.0], [1199, "Layer 2 Offset Random", 0.0], [1200, "Layer 3 Offset Random", 0.0], [1201, "Layer 4 Offset Random", 0.0], [1202, "Attack Random", 0.0], [1203, "Decay Random", 0.0], [1204, "Cutoff Random", 0.0], [1205, "Resonance Random", 0.0], [1206, "Total Random Amount", 1.0], [1219, "LFO Level", 1.0], [1220, "LFO Delay", 0.0], [1221, "LFO Fade In", 0.0], [1222, "LFO 2 Level", 1.0], [1223, "LFO 2 Delay", 0.0], [1224, "LFO 2 Fade In", 0.0], [1234, "LFO 2 Wave", 0.0], [1235, "LFO 2 Rate", 0.5], [1236, "LFO 2 Sync", 0.0], [1237, "LFO 2 Reset", 1.0], [1241, "Global Drift Speed", 0.0], [1242, "Voice Drift Speed", 0.0], [1285, "LFO Delay Sync", 0.0], [1286, "LFO 2 Delay Sync", 0.0], [1287, "LFO Fade In Sync", 0.0], [1288, "LFO 2 Fade In Sync", 0.0], [3081, "Layer 5 Level", 1.0], [3082, "Layer 5 Sample Pan", 0.5], [3085, "Layer 5 Semi Tune", 0.5], [3086, "Layer 5 Fine Tune", 0.5], [3089, "Layer 6 Level", 1.0], [3090, "Layer 6 Sample Pan", 0.5], [3093, "Layer 6 Semi Tune", 0.5], [3094, "Layer 6 Fine Tune", 0.5], [3097, "Layer 7 Level", 1.0], [3098, "Layer 7 Sample Pan", 0.5], [3101, "Layer 7 Semi Tune", 0.5], [3102, "Layer 7 Fine Tune", 0.5], [3105, "Layer 8 Level", 1.0], [3106, "Layer 8 Sample Pan", 0.5], [3109, "Layer 8 Semi Tune", 0.5], [3110, "Layer 8 Fine Tune", 0.5], [3111, "Layer 5 Slice", 0.0], [3112, "Layer 6 Slice", 0.0], [3113, "Layer 7 Slice", 0.0], [3114, "Layer 8 Slice", 0.0], [3131, "Layer 5 Reverse", 0.0], [3132, "Layer 6 Reverse", 0.0], [3133, "Layer 7 Reverse", 0.0], [3134, "Layer 8 Reverse", 0.0], [3135, "Layer 5 Offset", 0.5], [3136, "Layer 6 Offset", 0.5], [3137, "Layer 7 Offset", 0.5], [3138, "Layer 8 Offset", 0.5], [3139, "Layer 5 Loop Xfade", 0.0], [3140, "Layer 6 Loop Xfade", 0.0], [3141, "Layer 7 Loop Xfade", 0.0], [3142, "Layer 8 Loop Xfade", 0.0], [3143, "Layer 5 Loop Xfade Type", 0.0], [3144, "Layer 6 Loop Xfade Type", 0.0], [3145, "Layer 7 Loop Xfade Type", 0.0], [3146, "Layer 8 Loop Xfade Type", 0.0], [3147, "Layer 5 Slice Tail Length", 0.0], [3148, "Layer 6 Slice Tail Length", 0.0], [3149, "Layer 7 Slice Tail Length", 0.0], [3150, "Layer 8 Slice Tail Length", 0.0], [3151, "Layer 5 Slice Tail Start", 0.0], [3152, "Layer 6 Slice Tail Start", 0.0], [3153, "Layer 7 Slice Tail Start", 0.0], [3154, "Layer 8 Slice Tail Start", 0.0], [3155, "Layer 5 Pitch Random", 0.0], [3156, "Layer 6 Pitch Random", 0.0], [3157, "Layer 7 Pitch Random", 0.0], [3158, "Layer 8 Pitch Random", 0.0], [3159, "Layer 5 Level Random", 0.0], [3160, "Layer 6 Level Random", 0.0], [3161, "Layer 7 Level Random", 0.0], [3162, "Layer 8 Level Random", 0.0], [3163, "Layer 5 Pan Random", 0.0], [3164, "Layer 6 Pan Random", 0.0], [3165, "Layer 7 Pan Random", 0.0], [3166, "Layer 8 Pan Random", 0.0], [3167, "Layer 5 Offset Random", 0.0], [3168, "Layer 6 Offset Random", 0.0], [3169, "Layer 7 Offset Random", 0.0], [3170, "Layer 8 Offset Random", 0.0], [3179, "Layer Crossfade Mode", 0.0], [3180, "Layer Crossfade X", 0.0], [3181, "Layer Crossfade Y", 0.0], [3224, "Layer 1 Osc Decay", 0.36730000376701355], [3225, "Layer 2 Osc Decay", 0.36730000376701355], [3226, "Layer 3 Osc Decay", 0.36730000376701355], [3227, "Layer 4 Osc Decay", 0.36730000376701355], [3228, "Layer 5 Osc Decay", 0.36730000376701355], [3229, "Layer 6 Osc Decay", 0.36730000376701355], [3230, "Layer 7 Osc Decay", 0.36730000376701355], [3231, "Layer 8 Osc Decay", 0.36730000376701355], [3232, "Layer 1 Osc Start Phase", 0.0], [3233, "Layer 2 Osc Start Phase", 0.0], [3234, "Layer 3 Osc Start Phase", 0.0], [3235, "Layer 4 Osc Start Phase", 0.0], [3236, "Layer 5 Osc Start Phase", 0.0], [3237, "Layer 6 Osc Start Phase", 0.0], [3238, "Layer 7 Osc Start Phase", 0.0], [3239, "Layer 8 Osc Start Phase", 0.0], [3240, "Layer 1 Osc Param 1", 0.0], [3241, "Layer 2 Osc Param 1", 0.0], [3242, "Layer 3 Osc Param 1", 0.0], [3243, "Layer 4 Osc Param 1", 0.0], [3244, "Layer 5 Osc Param 1", 0.0], [3245, "Layer 6 Osc Param 1", 0.0], [3246, "Layer 7 Osc Param 1", 0.0], [3247, "Layer 8 Osc Param 1", 0.0], [3248, "Layer 1 Osc Param 2", 0.0], [3249, "Layer 2 Osc Param 2", 0.0], [3250, "Layer 3 Osc Param 2", 0.0], [3251, "Layer 4 Osc Param 2", 0.0], [3252, "Layer 5 Osc Param 2", 0.0], [3253, "Layer 6 Osc Param 2", 0.0], [3254, "Layer 7 Osc Param 2", 0.0], [3255, "Layer 8 Osc Param 2", 0.0], [3256, "Layer 1 Osc Param 3", 0.0], [3257, "Layer 2 Osc Param 3", 0.0], [3258, "Layer 3 Osc Param 3", 0.0], [3259, "Layer 4 Osc Param 3", 0.0], [3260, "Layer 5 Osc Param 3", 0.0], [3261, "Layer 6 Osc Param 3", 0.0], [3262, "Layer 7 Osc Param 3", 0.0], [3263, "Layer 8 Osc Param 3", 0.0], [3264, "Layer 1 Osc Param 4", 0.0], [3265, "Layer 2 Osc Param 4", 0.0], [3266, "Layer 3 Osc Param 4", 0.0], [3267, "Layer 4 Osc Param 4", 0.0], [3268, "Layer 5 Osc Param 4", 0.0], [3269, "Layer 6 Osc Param 4", 0.0], [3270, "Layer 7 Osc Param 4", 0.0], [3271, "Layer 8 Osc Param 4", 0.0], [3272, "Layer 1 Osc Param 5", 0.0], [3273, "Layer 2 Osc Param 5", 0.0], [3274, "Layer 3 Osc Param 5", 0.0], [3275, "Layer 4 Osc Param 5", 0.0], [3276, "Layer 5 Osc Param 5", 0.0], [3277, "Layer 6 Osc Param 5", 0.0], [3278, "Layer 7 Osc Param 5", 0.0], [3279, "Layer 8 Osc Param 5", 0.0], [3404, "Articulation 1 Speed", 0.5], [3405, "Articulation 2 Speed", 0.5], [3406, "Articulation 3 Speed", 0.5], [3407, "Articulation 4 Speed", 0.5], [3408, "Articulation 1 Dynamics", 0.5], [3409, "Articulation 2 Dynamics", 0.5], [3410, "Articulation 3 Dynamics", 0.5], [3411, "Articulation 4 Dynamics", 0.5], [3412, "Articulation 1 Stereo", 1.0], [3413, "Articulation 2 Stereo", 1.0], [3414, "Articulation 3 Stereo", 1.0], [3415, "Articulation 4 Stereo", 1.0], [3416, "Articulation 1 Speed Scale", 0.5], [3417, "Articulation 2 Speed Scale", 0.5], [3418, "Articulation 3 Speed Scale", 0.5], [3419, "Articulation 4 Speed Scale", 0.5], [584, "Vel To Filter Attack", 0.0], [585, "Velocity To Filter Depth", 0.0], [586, "Vel To Filter Cutoff", 0.0], [587, "Filter Type", 0.0], [588, "LFO To Pitch", 0.0], [589, "LFO To Filter", 0.0], [590, "LFO To Amp", 0.0], [591, "LFO To Pan", 0.0], [592, "LFO Wave", 0.0], [593, "LFO Rate", 0.0], [594, "LFO Sync", 0.0], [596, "Velocity To Pitch", 0.0], [597, "Velocity To Amp Attack", 0.0], [598, "Velocity To Amp", 0.0], [599, "Velocity To Pan", 0.0], [600, "Attack Random", 0.0], [601, "Decay Random", 0.0], [602, "Cutoff Random", 0.0], [603, "Resonance Random", 0.0], [604, "Total Random Amount", 0.0], [7, "Volume", 0.7079457640647888], [10, "Pan", 0.5], [91, "Send 1", 0.0], [92, "Send 2", 0.0], [93, "Send 3", 0.0], [94, "Send 4", 0.0], [95, "Send 5", 0.0], [256, "Mute", 0.0], [257, "Solo", 0.0], [320, "Insert 1", 0.0], [321, "Insert 2", 0.0], [322, "Insert 3", 0.0], [323, "Insert 4", 0.0], [324, "Inserts Enabled", 1.0], [325, "Audio Route", 9.0], [326, "Insert Enable 1", 0.0], [327, "Insert Enable 2", 0.0], [328, "Insert Enable 3", 0.0], [329, "Insert Enable 4", 0.0], [330, "Crossfader Route", 0.0], [331, "Crossfader Position", 0.0], [332, "Crossfader Curve", 0.0], [333, "Cue Bus Enable", 0.0], [334, "Crossfader Breakpoint", 0.0], [530, "Amp Env Decay Mode", 1.0], [536, "Filter Env Decay Mode", 1.0], [554, "Keygroup Legacy Mode", 0.0], [555, "Filter Cutoff", 0.0], [556, "Filter Resonance", 0.0], [557, "Filter Env Depth", 0.0], [558, "Amp Env Attack", 0.0], [559, "Amp Env Decay", 0.0], [560, "Amp Env Release", 0.0], [561, "Amp Env Hold", 0.0], [562, "Amp Env Sustain", 0.0], [563, "Filter Env Attack", 0.0], [564, "Filter Env Hold", 0.0], [565, "Filter Env Decay", 0.0], [566, "Filter Env Sustain", 0.0], [567, "Filter Env Release", 0.0], [568, "Amp Env Attack Curve", 0.0], [569, "Amp Env Decay Curve", 0.0], [570, "Amp Env Release Curve", 0.0], [571, "Filter Env Attack Curve", 0.0], [572, "Filter Env Decay Curve", 0.0], [573, "Filter Env Release Curve", 0.0], [574, "Pitch Env Attack", 0.0], [575, "Pitch Env Hold", 0.0], [576, "Pitch Env Decay", 0.0], [577, "Pitch Env Sustain", 0.0], [578, "Pitch Env Release", 0.0], [579, "Pitch Env Attack Curve", 0.0], [580, "Pitch Env Decay Curve", 0.0], [581, "Pitch Env Release Curve", 0.0], [582, "Pitch Env Depth", 0.0], [583, "Filter Keytrack", 0.0], [595, "LFO Reset", 0.0], [605, "Filter 2 Cutoff", 1.0], [606, "Filter 2 Resonance", 0.0], [607, "Filter 2 Env Depth", 0.0], [608, "Amp Env Delay", 0.0], [609, "Filter Env Delay", 0.0], [610, "Pitch Env Delay", 0.0], [611, "Aux Env Delay", 0.0], [612, "Aux Env Attack", 0.0], [613, "Aux Env Hold", 0.0], [614, "Aux Env Decay", 0.04724409431219101], [615, "Aux Env Sustain", 1.0], [616, "Aux Env Release", 0.0], [617, "Aux Env Attack Curve", 0.375], [618, "Aux Env Decay Curve", 0.375], [619, "Aux Env Release Curve", 0.375], [620, "Aux Env Amount", 1.0], [624, "Timbre Shift", 0.0], [625, "Amp Env Looped", 0.0], [626, "Filter Env Looped", 0.0], [627, "Pitch Env Looped", 0.0], [628, "Aux Env Looped", 0.0], [629, "Amp Env Tempo Sync", 0.0], [630, "Filter Env Tempo Sync", 0.0], [631, "Pitch Env Tempo Sync", 0.0], [632, "Aux Env Tempo Sync", 0.0], [633, "Amp Env Time Scaling", 0.5], [634, "Filter Env Time Scaling", 0.5], [635, "Pitch Env Time Scaling", 0.5], [636, "Aux Env Time Scaling", 0.5], [999, "Mono Retrigger", 0.0], [1008, "DrumFX 9", 0.0], [1017, "DrumFX Type9", 1.0], [1018, "MIDI Out Behaviour", 0.5], [1019, "MIDI Out Channel", 0.0], [1020, "MIDI Out Note", 0.0]];
+const PLUG={"DrumSynth:Multi": ["1 Model", "1 On", "1 Velocity", "1 Velocity 2", "1 Velocity 2 Target", "1 One-Shot", "1 Solo", "1 Tune", "1 Hold", "1 Decay", "1 Sweep", "1 Harm", "1 Click", "1 Noise", "1 Noise-Col", "1 Instrument", "1 Transient", "1 Attack", "1 Attack Shape", "1 Sustain", "1 Distortion", "1 Pre-Shape", "1 Drive", "1 Threshold", "1 High Cut", "1 Mix", "1 EQ", "1 Low Freq", "1 Low Gain", "1 Low Mid Freq", "1 Low Mid Gain", "1 Low Mid Q", "1 High Mid Freq", "1 High Mid Gain", "1 High Mid Q", "1 High Freq", "1 High Gain", "1 Compressor", "1 Threshold", "1 Ratio", "1 Attack", "1 Output", "1 Delay Send", "1 Diffuser Send", "1 Reverb Send", "1 Pan", "1 Gain", "2 Model", "2 On", "2 Velocity", "2 Velocity 2", "2 Velocity 2 Target", "2 One-Shot", "2 Solo", "2 Tune", "2 Low", "2 High", "2 Noise", "2 Noise-Col", "2 Hold", "2 Decay", "2 Stereo", "2 Instrument", "2 Transient", "2 Attack", "2 Attack Shape", "2 Sustain", "2 Distortion", "2 Pre-Shape", "2 Drive", "2 Threshold", "2 High Cut", "2 Mix", "2 EQ", "2 Low Freq", "2 Low Gain", "2 Low Mid Freq", "2 Low Mid Gain", "2 Low Mid Q", "2 High Mid Freq", "2 High Mid Gain", "2 High Mid Q", "2 High Freq", "2 High Gain", "2 Compressor", "2 Threshold", "2 Ratio", "2 Attack", "2 Output", "2 Delay Send", "2 Diffuser Send", "2 Reverb Send", "2 Pan", "2 Gain", "3 Model", "3 On", "3 Velocity", "3 Velocity 2", "3 Velocity 2 Target", "3 One-Shot", "3 Solo", "3 Tune", "3 Hold", "3 Decay", "3 Stereo", "3 Lo-Vol", "3 Hi-Vol", "3 Lo-Shape", "3 Hi-Shape", "3 Instrument", "3 Transient", "3 Attack", "3 Attack Shape", "3 Sustain", "3 Distortion", "3 Pre-Shape", "3 Drive", "3 Threshold", "3 High Cut", "3 Mix", "3 EQ", "3 Low Freq", "3 Low Gain", "3 Low Mid Freq", "3 Low Mid Gain", "3 Low Mid Q", "3 High Mid Freq", "3 High Mid Gain", "3 High Mid Q", "3 High Freq", "3 High Gain", "3 Compressor", "3 Threshold", "3 Ratio", "3 Attack", "3 Output", "3 Delay Send", "3 Diffuser Send", "3 Reverb Send", "3 Pan", "3 Gain", "4 Model", "4 On", "4 Velocity", "4 Velocity 2", "4 Velocity 2 Target", "4 One-Shot", "4 Solo", "4 Tune", "4 Hold", "4 Decay", "4 Stereo", "4 Lo-Vol", "4 Hi-Vol", "4 Lo-Shape", "4 Hi-Shape", "4 Instrument", "4 Transient", "4 Attack", "4 Attack Shape", "4 Sustain", "4 Distortion", "4 Pre-Shape", "4 Drive", "4 Threshold", "4 High Cut", "4 Mix", "4 EQ", "4 Low Freq", "4 Low Gain", "4 Low Mid Freq", "4 Low Mid Gain", "4 Low Mid Q", "4 High Mid Freq", "4 High Mid Gain", "4 High Mid Q", "4 High Freq", "4 High Gain", "4 Compressor", "4 Threshold", "4 Ratio", "4 Attack", "4 Output", "4 Delay Send", "4 Diffuser Send", "4 Reverb Send", "4 Pan", "4 Gain", "5 Model", "5 On", "5 Velocity", "5 Velocity 2", "5 Velocity 2 Target", "5 One-Shot", "5 Solo", "5 Count", "5 Speed", "5 Color", "5 Reso", "5 Tune", "5 Room", "5 Room-Len", "5 Stereo", "5 Instrument", "5 Transient", "5 Attack", "5 Attack Shape", "5 Sustain", "5 Distortion", "5 Pre-Shape", "5 Drive", "5 Threshold", "5 High Cut", "5 Mix", "5 EQ", "5 Low Freq", "5 Low Gain", "5 Low Mid Freq", "5 Low Mid Gain", "5 Low Mid Q", "5 High Mid Freq", "5 High Mid Gain", "5 High Mid Q", "5 High Freq", "5 High Gain", "5 Compressor", "5 Threshold", "5 Ratio", "5 Attack", "5 Output", "5 Delay Send", "5 Diffuser Send", "5 Reverb Send", "5 Pan", "5 Gain", "6 Model", "6 On", "6 Velocity", "6 Velocity 2", "6 Velocity 2 Target", "6 One-Shot", "6 Solo", "6 Tune", "6 Decay", "6 Noise", "6 Complex", "", "", "", "", "6 Instrument", "6 Transient", "6 Attack", "6 Attack Shape", "6 Sustain", "6 Distortion", "6 Pre-Shape", "6 Drive", "6 Threshold", "6 High Cut", "6 Mix", "6 EQ", "6 Low Freq", "6 Low Gain", "6 Low Mid Freq", "6 Low Mid Gain", "6 Low Mid Q", "6 High Mid Freq", "6 High Mid Gain", "6 High Mid Q", "6 High Freq", "6 High Gain", "6 Compressor", "6 Threshold", "6 Ratio", "6 Attack", "6 Output", "6 Delay Send", "6 Diffuser Send", "6 Reverb Send", "6 Pan", "6 Gain", "7 Model", "7 On", "7 Velocity", "7 Velocity 2", "7 Velocity 2 Target", "7 One-Shot", "7 Solo", "7 Tune", "7 Tone", "7 Decay", "7 Complex", "7 Noise", "7 Noise-Col", "7 Noise-Dec", "7 Noise-Stereo", "7 Instrument", "7 Transient", "7 Attack", "7 Attack Shape", "7 Sustain", "7 Distortion", "7 Pre-Shape", "7 Drive", "7 Threshold", "7 High Cut", "7 Mix", "7 EQ", "7 Low Freq", "7 Low Gain", "7 Low Mid Freq", "7 Low Mid Gain", "7 Low Mid Q", "7 High Mid Freq", "7 High Mid Gain", "7 High Mid Q", "7 High Freq", "7 High Gain", "7 Compressor", "7 Threshold", "7 Ratio", "7 Attack", "7 Output", "7 Delay Send", "7 Diffuser Send", "7 Reverb Send", "7 Pan", "7 Gain", "8 Model", "8 On", "8 Velocity", "8 Velocity 2", "8 Velocity 2 Target", "8 One-Shot", "8 Solo", "8 Tune", "8 Decay", "8 Tone", "8 Stereo", "", "", "", "", "8 Instrument", "8 Transient", "8 Attack", "8 Attack Shape", "8 Sustain", "8 Distortion", "8 Pre-Shape", "8 Drive", "8 Threshold", "8 High Cut", "8 Mix", "8 EQ", "8 Low Freq", "8 Low Gain", "8 Low Mid Freq", "8 Low Mid Gain", "8 Low Mid Q", "8 High Mid Freq", "8 High Mid Gain", "8 High Mid Q", "8 High Freq", "8 High Gain", "8 Compressor", "8 Threshold", "8 Ratio", "8 Attack", "8 Output", "8 Delay Send", "8 Diffuser Send", "8 Reverb Send", "8 Pan", "8 Gain", "Delay", "Delay Time", "Ratio", "Feedback", "Fdbk Filter Freq", "Fdbk Reso", "Fdbk Reso Freq", "Stereo Width", "Reverb Send", "Diffuser", "Delay", "Feedback", "Diffusion", "Bright", "Reverb", "Time", "Low Cut", "High Cut", "Mode", "1 Mute Group", "2 Mute Group", "3 Mute Group", "4 Mute Group", "5 Mute Group", "6 Mute Group", "7 Mute Group", "8 Mute Group"], "6W6": ["BD Tune", "BD Decay", "BD Attack", "BD Drive", "BD Distortion", "BD Level", "SD Tune", "SD Snappy", "SD Tone", "SD Drive", "SD Distortion", "SD Level", "LT Tune", "LT Decay", "LT Drive", "LT Distortion", "LT Level", "HT Tune", "HT Decay", "HT Drive", "HT Distortion", "HT Level", "CH Tune", "CH Decay", "CH Drive", "CH Distortion", "CH Level", "Choke", "OH Tune", "OH Decay", "OH Drive", "OH Distortion", "OH Level", "CY Tune", "CY Decay", "CY Drive", "CY Distortion", "CY Level", "CP Tune", "CP Decay", "CP Noise", "CP Drive", "CP Distortion", "CP Level", "Master Dist", "Master Drive", "Volume", "Comp", "Velocity", "Note Map", "BD Rev", "BD Dly", "SD Rev", "SD Dly", "LT Rev", "LT Dly", "HT Rev", "HT Dly", "CH Rev", "CH Dly", "OH Rev", "OH Dly", "CY Rev", "CY Dly", "CP Rev", "CP Dly", "REV Decay", "REV Tone", "REV HPF", "REV Level", "DLY Time", "DLY Fdbk", "DLY Tone", "DLY HPF", "DLY Level", "SD Decay", "Focus", "Mutes", "BD Distortion List", "SD Distortion List", "LT Distortion List", "HT Distortion List", "CH Distortion List", "Choke List", "OH Distortion List", "CY Distortion List", "CP Distortion List", "DLY Time List", "Master Dist List"], "8W8": ["BD Tune", "BD Attack", "BD Decay", "BD Tone", "BD Drive", "BD Distortion", "BD Level", "SD Tune", "SD Decay", "SD Snappy", "SD Drive", "SD Distortion", "SD Level", "LT Tune", "LT Decay", "LT Drive", "LT Distortion", "LT Level", "MT Tune", "MT Decay", "MT Drive", "MT Distortion", "MT Level", "HT Tune", "HT Decay", "HT Drive", "HT Distortion", "HT Level", "LC Tune", "LC Decay", "LC Drive", "LC Distortion", "LC Level", "MC Tune", "MC Decay", "MC Drive", "MC Distortion", "MC Level", "HC Tune", "HC Decay", "HC Drive", "HC Distortion", "HC Level", "RS Tune", "RS Decay", "RS Drive", "RS Distortion", "RS Level", "CL Tune", "CL Decay", "CL Drive", "CL Distortion", "CL Level", "MA Tune", "MA Attack", "MA Decay", "MA Drive", "MA Distortion", "MA Level", "CP Tune", "CP Decay", "CP Drive", "CP Distortion", "CP Level", "CB Tune", "CB Decay", "CB Drive", "CB Distortion", "CB Level", "CH Tune", "CH Decay", "CH Drive", "CH Distortion", "CH Level", "Choke", "OH Tune", "OH Decay", "OH Drive", "OH Distortion", "OH Level", "CY Tune", "CY Decay", "CY Drive", "CY Distortion", "CY Level", "Master Dist", "Master Drive", "Comp", "Volume", "Velocity", "Note Map", "SD Rev", "SD Dly", "LT Rev", "LT Dly", "MT Rev", "MT Dly", "HT Rev", "HT Dly", "LC Rev", "LC Dly", "MC Rev", "MC Dly", "HC Rev", "HC Dly", "RS Rev", "RS Dly", "CL Rev", "CL Dly", "MA Rev", "MA Dly", "CP Rev", "CP Dly", "CB Rev", "CB Dly", "CH Rev", "CH Dly", "OH Rev", "OH Dly", "CY Rev", "CY Dly", "REV Decay", "REV Tone", "REV HPF", "REV Level", "DLY Time", "DLY Fdbk", "DLY Tone", "DLY HPF", "DLY Level", "Focus", "Mutes", "BD Distortion List", "SD Distortion List", "LT Distortion List", "MT Distortion List", "HT Distortion List", "LC Distortion List", "MC Distortion List", "HC Distortion List", "RS Distortion List", "CL Distortion List", "MA Distortion List", "CP Distortion List", "CB Distortion List", "CH Distortion List", "Choke List", "OH Distortion List", "CY Distortion List", "DLY Time List", "Master Dist List"], "9W9": ["Note Map", "BD Tune", "BD Attack", "BD Decay", "BD P. Depth", "BD Pitch", "BD Drive", "BD Distortion", "BD Level", "SN Tune", "SN Tone", "SN Snappy", "SN Drive", "SN Distortion", "SN Level", "SN Rev", "SN Dly", "LT Tune", "LT Decay", "LT Attack", "LT Drive", "LT Distortion", "LT Level", "LT Rev", "LT Dly", "MT Tune", "MT Decay", "MT Attack", "MT Drive", "MT Distortion", "MT Level", "MT Rev", "MT Dly", "HT Tune", "HT Decay", "HT Attack", "HT Drive", "HT Distortion", "HT Level", "HT Rev", "HT Dly", "RM Tune", "RM Drive", "RM Distortion", "RM Level", "RM Rev", "RM Dly", "CP Tune", "CP Tail", "CP Drive", "CP Distortion", "CP Level", "CP Rev", "CP Dly", "CH Decay", "CH Tune", "CH Drive", "CH Distortion", "CH Level", "CH Rev", "CH Dly", "OH Decay", "OH Tune", "OH Drive", "OH Distortion", "OH Level", "OH Rev", "OH Dly", "RD Decay", "RD Tune", "RD Drive", "RD Distortion", "RD Level", "RD Rev", "RD Dly", "CY Decay", "CY Tune", "CY Drive", "CY Distortion", "CY Level", "CY Rev", "CY Dly", "Master Dist", "Master Drive", "Comp", "Volume", "Accent", "Velocity", "Rev Decay", "Rev Tone", "Rev HPF", "Rev Level", "Dly Time", "Dly Fdbk", "Dly Tone", "Dly HPF", "Dly Level", "BD Distortion List", "SN Distortion List", "LT Distortion List", "MT Distortion List", "HT Distortion List", "RM Distortion List", "CP Distortion List", "CH Distortion List", "OH Distortion List", "RD Distortion List", "CY Distortion List", "Dly Time List", "Master Dist List"], "Iona": ["Volume", "Transpose", "ModWheel Lfo Amount", "Portamento Mode", "Portamento Time", "Lfo Shape", "Lfo Sync", "Lfo Speed", "LFO Pitch Modulation", "VCO Range", "Pulse Width", "PWM Source", "Saw Level", "Pulse Level", "Sub Mode", "Sub Level", "Noise Level", "Cutoff", "Resonance", "Vcf Env Amount", "Vcf Mod Amount", "Vcf Kbd Amount", "VCA Mode", "VCA Env Trig", "Env1 Attack", "Env1 Decay", "Env1 Sustain", "Env1 Release", "", "", "", "Arp Up", "Arp Down", "Arp Up/Down", "Arpeggiator Gate", "Arpeggiator Hold", "Arpeggiator Octaves", "StepSeq Record", "StepSeq Playback", "StepSeq Reset", "StepSeq Shift Left", "StepSeq Shift Right", "StepSeq Step", "StepSeq Playback Steps", "StepSeq Tie", "StepSeq Legato", "StepSeq Rest", "StepSeq Transpose", "Arp/Seq Clock Source", "Arp/Seq Speed", "Arp/Seq Swing", "Note 1", "Note 2", "Note 3", "Note 4", "Note 5", "Note 6", "Note 7", "Note 8", "Note 9", "Note 10", "Note 11", "Note 12", "Note 13", "Note 14", "Note 15", "Note 16", "Note 17", "Note 18", "Note 19", "Note 20", "Note 21", "Note 22", "Note 23", "Note 24", "Note 25", "Note 26", "Note 27", "Note 28", "Note 29", "Note 30", "Note 31", "Note 32", "Note 33", "Note 34", "Note 35", "Note 36", "Note 37", "Note 38", "Note 39", "Note 40", "Note 41", "Note 42", "Note 43", "Note 44", "Note 45", "Note 46", "Note 47", "Note 48", "Note 49", "Note 50", "Note 51", "Note 52", "Note 53", "Note 54", "Note 55", "Note 56", "Note 57", "Note 58", "Note 59", "Note 60", "Note 61", "Note 62", "Note 63", "Note 64", "Note 65", "Note 66", "Note 67", "Note 68", "Note 69", "Note 70", "Note 71", "Note 72", "Note 73", "Note 74", "Note 75", "Note 76", "Note 77", "Note 78", "Note 79", "Note 80", "Note 81", "Note 82", "Note 83", "Note 84", "Note 85", "Note 86", "Note 87", "Note 88", "Note 89", "Note 90", "Note 91", "Note 92", "Note 93", "Note 94", "Note 95", "Note 96", "Note 97", "Note 98", "Note 99", "Note 100", "Note 101", "Note 102", "Note 103", "Note 104", "Note 105", "Note 106", "Note 107", "Note 108", "Note 109", "Note 110", "Note 111", "Note 112", "Note 113", "Note 114", "Note 115", "Note 116", "Note 117", "Note 118", "Note 119", "Note 120", "Note 121", "Note 122", "Note 123", "Note 124", "Note 125", "Note 126", "Note 127", "Note 128", "Gate 1", "Gate 2", "Gate 3", "Gate 4", "Gate 5", "Gate 6", "Gate 7", "Gate 8", "Gate 9", "Gate 10", "Gate 11", "Gate 12", "Gate 13", "Gate 14", "Gate 15", "Gate 16", "Gate 17", "Gate 18", "Gate 19", "Gate 20", "Gate 21", "Gate 22", "Gate 23", "Gate 24", "Gate 25", "Gate 26", "Gate 27", "Gate 28", "Gate 29", "Gate 30", "Gate 31", "Gate 32", "Gate 33", "Gate 34", "Gate 35", "Gate 36", "Gate 37", "Gate 38", "Gate 39", "Gate 40", "Gate 41", "Gate 42", "Gate 43", "Gate 44", "Gate 45", "Gate 46", "Gate 47", "Gate 48", "Gate 49", "Gate 50", "Gate 51", "Gate 52", "Gate 53", "Gate 54", "Gate 55", "Gate 56", "Gate 57", "Gate 58", "Gate 59", "Gate 60", "Gate 61", "Gate 62", "Gate 63", "Gate 64", "Gate 65", "Gate 66", "Gate 67", "Gate 68", "Gate 69", "Gate 70", "Gate 71", "Gate 72", "Gate 73", "Gate 74", "Gate 75", "Gate 76", "Gate 77", "Gate 78", "Gate 79", "Gate 80", "Gate 81", "Gate 82", "Gate 83", "Gate 84", "Gate 85", "Gate 86", "Gate 87", "Gate 88", "Gate 89", "Gate 90", "Gate 91", "Gate 92", "Gate 93", "Gate 94", "Gate 95", "Gate 96", "Gate 97", "Gate 98", "Gate 99", "Gate 100", "Gate 101", "Gate 102", "Gate 103", "Gate 104", "Gate 105", "Gate 106", "Gate 107", "Gate 108", "Gate 109", "Gate 110", "Gate 111", "Gate 112", "Gate 113", "Gate 114", "Gate 115", "Gate 116", "Gate 117", "Gate 118", "Gate 119", "Gate 120", "Gate 121", "Gate 122", "Gate 123", "Gate 124", "Gate 125", "Gate 126", "Gate 127", "Gate 128", "Step 1", "Step 2", "Step 3", "Step 4", "Step 5", "Step 6", "Step 7", "Step 8", "Step 9", "Step 10", "Step 11", "Step 12", "Step 13", "Step 14", "Step 15", "Step 16", "Step 17", "Step 18", "Step 19", "Step 20", "Step 21", "Step 22", "Step 23", "Step 24", "Step 25", "Step 26", "Step 27", "Step 28", "Step 29", "Step 30", "Step 31", "Step 32", "Step 33", "Step 34", "Step 35", "Step 36", "Step 37", "Step 38", "Step 39", "Step 40", "Step 41", "Step 42", "Step 43", "Step 44", "Step 45", "Step 46", "Step 47", "Step 48", "Step 49", "Step 50", "Step 51", "Step 52", "Step 53", "Step 54", "Step 55", "Step 56", "Step 57", "Step 58", "Step 59", "Step 60", "Step 61", "Step 62", "Step 63", "Step 64", "Step 65", "Step 66", "Step 67", "Step 68", "Step 69", "Step 70", "Step 71", "Step 72", "Step 73", "Step 74", "Step 75", "Step 76", "Step 77", "Step 78", "Step 79", "Step 80", "Step 81", "Step 82", "Step 83", "Step 84", "Step 85", "Step 86", "Step 87", "Step 88", "Step 89", "Step 90", "Step 91", "Step 92", "Step 93", "Step 94", "Step 95", "Step 96", "Step 97", "Step 98", "Step 99", "Step 100", "Step 101", "Step 102", "Step 103", "Step 104", "Step 105", "Step 106", "Step 107", "Step 108", "Step 109", "Step 110", "Step 111", "Step 112", "Step 113", "Step 114", "Step 115", "Step 116", "Step 117", "Step 118", "Step 119", "Step 120", "Step 121", "Step 122", "Step 123", "Step 124", "Step 125", "Step 126", "Step 127", "Step 128", "StepSeq Locked", "Front Panel Color", "Lo-Fi", "Decimator", "Bitcrush", "Mix", "Pitch Bend Up", "Pitch Bend Down", "Bend VCF Amount", "", "", "", "", "", "", "", "", "Delay", "Delay Time", "Delay Sync", "Delay L/R Ratio", "Delay Feedback", "Delay Fdbk Damp", "Delay Fdbk Reso", "Delay Fdbk Reso Freq", "Delay HPF", "Delay Width", "Delay Mix", "Reverb", "Reverb Pre-Delay", "", "", "", "Reverb Decay", "", "Reverb Damping (High)", "Reverb Modulation Speed", "Reverb Modulation Amount", "Reverb Stereo Width", "Reverb Mix", "EQ", "EQ Low Gain", "EQ Low Freq", "EQ Mid Gain", "EQ Mid Freq", "EQ Mid Q", "EQ High Gain", "EQ High Freq", "EQ Output"], "CW-78": ["BD Tune", "BD Decay", "BD Drive", "BD Distortion", "BD Level", "SD Tune", "SD Decay", "SD Snappy", "SD Drive", "SD Distortion", "SD Level", "RS Tune", "RS Decay", "RS Drive", "RS Distortion", "RS Level", "HH Tune", "HH Decay", "HH Drive", "HH Distortion", "HH Level", "CY Tune", "CY Decay", "CY Drive", "CY Distortion", "CY Level", "M Tune", "M Decay", "M Drive", "M Distortion", "M Level", "C Tune", "C Decay", "C Drive", "C Distortion", "C Level", "HB Tune", "HB Decay", "HB Drive", "HB Distortion", "HB Level", "LB Tune", "LB Decay", "LB Drive", "LB Distortion", "LB Level", "LC Tune", "LC Decay", "LC Drive", "LC Distortion", "LC Level", "CB Tune", "CB Decay", "CB Drive", "CB Distortion", "CB Level", "TB Tune", "TB Decay", "TB Drive", "TB Distortion", "TB Level", "G Tune", "G Decay", "G Rate", "G Drive", "G Distortion", "G Level", "MB Tune", "MB Decay", "MB Drive", "MB Distortion", "MB Level", "Master Dist", "Master Drive", "Comp", "Volume", "Velocity", "Note Map", "Choke", "SD Rev", "SD Dly", "RS Rev", "RS Dly", "HH Rev", "HH Dly", "CY Rev", "CY Dly", "M Rev", "M Dly", "C Rev", "C Dly", "HB Rev", "HB Dly", "LB Rev", "LB Dly", "LC Rev", "LC Dly", "CB Rev", "CB Dly", "TB Rev", "TB Dly", "G Rev", "G Dly", "MB Rev", "MB Dly", "REV Decay", "REV Tone", "REV HPF", "REV Level", "DLY Time", "DLY Fdbk", "DLY Tone", "DLY HPF", "DLY Level", "RHY Mode", "RHY A/B", "RHY Rhythm 1", "RHY Rhythm 2", "Focus", "Mutes", "BD Distortion List", "SD Distortion List", "RS Distortion List", "HH Distortion List", "CY Distortion List", "M Distortion List", "C Distortion List", "HB Distortion List", "LB Distortion List", "LC Distortion List", "CB Distortion List", "TB Distortion List", "G Distortion List", "MB Distortion List", "RHY Mode List", "RHY A/B List", "RHY Rhythm 1 List", "RHY Rhythm 2 List", "DLY Time List", "Master Dist List", "Choke List"], "TR-MPC": ["Slot 1 voice", "Slot 1 Kit", "Slot 1 Level", "Slot 1 Tune", "Slot 1 Decay", "Slot 1 Drive", "Slot 1 Dist", "Slot 1 Attack", "Slot 1 Tone", "Slot 1 Snappy", "Slot 1 Noise", "Slot 1 Rate", "Slot 1 Sweep", "Slot 1 Pitch Mod", "Slot 1 Noise Decay", "Slot 1 Saturate", "Slot 1 Pan", "Slot 1 Rev", "Slot 1 Dly", "Slot 2 voice", "Slot 2 Kit", "Slot 2 Level", "Slot 2 Tune", "Slot 2 Decay", "Slot 2 Drive", "Slot 2 Dist", "Slot 2 Attack", "Slot 2 Tone", "Slot 2 Snappy", "Slot 2 Noise", "Slot 2 Rate", "Slot 2 Sweep", "Slot 2 Pitch Mod", "Slot 2 Noise Decay", "Slot 2 Saturate", "Slot 2 Pan", "Slot 2 Rev", "Slot 2 Dly", "Slot 3 voice", "Slot 3 Kit", "Slot 3 Level", "Slot 3 Tune", "Slot 3 Decay", "Slot 3 Drive", "Slot 3 Dist", "Slot 3 Attack", "Slot 3 Tone", "Slot 3 Snappy", "Slot 3 Noise", "Slot 3 Rate", "Slot 3 Sweep", "Slot 3 Pitch Mod", "Slot 3 Noise Decay", "Slot 3 Saturate", "Slot 3 Pan", "Slot 3 Rev", "Slot 3 Dly", "Slot 4 voice", "Slot 4 Kit", "Slot 4 Level", "Slot 4 Tune", "Slot 4 Decay", "Slot 4 Drive", "Slot 4 Dist", "Slot 4 Attack", "Slot 4 Tone", "Slot 4 Snappy", "Slot 4 Noise", "Slot 4 Rate", "Slot 4 Sweep", "Slot 4 Pitch Mod", "Slot 4 Noise Decay", "Slot 4 Saturate", "Slot 4 Pan", "Slot 4 Rev", "Slot 4 Dly", "Slot 5 voice", "Slot 5 Kit", "Slot 5 Level", "Slot 5 Tune", "Slot 5 Decay", "Slot 5 Drive", "Slot 5 Dist", "Slot 5 Attack", "Slot 5 Tone", "Slot 5 Snappy", "Slot 5 Noise", "Slot 5 Rate", "Slot 5 Sweep", "Slot 5 Pitch Mod", "Slot 5 Noise Decay", "Slot 5 Saturate", "Slot 5 Pan", "Slot 5 Rev", "Slot 5 Dly", "Slot 6 voice", "Slot 6 Kit", "Slot 6 Level", "Slot 6 Tune", "Slot 6 Decay", "Slot 6 Drive", "Slot 6 Dist", "Slot 6 Attack", "Slot 6 Tone", "Slot 6 Snappy", "Slot 6 Noise", "Slot 6 Rate", "Slot 6 Sweep", "Slot 6 Pitch Mod", "Slot 6 Noise Decay", "Slot 6 Saturate", "Slot 6 Pan", "Slot 6 Rev", "Slot 6 Dly", "Slot 7 voice", "Slot 7 Kit", "Slot 7 Level", "Slot 7 Tune", "Slot 7 Decay", "Slot 7 Drive", "Slot 7 Dist", "Slot 7 Attack", "Slot 7 Tone", "Slot 7 Snappy", "Slot 7 Noise", "Slot 7 Rate", "Slot 7 Sweep", "Slot 7 Pitch Mod", "Slot 7 Noise Decay", "Slot 7 Saturate", "Slot 7 Pan", "Slot 7 Rev", "Slot 7 Dly", "Slot 8 voice", "Slot 8 Kit", "Slot 8 Level", "Slot 8 Tune", "Slot 8 Decay", "Slot 8 Drive", "Slot 8 Dist", "Slot 8 Attack", "Slot 8 Tone", "Slot 8 Snappy", "Slot 8 Noise", "Slot 8 Rate", "Slot 8 Sweep", "Slot 8 Pitch Mod", "Slot 8 Noise Decay", "Slot 8 Saturate", "Slot 8 Pan", "Slot 8 Rev", "Slot 8 Dly", "Slot 9 voice", "Slot 9 Kit", "Slot 9 Level", "Slot 9 Tune", "Slot 9 Decay", "Slot 9 Drive", "Slot 9 Dist", "Slot 9 Attack", "Slot 9 Tone", "Slot 9 Snappy", "Slot 9 Noise", "Slot 9 Rate", "Slot 9 Sweep", "Slot 9 Pitch Mod", "Slot 9 Noise Decay", "Slot 9 Saturate", "Slot 9 Pan", "Slot 9 Rev", "Slot 9 Dly", "Slot 10 voice", "Slot 10 Kit", "Slot 10 Level", "Slot 10 Tune", "Slot 10 Decay", "Slot 10 Drive", "Slot 10 Dist", "Slot 10 Attack", "Slot 10 Tone", "Slot 10 Snappy", "Slot 10 Noise", "Slot 10 Rate", "Slot 10 Sweep", "Slot 10 Pitch Mod", "Slot 10 Noise Decay", "Slot 10 Saturate", "Slot 10 Pan", "Slot 10 Rev", "Slot 10 Dly", "Slot 11 voice", "Slot 11 Kit", "Slot 11 Level", "Slot 11 Tune", "Slot 11 Decay", "Slot 11 Drive", "Slot 11 Dist", "Slot 11 Attack", "Slot 11 Tone", "Slot 11 Snappy", "Slot 11 Noise", "Slot 11 Rate", "Slot 11 Sweep", "Slot 11 Pitch Mod", "Slot 11 Noise Decay", "Slot 11 Saturate", "Slot 11 Pan", "Slot 11 Rev", "Slot 11 Dly", "Slot 12 voice", "Slot 12 Kit", "Slot 12 Level", "Slot 12 Tune", "Slot 12 Decay", "Slot 12 Drive", "Slot 12 Dist", "Slot 12 Attack", "Slot 12 Tone", "Slot 12 Snappy", "Slot 12 Noise", "Slot 12 Rate", "Slot 12 Sweep", "Slot 12 Pitch Mod", "Slot 12 Noise Decay", "Slot 12 Saturate", "Slot 12 Pan", "Slot 12 Rev", "Slot 12 Dly", "Slot 13 voice", "Slot 13 Kit", "Slot 13 Level", "Slot 13 Tune", "Slot 13 Decay", "Slot 13 Drive", "Slot 13 Dist", "Slot 13 Attack", "Slot 13 Tone", "Slot 13 Snappy", "Slot 13 Noise", "Slot 13 Rate", "Slot 13 Sweep", "Slot 13 Pitch Mod", "Slot 13 Noise Decay", "Slot 13 Saturate", "Slot 13 Pan", "Slot 13 Rev", "Slot 13 Dly", "Slot 14 voice", "Slot 14 Kit", "Slot 14 Level", "Slot 14 Tune", "Slot 14 Decay", "Slot 14 Drive", "Slot 14 Dist", "Slot 14 Attack", "Slot 14 Tone", "Slot 14 Snappy", "Slot 14 Noise", "Slot 14 Rate", "Slot 14 Sweep", "Slot 14 Pitch Mod", "Slot 14 Noise Decay", "Slot 14 Saturate", "Slot 14 Pan", "Slot 14 Rev", "Slot 14 Dly", "Slot 15 voice", "Slot 15 Kit", "Slot 15 Level", "Slot 15 Tune", "Slot 15 Decay", "Slot 15 Drive", "Slot 15 Dist", "Slot 15 Attack", "Slot 15 Tone", "Slot 15 Snappy", "Slot 15 Noise", "Slot 15 Rate", "Slot 15 Sweep", "Slot 15 Pitch Mod", "Slot 15 Noise Decay", "Slot 15 Saturate", "Slot 15 Pan", "Slot 15 Rev", "Slot 15 Dly", "Slot 16 voice", "Slot 16 Kit", "Slot 16 Level", "Slot 16 Tune", "Slot 16 Decay", "Slot 16 Drive", "Slot 16 Dist", "Slot 16 Attack", "Slot 16 Tone", "Slot 16 Snappy", "Slot 16 Noise", "Slot 16 Rate", "Slot 16 Sweep", "Slot 16 Pitch Mod", "Slot 16 Noise Decay", "Slot 16 Saturate", "Slot 16 Pan", "Slot 16 Rev", "Slot 16 Dly", "Selected slot", "Selected slot Voice", "Selected slot Level", "Selected slot Tune", "Selected slot Decay", "Selected slot Drive", "Selected slot Dist", "Selected slot Attack", "Selected slot Tone", "Selected slot Snappy", "Selected slot Noise", "Selected slot Rate", "Selected slot Sweep", "Selected slot Pitch Mod", "Selected slot Noise Decay", "Selected slot Saturate", "Selected slot Pan", "Selected slot Rev", "Selected slot Dly", "Random Amount", "Random Voice", "Randomise", "Select All", "Clear", "Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6", "Slot 7", "Slot 8", "Slot 9", "Slot 10", "Slot 11", "Slot 12", "Slot 13", "Slot 14", "Slot 15", "Slot 16", "Rev Decay", "Rev Tone", "Rev HPF", "Rev Level", "Dly Time", "Dly Fdbk", "Dly Tone", "Dly HPF", "Dly Level", "Master Dist", "Master Drive", "Comp", "Volume", "Internal Reverb", "Internal Delay", "Internal Comp", "Random Voices", "Slot 1 voice List", "Slot 1 Dist List", "Slot 2 voice List", "Slot 2 Dist List", "Slot 3 voice List", "Slot 3 Dist List", "Slot 4 voice List", "Slot 4 Dist List", "Slot 5 voice List", "Slot 5 Dist List", "Slot 6 voice List", "Slot 6 Dist List", "Slot 7 voice List", "Slot 7 Dist List", "Slot 8 voice List", "Slot 8 Dist List", "Slot 9 voice List", "Slot 9 Dist List", "Slot 10 voice List", "Slot 10 Dist List", "Slot 11 voice List", "Slot 11 Dist List", "Slot 12 voice List", "Slot 12 Dist List", "Slot 13 voice List", "Slot 13 Dist List", "Slot 14 voice List", "Slot 14 Dist List", "Slot 15 voice List", "Slot 15 Dist List", "Slot 16 voice List", "Slot 16 Dist List", "Dly Time List", "Master Dist List"]};
+const KEY='"midiLearnSettings": ';
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const FLOATS=new Set(['min','max','stride','deadspot','skew','controlValue']);
+const $=id=>document.getElementById(id);
+let S=null; // {name, handle, origBytes, gz, text, start, end, rows:[{raw,obj,isNew}], tracks}
+
+const byId=new Map(PARAMS.map(p=>[p[0],p]));
+
+
+function msg(el,text,cls){el.textContent=text;el.className='msg '+(cls||'')}
+
+// --- tekstualni skener: kraj JSON vrednosti koja pocinje na poziciji i ---
+function scan(t,i){
+  const c=t[i];
+  if(c==='"'){for(i++;t[i]!=='"';i++)if(t[i]==='\\')i++;return i+1}
+  if(c==='{'||c==='['){
+    let d=0;
+    for(;i<t.length;i++){
+      const x=t[i];
+      if(x==='"'){for(i++;t[i]!=='"';i++)if(t[i]==='\\')i++}
+      else if(x==='{'||x==='[')d++;
+      else if(x==='}'||x===']'){d--;if(d===0)return i+1}
+    }
+    throw new Error('Unterminated structure in file.');
+  }
+  while(i<t.length&&!',}]\n'.includes(t[i]))i++;
+  return i;
+}
+function splitArray(t){ // t = "[ ... ]" -> sirovi tekst svakog elementa
+  const out=[];let i=1;
+  for(;;){
+    while(/\s|,/.test(t[i]))i++;
+    if(t[i]===']')return out;
+    const e=scan(t,i);out.push(t.slice(i,e));i=e;
+  }
+}
+// --- serijalizacija u istom obliku u kom MPC pise (novi red, bez uvlacenja) ---
+function ser(v,k){
+  if(Array.isArray(v))return v.length?'[\n'+v.map(x=>ser(x)).join(',\n')+'\n]':'[]';
+  if(v&&typeof v==='object'){const ks=Object.keys(v);return ks.length?'{\n'+ks.map(q=>JSON.stringify(q)+': '+ser(v[q],q)).join(',\n')+'\n}':'{}'}
+  if(typeof v==='number'&&FLOATS.has(k)&&Number.isInteger(v))return v.toFixed(1);
+  return JSON.stringify(v);
+}
+const RANGE=()=>({min:0,max:1,stride:0,deadspot:2,skew:1});
+function makeControl(track,idx,p,cc,ch,name){
+  return {control:{name:name||padName(idx)+' ('+p[1]+')',controlType:0,targetData:[{version:1,parameter:p[0],track,
+    insertParamIndex:{initialized:true,none:true},instrumentIndex:idx,paramType:0,
+    controlInputRange:RANGE(),parameterRange:RANGE(),behaviour:0}],momentary:0,controlValue:p[2]},
+    mapping:{mappingType:2,controlType:5,channel:ch,data1:cc,reverseInput:false}};
+}
+function padIndex(s){const m=/^([A-Ha-h])(\d{1,2})$/.exec(s.trim());if(!m||+m[2]<1||+m[2]>16)return -1;return (m[1].toUpperCase().charCodeAt(0)-65)*16+(+m[2])-1}
+function padName(i){return String.fromCharCode(65+Math.floor(i/16))+String(i%16+1).padStart(2,'0')}
+const tgt=o=>{const t=o.control.targetData[0]||{};return [t.track,t.instrumentIndex,t.parameter].join('|')};
+
+async function gunzip(buf){return new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer())}
+async function gzip(bytes){return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer())}
+
+async function load(file,handle){
+  try{
+    const orig=new Uint8Array(await file.arrayBuffer());
+    const gz=orig[0]===0x1f&&orig[1]===0x8b;
+    const text=new TextDecoder('utf-8',{fatal:true}).decode(gz?await gunzip(orig):orig);
+    const first=text.indexOf(KEY);
+    if(first<0||text.indexOf(KEY,first+1)>=0)throw new Error('midiLearnSettings section not found (or found more than once). Unknown project format.');
+    const start=first+KEY.length,end=scan(text,start),sec=text.slice(start,end);
+    const obj=JSON.parse(sec);
+    if(Object.keys(obj).length!==1||!Array.isArray(obj.controls))throw new Error('midiLearnSettings section has an unexpected shape; leaving the file untouched.');
+    const a=sec.indexOf('[');
+    const raws=splitArray(sec.slice(a,scan(sec,a)));
+    if(raws.length!==obj.controls.length)throw new Error('Mismatch while reading mappings.');
+    const body=text.slice(text.indexOf('{'));
+    const data=JSON.parse(body.replace(/: nan\b/g,': null')).data;
+    const tracks=(data.tracks||[]).filter(t=>t.program&&t.program.drum).map(t=>t.name);
+    const plug={};for(const t of data.tracks||[])if(t.program&&t.program.plugin){const d=(t.program.plugin.plugin||{}).description||{};if(d.uid===SR_UID||/^(StepRunner-8|Trig Seq)$/.test(d.name||''))continue;plug[t.name]=d.name||'?'}
+    const srs=srReadAll(data.tracks||[]);
+    S={name:file.name,handle,origBytes:orig,gz,text,start,end,tracks,plug,
+       rows:raws.map((raw,i)=>({raw,obj:obj.controls[i],isNew:false})),
+       fw:text.split('\n')[1]||'?',sr:srs,
+       trk:(data.tracks||[]).map(t=>{const pm=((t.program||{}).padNoteMap||{}).noteForPad||{},plug=!!(t.program&&t.program.plugin);
+         return {name:t.name,route:t.midiInputRoute,notes:[0,1,2,3,4,5,6,7].map(i=>Number.isInteger(pm['value'+i])?pm['value'+i]:plug?i:36+i)}}),pend:{}};
+    srFill();srUse(0);
+    $('info').textContent=`${S.name} · firmware ${S.fw} · ${gz?'gzip':'uncompressed'} · ${(text.length/1e6).toFixed(1)} MB · drum programs: ${tracks.length} · plugin tracks: ${Object.keys(plug).length}`;
+    $('track').innerHTML=tracks.map(t=>`<option value="${esc(t)}">${esc(t)} · drum</option>`).join('')+Object.keys(plug).map(t=>`<option value="${esc(t)}">${esc(t)} · ${esc(plug[t])}</option>`).join('');
+    for(const id of ['tsSec','ccSec','listSec','saveSec','support'])$(id).hidden=false;
+    $('saveOver').disabled=!handle;
+    {const any=tracks.length+Object.keys(plug).length;msg($('loadmsg'),any?'':'The project has no drum programs or plugin tracks; mappings can only be viewed and deleted.',any?'':'warn')}
+    if(S.fw!=='3.9.1.2')msg($('loadmsg'),`The format was verified on firmware 3.9.1.2; this project was saved on ${S.fw}. Try it on a copy first.`,'warn');
+    msg($('savemsg'),handle?'':'This browser cannot write over the file (or the file was dropped); use "Download as new file".','warn');
+    msg($('tsmsg'),'');tsMode();noteLbl();render();
+  }catch(e){S=null;for(const id of ['tsSec','ccSec','listSec','saveSec','support'])$(id).hidden=true;$('info').textContent='';msg($('loadmsg'),'Error: '+e.message,'err')}
+}
+
+const SRC_TRACK={Mixer:[[7,'Volume',0.7079457640647888],[10,'Pan',0.5],[256,'Mute',0],[91,'Send 1',0],[92,'Send 2',0],[93,'Send 3',0],[94,'Send 4',0]],Track:[[1110,'Global Semi Tune',0.5],[1111,'Global Fine Tune',0.5]]};
+const trackParam=id=>[...SRC_TRACK.Mixer,...SRC_TRACK.Track].find(x=>x[0]===id);
+const p2=n=>String(n).padStart(2,'0');
+function render(){
+  const tb=$('rows');tb.textContent='';
+  const seen={};for(const r of S.rows){const k=r.obj.mapping.channel+'/'+r.obj.mapping.data1;seen[k]=(seen[k]||0)+1}
+  S.rows.forEach((r,i)=>{
+    const t=r.obj.control.targetData[0]||{},m=r.obj.mapping,tr=document.createElement('tr');
+    const p=byId.get(t.parameter);
+    const pl=t.instrumentIndex===256&&t.parameter>=4096?(PLUG[S.plug[t.track]]||[])[t.parameter-4096]:null;
+    const where=t.instrumentIndex===256?'plugin':t.instrumentIndex===257?'whole track':'Pad › '+padName(t.instrumentIndex||0);
+    const tp=t.instrumentIndex===257?trackParam(t.parameter):null;
+    const cells=[t.track,where,t.instrumentIndex===256?(pl||r.obj.control.name):(tp?tp[1]:(p?p[1]:r.obj.control.name)),t.parameter,m.channel];
+    for(const c of cells){const td=document.createElement('td');td.textContent=c;tr.appendChild(td)}
+    const tdc=document.createElement('td'),inp=document.createElement('input');
+    inp.type='number';inp.min=0;inp.max=127;inp.value=m.data1;inp.setAttribute('aria-label','CC');
+    inp.onchange=()=>{const v=+inp.value;if(!Number.isInteger(v)||v<0||v>127){inp.value=m.data1;return}m.data1=v;r.raw=ser(r.obj);r.isNew=true;render()};
+    tdc.appendChild(inp);tr.appendChild(tdc);
+    const tdt=document.createElement('td');
+    if(r.isNew)tdt.innerHTML='<span class="tag new">changed</span> ';
+    if(seen[m.channel+'/'+m.data1]>1)tdt.innerHTML+='<span class="tag dup" title="Several mappings use the same channel and CC">shared CC</span>';
+    tr.appendChild(tdt);
+    const tdx=document.createElement('td'),b=document.createElement('button');
+    b.className='x';b.textContent='×';b.title='Delete';b.onclick=()=>{S.rows.splice(i,1);render()};
+    tdx.appendChild(b);tr.appendChild(tdx);tb.appendChild(tr);
+  });
+  $('count').textContent='('+S.rows.length+')';$('empty').hidden=S.rows.length>0;
+}
+async function build(){
+  const sec=S.rows.length?'{\n"controls": [\n'+S.rows.map(r=>r.raw).join(',\n')+'\n]\n}':'{\n"controls": []\n}';
+  const ed=[[S.start,S.end,sec],...Object.values(S.pend)].sort((a,b)=>b[0]-a[0]);
+  let out=S.text;for(const [a,b,v] of ed)out=out.slice(0,a)+v+out.slice(b);
+  const chk=JSON.parse(out.slice(out.indexOf('{')).replace(/: nan\b/g,': null')).data.midiLearnSettings.controls;
+  if(chk.length!==S.rows.length)throw new Error('Result check failed; nothing was saved.');
+  const bytes=new TextEncoder().encode(out);
+  return S.gz?await gzip(bytes):bytes;
+}
+function download(bytes,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/octet-stream'}));
+  a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function save(over){
+  try{
+    const bytes=await build();
+    if($('bak').checked)download(S.origBytes,S.name+'.bak');
+    if(over){
+      const w=await S.handle.createWritable();await w.write(bytes);await w.close();
+      msg($('savemsg'),`Saved over ${S.name} (${S.rows.length} mappings).`,'ok');
+    }else{
+      download(bytes,S.name);
+      msg($('savemsg'),`Downloaded as ${S.name} (${S.rows.length} mappings). Copy it over the project on the MPC.`,'ok');
+    }
+    S.rows.forEach(r=>r.isNew=false);render();
+  }catch(e){msg($('savemsg'),'Error while saving: '+e.message,'err')}
+}
+
+// --- StepRunner-8: 8 traka = padovi A01-A08, 5 CC lock knobova po traci ---
+const TS_BASE=[20,25,85,102,107,112,14,80];
+// Knob 6 (PAN): fixed CC per StepRunner-8 track, independent of CC BASE.
+const PAN_CC=[30,31,90,117,118,119,3,9];
+const ccOf=(bs,t,k)=>k<5?bs[t]+k:PAN_CC[t];
+const KN=[0,1,2,3,4,5];
+// Grupe kako ih MPC prikazuje u MIDI Learn > TARGET za pad drum programa (procitano sa uredjaja, firmware 3.9.1.2).
+const MIXER_IDS=[518,517,526,527,522,523,524,525];
+const TRACK_IDS=new Set([132, 133, 513, 514, 515, 516, 519, 520, 521, 528, 529, 531, 532, 533, 534, 535, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 621, 622, 623, 637, 990, 991, 992, 993, 994, 995, 996, 997, 998, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1039, 1040, 1043, 1044, 1047, 1048, 1051, 1052, 1055, 1056, 1059, 1060, 1063, 1064, 1067, 1068, 1079, 1080, 1081, 1082, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1092, 1093, 1094, 1095, 1096, 1118, 1119, 1120, 1121, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203, 1204, 1205, 1206, 1219, 1220, 1221, 1222, 1223, 1224, 1234, 1235, 1236, 1237, 1241, 1242, 1285, 1286, 1287, 1288, 3081, 3082, 3085, 3086, 3089, 3090, 3093, 3094, 3097, 3098, 3101, 3102, 3105, 3106, 3109, 3110, 3111, 3112, 3113, 3114, 3131, 3132, 3133, 3134, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142, 3143, 3144, 3145, 3146, 3147, 3148, 3149, 3150, 3151, 3152, 3153, 3154, 3155, 3156, 3157, 3158, 3159, 3160, 3161, 3162, 3163, 3164, 3165, 3166, 3167, 3168, 3169, 3170, 3179, 3180, 3181, 3224, 3225, 3226, 3227, 3228, 3229, 3230, 3231, 3232, 3233, 3234, 3235, 3236, 3237, 3238, 3239, 3240, 3241, 3242, 3243, 3244, 3245, 3246, 3247, 3248, 3249, 3250, 3251, 3252, 3253, 3254, 3255, 3256, 3257, 3258, 3259, 3260, 3261, 3262, 3263, 3264, 3265, 3266, 3267, 3268, 3269, 3270, 3271, 3272, 3273, 3274, 3275, 3276, 3277, 3278, 3279, 3404, 3405, 3406, 3407, 3408, 3409, 3410, 3411, 3412, 3413, 3414, 3415, 3416, 3417, 3418, 3419]);
+const GROUPS=['Mixer','Track','Not in the MPC menu for drum programs'];
+const pgrp=i=>MIXER_IDS.includes(i)?0:TRACK_IDS.has(i)?1:2;
+$('knobs').innerHTML=KN.map(k=>`<div class="knob"><b><span class="dial"></span>${k<5?'CC KNOB '+(k+1):'PAN KNOB'}</b>
+  <select id="kn${k}" aria-label="Parameter for knob ${k+1}"><option value="">— not mapped —</option>${GROUPS.map((g,gi)=>`<optgroup label="${g}">${PARAMS.filter(p=>pgrp(p[0])===gi).map(p=>`<option value="${p[0]}">${p[1]} [${p[0]}]</option>`).join('')}</optgroup>`).join('')}</select>
+  <div class="info" id="kni${k}"></div></div>`).join('');
+// CC setup: one CC number per track and knob. Defaults = StepRunner-8's factory numbers; replaced by the numbers
+// read from the StepRunner-8 plugin in the project, when there is one.
+const CC_DEF=[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>ccOf(TS_BASE,t,k)));
+let CC_SRC=CC_DEF;   // what "Read CCs from project" goes back to
+const CH_DEF=Array(8).fill(1);let CH_SRC=CH_DEF;
+$('ccgrid').innerHTML='<thead><tr><th></th>'+[0,1,2,3,4,5,6,7].map(t=>`<th>T${t+1} · ${padName(t)}</th>`).join('')+'</tr></thead><tbody>'+
+  '<tr class="chrow"><td>MIDI channel</td>'+[0,1,2,3,4,5,6,7].map(t=>`<td><input id="chn${t}" type="number" min="1" max="16" value="1" aria-label="Track ${t+1} MIDI channel"></td>`).join('')+'</tr>'+
+  KN.map(k=>`<tr><td>${k<5?'CC knob '+(k+1):'Pan knob'}</td>`+[0,1,2,3,4,5,6,7].map(t=>`<td><input id="cc${t}_${k}" type="number" min="0" max="127" value="${CC_DEF[t][k]}" aria-label="Track ${t+1}, ${k<5?'CC knob '+(k+1):'Pan knob'} CC number"></td>`).join('')+'</tr>').join('')+'</tbody>';
+const ccv=(t,k)=>+$('cc'+t+'_'+k).value;
+const ccAll=()=>[0,1,2,3,4,5,6,7].flatMap(t=>KN.map(k=>ccv(t,k)));
+const chv=t=>+$('chn'+t).value;   // MIDI channel 1..16 of StepRunner-8 track t
+const pair=(t,k)=>chv(t)+':'+ccv(t,k);   // what MPC tells messages apart by
+const pairAll=()=>[0,1,2,3,4,5,6,7].flatMap(t=>KN.map(k=>pair(t,k)));
+function chSet(a){for(let t=0;t<8;t++)$('chn'+t).value=a[t];chTop()}
+function chTop(){const v=[0,1,2,3,4,5,6,7].map(chv);$('tsch').value=$('tsch2').value=v.every(x=>x===v[0])?v[0]:''}
+function ccSet(m){for(let t=0;t<8;t++)for(const k of KN)$('cc'+t+'_'+k).value=m[t][k]}
+// ---- StepRunner-8 state in the project: "state" = JUCE base64 of a VST2 bank (CcnK/FBCh), chunk text from byte 160
+const SR_UID=1397894456;   // 'SR-8'
+const B64T='.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+';
+function jdec(st){const dot=st.indexOf('.');const n=parseInt(st,10);const b=new Uint8Array(n);let pos=0;
+  for(let i=dot+1;i<st.length;i++,pos+=6){const v=B64T.indexOf(st[i]);if(v<0)break;for(let k=0;k<6;k++)if(v>>k&1){const bit=pos+k;if(bit>>3<n)b[bit>>3]|=1<<(bit&7)}}
+  return b}
+function srReadAll(tracks){   // -> [{name, plugin, cc[8][6], ch[8]}] for every StepRunner-8 in the project
+  const out=[];
+  for(const t of tracks){
+    const pl=t.program&&t.program.plugin&&t.program.plugin.plugin;if(!pl)continue;
+    const d=pl.description||{};if(d.uid!==SR_UID&&!/^(StepRunner-8|Trig Seq)$/.test(d.name||''))continue;
+    try{
+      const b=jdec(pl.state||'');
+      if(String.fromCharCode(...b.slice(0,4))!=='CcnK'||String.fromCharCode(...b.slice(8,12))!=='FBCh')continue;
+      const len=(b[156]<<24|b[157]<<16|b[158]<<8|b[159])>>>0;
+      let txt=new TextDecoder('latin1').decode(b.slice(160,160+len));txt=txt.split('\0')[0];
+      if(!/^TSq[23]/.test(txt))continue;
+      const base=[...TS_BASE],own=[...Array(8)].map(()=>[0,0,0,0,0]),ch=Array(8).fill(0);
+      for(const l of txt.split('\n')){   // only the lines of the pattern playing (no "V../Z.." prefix)
+        let m=/^t (\d) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)(?: (\d+))?/.exec(l);
+        if(m&&+m[1]<8){base[+m[1]]=m[9]!==undefined?+m[9]:20;ch[+m[1]]=+m[4];own[+m[1]]=[0,0,0,0,0];continue}
+        m=/^C (\d) (\d+) (\d+) (\d+) (\d+) (\d+)/.exec(l);
+        if(m&&+m[1]<8)own[+m[1]]=[2,3,4,5,6].map(i=>+m[i]);
+      }
+      const cc=[0,1,2,3,4,5,6,7].map(i=>KN.map(k=>k<5?(own[i][k]?(own[i][k]-1)&127:Math.min(base[i],123)+k):PAN_CC[i]));
+      out.push({name:t.name,plugin:d.name,cc,ch,ti:tracks.indexOf(t),state:pl.state,isSR:d.uid===SR_UID||d.name==='StepRunner-8'});
+    }catch(e){}
+  }
+  let slot=0;for(const r of out)if(r.isSR)r.slot=slot++;   // ALSA names follow load order: "StepRunner-8", "StepRunner-8 2", ...
+  return out;
+}
+function jenc(b){let s=b.length+'.';const nb=b.length*8;for(let pos=0;pos<nb;pos+=6){let v=0;for(let k=0;k<6;k++){const bit=pos+k;if(bit<nb&&b[bit>>3]>>(bit&7)&1)v|=1<<k}s+=B64T[v]}return s}
+// new plugin state with the MIDI channel (1..16) of every track set, in the playing pattern and in every stored pattern/state
+function srWithCh(sr,chs,notes){   // chs / notes: null = leave as is
+  const b=jdec(sr.state),len=(b[156]<<24|b[157]<<16|b[158]<<8|b[159])>>>0;
+  const txt=new TextDecoder('latin1').decode(b.slice(160,160+len));
+  let n=0;
+  const out=txt.replace(/^((?:[VZ]\d+ )?t (\d) \d+ \d+ )(\d+) (\d+)/gm,(m,a,t,c,nt)=>{if(+t>7)return m;const v=chs?String(chs[+t]-1):c,w=notes?String(notes[+t]):nt;if(v!==c||w!==nt)n++;return a+v+' '+w});
+  if(!n)return null;
+  const tb=Uint8Array.from(out,c=>c.charCodeAt(0)),rest=b.slice(160+len);
+  const nb=new Uint8Array(160+tb.length+rest.length);nb.set(b.slice(0,160));nb.set(tb,160);nb.set(rest,160+tb.length);
+  const L=tb.length;nb[156]=L>>>24&255;nb[157]=L>>>16&255;nb[158]=L>>>8&255;nb[159]=L&255;
+  return jenc(nb);
+}
+// raw-text span of the JSON value at a path ("data","tracks",3,"midiInputRoute"), so only that value is replaced
+function spanOf(text,path){
+  let i=text.indexOf('{');
+  const ws=()=>{while(/\s/.test(text[i]))i++};
+  for(const key of path){
+    ws();
+    if(typeof key==='number'){if(text[i]!=='[')return null;i++;for(let n=0;;n++){ws();if(text[i]===']')return null;if(n===key)break;i=scan(text,i);ws();if(text[i]===',')i++}}
+    else{if(text[i]!=='{')return null;i++;for(;;){ws();if(text[i]!=='"')return null;const e=scan(text,i),k=JSON.parse(text.slice(i,e));i=e;ws();i++;ws();if(k===key)break;i=scan(text,i);ws();if(text[i]===',')i++}}
+  }
+  ws();return [i,scan(text,i)];
+}
+const progNotes=()=>{const t=S&&S.trk.find(x=>x.name===$('track').value);return t?t.notes:[36,37,38,39,40,41,42,43]};
+function noteLbl(){}
+const srPort=sr=>sr.slot?`StepRunner-8 ${sr.slot+1} MIDI Out`:'StepRunner-8 MIDI Out';
+function srRoute(sr,ch){   // MPC remembers MIDI inputs by name; the id is the ALSA client:port (taken from the project when known)
+  const name=srPort(sr),known=S.trk.map(t=>t.route&&t.route.inputPort).find(p=>p&&p.deviceName===name&&p.deviceId);
+  return {inputPort:{type:0,deviceName:name,deviceId:known?known.deviceId:(130+sr.slot)+'-0',os:'Linux'},inputChannel:ch};
+}
+const chText=sr=>{const c=[...new Set(sr.ch)];return c.length===1?'ch '+(c[0]+1):'ch '+sr.ch.map(x=>x+1).join('/')};
+function srFill(){
+  $('srinst').innerHTML=S.sr.length?S.sr.map((r,i)=>`<option value="${i}">${esc(r.name)} · ${esc(r.plugin)} · ${chText(r)}</option>`).join(''):'<option value="-1">none in this project (default CCs)</option>';
+  $('srinst').disabled=S.sr.length<2;
+}
+function srUse(i){   // load the CC numbers and channel of instance i into CC setup
+  const sr=S.sr[i];
+  if(!sr){CC_SRC=CC_DEF;CH_SRC=CH_DEF;ccSet(CC_DEF);chSet(CH_DEF);msg($('srinfo'),'No StepRunner-8 in this project: StepRunner-8 default CC numbers are used.','');return}
+  CC_SRC=sr.cc;CH_SRC=sr.ch.map(c=>c+1);ccSet(sr.cc);
+  chSet(sr.ch.map(c=>c+1));srInfo(i);
+}
+function srInfo(i){   // the message above CC setup, from the instances as they are now (also after Apply changed a channel)
+  const sr=S.sr[i];if(!sr)return;const chs=[...new Set(sr.ch)];
+  let txt=`CC numbers and MIDI channels read from ${sr.plugin} on track "${sr.name}" (`+(chs.length===1?`channel ${chs[0]+1}`:`channels ${sr.ch.map(c=>c+1).join(', ')}`)+').';
+  let cls='ok';
+  if(S.sr.length>1)txt=`${S.sr.length} StepRunner-8 instances in this project. `+txt;
+  // two instances on the same channel with a shared CC number cannot be told apart by MPC
+  const mine=new Set(sr.cc.flatMap((r,t)=>r.map(c=>sr.ch[t]+':'+c)));
+  const clash=S.sr.filter((o,j)=>j!==i&&o.cc.some((r,t)=>r.some(c=>mine.has(o.ch[t]+':'+c)))).map(o=>o.name);
+  if(clash.length){txt+=` Warning: ${clash.join(', ')} sends some of the same CC numbers on the same channel; MPC cannot tell them apart, so a mapping reacts to both.`;cls='warn'}
+  msg($('srinfo'),txt,cls);
+}
+function tsCheck(){
+  const all=ccAll(),chs=[0,1,2,3,4,5,6,7].map(chv);
+  if(all.some(v=>!Number.isInteger(v)||v<0||v>127))return 'Every CC number must be 0–127.';
+  if(chs.some(v=>!Number.isInteger(v)||v<1||v>16))return 'Every MIDI channel must be 1–16.';
+  const pa=pairAll(),dup=pa.find((v,i)=>pa.indexOf(v)!==i);
+  if(dup!==undefined){const [c,n]=dup.split(':');return `CC ${n} on MIDI channel ${c} is used by more than one knob in CC setup.`}
+  if(!$('track').value)return 'No program in the project.';
+  if(isPlug()){
+    const vs=pgVals().flat().filter(Boolean);
+    if(new Set(vs).size!==vs.length)return 'The same plugin parameter is selected twice.';
+    return '';
+  }
+  if(perTrack()){
+    for(let t=0;t<8;t++){const r=dkVals()[t].filter(Boolean);if(new Set(r).size!==r.length)return `T${t+1}: the same parameter is selected on two knobs.`}
+    return '';
+  }
+  const ps=KN.map(k=>$('kn'+k).value).filter(Boolean);
+  if(new Set(ps).size!==ps.length)return 'The same parameter is selected on two knobs.';
+  return '';
+}
+function tsPreview(){
+  for(const k of KN)$('kni'+k).textContent=[0,1,2,3,4,5,6,7].map(t=>padName(t)+' CC'+ccv(t,k)).join(' · ');
+  for(let t=0;t<8;t++)for(const k of KN){const e=$('pgc'+t+'_'+k);if(e)e.textContent='CC '+ccv(t,k);$('dkc'+t+'_'+k).textContent='CC '+ccv(t,k)}
+  const pa=pairAll();let bad=false;for(let t=0;t<8;t++)for(const k of KN){const b=pa.filter(v=>v===pair(t,k)).length>1;$('cc'+t+'_'+k).classList.toggle('bad',b);bad=bad||b}
+  if(bad)$('ccsetup').open=true;
+  const e=tsCheck();$('tsApply').disabled=!!e;if(e)msg($('tsmsg'),e,'err');else if($('tsmsg').className.includes('err'))msg($('tsmsg'),'');
+}
+const isPlug=()=>!!(S&&S.plug[$('track').value]);
+const plugNames=()=>PLUG[S.plug[$('track').value]]||[];
+const pgVals=()=>[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>$('pg'+t+'_'+k)?$('pg'+t+'_'+k).value:''));
+function pgOptions(group){
+  return '<option value="">—</option>'+plugNames().map((n,i)=>[n,i]).filter(([n])=>n&&(!group||n.startsWith(group+' '))).map(([n,i])=>`<option value="${4096+i}">${esc(n)}</option>`).join('');
+}
+function pgBuild(){
+  $('pgrid').innerHTML='<thead><tr><th>Track</th>'+[1,2,3,4,5].map(k=>`<th class="kh"><span class="dial"></span>CC knob ${k}</th>`).join('')+'<th class="kh"><span class="dial"></span>Pan knob</th>'+'</tr></thead><tbody>'+
+    [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1}</td>`+
+      KN.map(k=>`<td><select id="pg${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${pgOptions('')}</select><span class="cc" id="pgc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
+  for(let t=0;t<8;t++)for(const k of KN)$('pg'+t+'_'+k).onchange=()=>{autofill(t,k);tsPreview()};
+}
+// Auto-fill: from the first chosen cell of a column, guess the next tracks' parameters.
+// A number in the name counts up ("Slot 1 Tune" -> "Slot 2 Tune"); without a number, the same name after the first
+// word is taken from the next instruments in list order ("BD Tune" -> "SN Tune", "LT Tune" ...).
+function afSeq(i0,count){
+  const names=plugNames(),n=names[i0],out=[];
+  const nth=(name,occ)=>{let c=0;for(let i=0;i<names.length;i++)if(names[i]===name){if(c===occ)return i;c++}return -1};
+  let occ=0;for(let i=0;i<i0;i++)if(names[i]===n)occ++;   // the 2nd "1 Attack" maps to the 2nd "2 Attack"
+  const m=/\d+/.exec(n);
+  if(m){for(let j=1;j<=count;j++)out.push(nth(n.slice(0,m.index)+(+m[0]+j)+n.slice(m.index+m[0].length),occ));return out}
+  const sp=n.indexOf(' ');if(sp<0)return out;
+  const rest=n.slice(sp),seen=new Set([n.slice(0,sp)]);
+  for(let i=i0+1;i<names.length&&out.length<count;i++){const x=names[i]||'',q=x.indexOf(' ');if(q<0)continue;const w=x.slice(0,q);if(x.slice(q)===rest&&!seen.has(w)){seen.add(w);out.push(i)}}
+  return out;
+}
+const afP=()=>isPlug()?'pg':'dk';   // which table auto-fill works on
+function autofill(t0,k){
+  if(!$('autofill').checked)return;
+  const P=afP(),v=$(P+t0+'_'+k).value;if(!v)return;
+  for(let t=0;t<t0;t++)if($(P+t+'_'+k).value)return;   // only from the first chosen cell of the column
+  let found=0;
+  if(P==='dk'){for(let t=t0+1;t<8;t++){$('dk'+t+'_'+k).value=v;found++}}   // drum program: the same parameter on the pads below
+  else{const seq=afSeq(+v-4096,7-t0);
+  for(let j=0;j<7-t0;j++){const i=seq[j];const el=$('pg'+(t0+1+j)+'_'+k);el.value=i!==undefined&&i>=0?String(4096+i):'';if(el.value)found++}}
+  $('afinfo').textContent=`Knob column ${k<5?k+1:'Pan'}: filled ${found} of ${7-t0} tracks below T${t0+1}.`;
+}
+$('autofill').addEventListener('change',()=>{if(!$('autofill').checked)return;const P=afP();for(const k of KN)for(let t=0;t<8;t++)if($(P+t+'_'+k)&&$(P+t+'_'+k).value){autofill(t,k);break}tsPreview()});
+// ---- drum program, "different parameter per track": one list per track and knob (pad = A01..A08 as T1..T8)
+const DR_OPTS='<option value="">—</option>'+GROUPS.map((g,gi)=>`<optgroup label="${g}">${PARAMS.filter(p=>pgrp(p[0])===gi).map(p=>`<option value="${p[0]}">${esc(p[1])} [${p[0]}]</option>`).join('')}</optgroup>`).join('');
+$('drgrid').innerHTML='<thead><tr><th>Track</th>'+[1,2,3,4,5].map(k=>`<th class="kh"><span class="dial"></span>CC knob ${k}</th>`).join('')+'<th class="kh"><span class="dial"></span>Pan knob</th></tr></thead><tbody>'+
+  [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1} · ${padName(t)}</td>`+KN.map(k=>`<td><select id="dk${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${DR_OPTS}</select><span class="cc" id="dkc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
+for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).addEventListener('change',()=>{autofill(t,k);tsPreview()});
+const perTrack=()=>true;   // drum programs: always one parameter per track and knob (auto-fill copies it down)
+const dkVals=()=>[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>$('dk'+t+'_'+k).value));
+function drShow(){$('knobs').hidden=perTrack();$('drgridw').hidden=!perTrack()}
+$('drmode').addEventListener('change',()=>{
+  if(perTrack()){for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).value=$('kn'+k).value}   // start from the shared choice
+  else{for(const k of KN){const v=dkVals().map(r=>r[k]);$('kn'+k).value=v.every(x=>x===v[0])?v[0]:''}}
+  drShow();tsPreview();
+});
+function tsMode(){
+  const pl=isPlug();$('drum').hidden=pl;$('plug').hidden=!pl;$('afrow').hidden=false;$('afrow').style.display='flex';if(!pl)drShow();
+  $('aflbl').textContent=pl?'Auto-fill the column from the first chosen parameter (e.g. "1 Tune" → "2 Tune", "3 Tune"…; "BD Tune" → "SN Tune", "LT Tune"…)'
+    :'Auto-fill the column from the first chosen parameter (the same parameter on the pads below: A01 Filter Cutoff → A02…A08 Filter Cutoff)';$('afinfo').textContent='';
+  if(pl){
+    const name=S.plug[$('track').value],known=!!PLUG[name];
+    msg($('plugnote'),known?`Plugin ${name}: ${PLUG[name].filter(Boolean).length} parameters. Pick a parameter per knob for each StepRunner-8 track.`:`No parameter list for plugin "${name}". A probe project for it is needed, as for the others.`,known?'':'warn');
+    pgBuild();
+  }
+  tsFromProject();
+}
+function tsFromProject(){ // fill the knobs from what the project already has
+  const tr=$('track').value;
+  if(isPlug()){
+    for(let t=0;t<8;t++)for(const k of KN){
+      const r=S.rows.find(x=>{const q=x.obj.control.targetData[0]||{},m=x.obj.mapping;return x.obj.control.targetData.length===1&&q.track===tr&&q.instrumentIndex===256&&m.channel===chv(t)&&m.data1===ccv(t,k)});
+      $('pg'+t+'_'+k).value=r?String(r.obj.control.targetData[0].parameter):'';
+    }
+    tsPreview();return;
+  }
+  for(let t=0;t<8;t++)for(const k of KN){   // per track: what pad t has on that track's CC
+    const r=S.rows.find(x=>{const q=x.obj.control.targetData[0]||{},m=x.obj.mapping;return x.obj.control.targetData.length===1&&q.track===tr&&q.instrumentIndex===t&&m.channel===chv(t)&&m.data1===ccv(t,k)});
+    const id=r?String(r.obj.control.targetData[0].parameter):(k===5?'517':'');
+    $('dk'+t+'_'+k).value=byId.has(+id)?id:'';
+  }
+  const v=dkVals(),same=KN.every(k=>v.every(r=>r[k]===v[0][k]));
+  for(const k of KN)$('kn'+k).value=v[0][k];
+  $('drmode').value='per';drShow();
+  tsPreview();
+}
+function tsApply(){
+  if(tsCheck())return;
+  const tr=$('track').value;
+  const ccs=new Set(pairAll());
+  const fresh=[];
+  if(isPlug()){
+    const names=plugNames(),vs=pgVals();
+    for(let t=0;t<8;t++)for(const k of KN){
+      if(!vs[t][k])continue;const id=+vs[t][k],n=names[id-4096];
+      const obj=makeControl(tr,256,[id,n,0],ccv(t,k),chv(t),tr+' ('+n+')');fresh.push({raw:ser(obj),obj,isNew:true});
+    }
+  }else for(let t=0;t<8;t++)for(const k of KN){
+    const p=byId.get(+(perTrack()?$('dk'+t+'_'+k).value:$('kn'+k).value));if(!p)continue;
+    const obj=makeControl(tr,t,p,ccv(t,k),chv(t));fresh.push({raw:ser(obj),obj,isNew:true});
+  }
+  const keys=new Set(fresh.map(r=>tgt(r.obj)));
+  // removed: everything on this program and channel that uses these CC numbers, and anything aiming at the same pad+parameter
+  let byCC=0,byTarget=0;
+  S.rows=S.rows.filter(r=>{const t=r.obj.control.targetData[0]||{},m=r.obj.mapping;
+    const cc=t.track===tr&&m.mappingType===2&&ccs.has(m.channel+':'+m.data1),same=keys.has(tgt(r.obj));
+    if(cc)byCC++;else if(same)byTarget++;
+    return !(cc||same)});
+  S.rows.push(...fresh);
+  const pl=n=>n===1?'':'s';
+  const extra=[];let warn=byTarget>0;
+  const sr=S.sr[+$('srinst').value],chs=[0,1,2,3,4,5,6,7].map(chv);
+  const doCh=true,doNt=true,notes=progNotes();   // StepRunner-8 always gets the channels from CC setup and the program's pad notes
+  if(sr&&(doCh||doNt)){
+    const st=srWithCh(sr,doCh?chs:null,doNt?notes:null);
+    const sp=st&&spanOf(S.text,['data','tracks',sr.ti,'program','plugin','plugin','state']);
+    if(sp){S.pend['state'+sr.ti]=[sp[0],sp[1],JSON.stringify(st)];sr.state=st;
+      if(doCh){sr.ch=chs.map(c=>c-1);CH_SRC=[...chs];srFill();$('srinst').value=S.sr.indexOf(sr);srInfo(S.sr.indexOf(sr))}}
+    else if(st){extra.push(`could not find the state of ${sr.name}; it was not changed`);warn=true}
+    if(!st||sp){
+      if(doCh)extra.push(`${sr.name} sends on `+([...new Set(chs)].length===1?`channel ${chs[0]}`:`channels ${chs.join(', ')}`));
+      if(doNt)extra.push(`${doCh?'its':sr.name+'\'s'} tracks T1–T8 play notes ${notes.join(', ')} (pads A01–A08 of "${tr}")`);
+    }
+  }
+  if($('setin').checked){
+    if(!sr||!sr.isSR){extra.push('program input not changed (no StepRunner-8 instance selected)');warn=true}
+    else{const ti=S.trk.findIndex(t=>t.name===tr),same=chs.every(c=>c===chs[0]),r=srRoute(sr,same?chs[0]:0);
+      const sp=ti>=0&&spanOf(S.text,['data','tracks',ti,'midiInputRoute']);
+      if(sp){S.pend['route'+ti]=[sp[0],sp[1],ser(r)];S.trk[ti].route=r;
+        extra.push(`"${tr}" receives MIDI only from ${r.inputPort.deviceName}, `+(same?`channel ${chs[0]}`:'all channels (the tracks use different channels)'));if(!same)warn=true}
+      else{extra.push(`could not find the MIDI input of "${tr}"`);warn=true}}
+  }
+  msg($('tsmsg'),`Wrote ${fresh.length} mapping${pl(fresh.length)}, removed ${byCC} old one${pl(byCC)} on the same CC numbers`+
+    (byTarget?` and replaced ${byTarget} that pointed at the same pad and parameter from another channel or CC (for example another StepRunner-8 instance)`:'')+'. '+
+    (extra.length?extra.map(x=>x[0].toUpperCase()+x.slice(1)).join('. ')+'. ':'')+'Not saved to the file yet.',warn?'warn':'ok');
+  render();
+}
+for(const k of KN)$('kn'+k).addEventListener('change',tsPreview);
+$('kn5').value='517';for(let t=0;t<8;t++)$('dk'+t+'_5').value='517';
+for(let t=0;t<8;t++)for(const k of KN)$('cc'+t+'_'+k).addEventListener('input',tsPreview);
+for(const id of ['tsch','tsch2'])$(id).addEventListener('input',()=>{const v=+$(id).value;if(Number.isInteger(v)&&v>=1&&v<=16){for(let t=0;t<8;t++)$('chn'+t).value=v;$(id==='tsch'?'tsch2':'tsch').value=v}tsPreview()});
+for(let t=0;t<8;t++){$('chn'+t).addEventListener('input',()=>{chTop();tsPreview()})}
+$('track').addEventListener('change',()=>{if(S){tsMode();noteLbl()}});
+$('tsApply').onclick=tsApply;
+$('tsReset').onclick=()=>{ccSet(CC_SRC);chSet(CH_SRC);tsPreview()};
+$('srinst').addEventListener('change',()=>{srUse(+$('srinst').value);if(S)tsFromProject()});
+$('tsDefault').onclick=()=>{ccSet(CC_DEF);chSet(CH_DEF);tsPreview()};
+tsPreview();
+
+$('open').onclick=async()=>{
+  if(window.showOpenFilePicker){
+    try{const [h]=await showOpenFilePicker({types:[{description:'MPC project',accept:{'application/octet-stream':['.xpj']}}]});load(await h.getFile(),h)}catch(e){if(e.name!=='AbortError')$('file').click()}
+  }else $('file').click();
+};
+$('file').onchange=e=>{if(e.target.files[0])load(e.target.files[0],null);e.target.value=''};
+const d=$('drop');
+d.ondragover=e=>{e.preventDefault();d.classList.add('over')};
+d.ondragleave=()=>d.classList.remove('over');
+d.ondrop=e=>{e.preventDefault();d.classList.remove('over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0],null)};
+
+$('clear').onclick=()=>{S.rows=[];render()};
+$('saveOver').onclick=()=>save(true);
+$('saveAs').onclick=()=>save(false);
+</script>
+</body>
+</html>

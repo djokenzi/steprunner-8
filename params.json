@@ -3198,6 +3198,25 @@
     "P8"
    ],
    "default": 0
+  },
+  {
+   "key": "pf_stopcc",
+   "name": "Stop CC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "nav_left",
+   "name": "Left",
+   "momentary": true
+  },
+  {
+   "key": "nav_right",
+   "name": "Right",
+   "momentary": true
   }
  ]
 }

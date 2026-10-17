@@ -177,6 +177,8 @@ opt("ttl", "Panel Title Look", ["HIDDEN", "SETUP"] + ["ST%d" % k for k in range(
 opt("st_rres", "Ratchet Resolution", ["AUTO", "1/16", "1/32", "1/48", "1/64", "1/80"])   # v2.1.0: hits per step of the RATCHET
 opt("pf_alt", "Alt Bar", onoff); opt("pf_afill", "Auto Fill", onoff)   # v2.2.0 PERFORM pads
 opt("pst_pat", "States Pattern", ["P%d" % k for k in range(1, 9)])   # read-only, v1.1.0: whose STATEs the PERFORM tab shows (the pattern playing)
+opt("pf_stopcc", "Stop CC", onoff)   # v1.2.0 PERFORM pad STOP CC: lit = no CC goes out (replaces the HUMANIZE pad; pf_hum stays)
+trig("nav_left", "Left"); trig("nav_right", "Right")   # v1.2.0: the arrow buttons left of EUCLIDIAN (no function yet)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

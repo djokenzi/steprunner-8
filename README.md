@@ -20,7 +20,7 @@ A short demo, and how to map StepRunner-8 to a drum program:
   micro-timing and ratchets
 - Euclidean generator per track, random generators for trigs and every lock
 - 8 patterns (cue the next one while playing), pattern length, shuffle, copy / paste of steps, pages, tracks and patterns
-- PERFORM tab: mutes, live effects (loops, fill, humanize, build, echo, ghost notes, fade out …), PERFORM ALL
+- PERFORM tab: mutes, live effects (loops, fill, stop CC, build, echo, ghost notes, fade out …), PERFORM ALL
   offsets and 8 STATE slots per pattern that recall the whole sequencer
 - CC locks go back to the pad's own value after the locked step (base values)
 - CREATE DEFAULT MAP writes MIDI Learn mappings for the CC locks into your saved MPC project, so the CC knobs drive the
@@ -30,6 +30,17 @@ A short demo, and how to map StepRunner-8 to a drum program:
 ## Manual
 
 The full user manual with screenshots is in [docs/MANUAL.md](docs/MANUAL.md).
+
+## StepRunner-8 MPC Mapper
+
+Map StepRunner-8's CC locks to any drum pad or plugin parameter in your browser, no MIDI Learn needed. 
+
+  - [Open the Mapper](https://djokenzi.github.io/steprunner-8/mpcmap.html)
+  - [User guide](docs/MAPPER.md)
+    
+See it in action in the demo video on YouTube: 
+
+[![StepRunner-8 MPC Mapper demo](https://img.youtube.com/vi/wTp898KZE78/hqdefault.jpg)](https://www.youtube.com/watch?v=wTp898KZE78)
 
 ## Install
 
@@ -71,3 +82,9 @@ Developer notes are in `PROJECT_NOTES.md`; the history (it started as "Trig Seq"
 ## License
 
 MIT, see [LICENSE](LICENSE). Community software, not affiliated with or endorsed by Akai Professional.
+
+## Support
+
+StepRunner-8 is free and developed in my spare time. If it's earned a place in your MPC workflow and you enjoy using it, a small donation helps keep new features coming.
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/PP5SH6BWF8WW8)

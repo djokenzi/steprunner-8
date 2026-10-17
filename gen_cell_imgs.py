@@ -75,6 +75,13 @@ if os.path.exists(FONT):
     seg(False, "PATTERN EDIT").save("images/pattern_edit_off.png"); seg(True, "PATTERN EDIT").save("images/pattern_edit_on.png")
     seg(False, "SETUP").save("images/global_edit_off.png"); seg(True, "SETUP").save("images/global_edit_on.png")   # GLOBAL until v1.63
     seg(False, "EUCLIDIAN").save("images/euclid_edit_off.png"); seg(True, "EUCLIDIAN").save("images/euclid_edit_on.png")
+    for on in (False, True):   # v1.2.0: the two arrow buttons left of EUCLIDIAN: its style, half its width, a triangle for text
+        for nm, left in (("nav_left", True), ("nav_right", False)):
+            im = seg(on, "", 72).resize((72 * SS, BH * SS), Image.LANCZOS); d = ImageDraw.Draw(im)
+            cx, cy, hw, hh = 36 * SS, BH * SS / 2, 6 * SS, 8 * SS
+            pts = [(cx - hw, cy), (cx + hw, cy - hh), (cx + hw, cy + hh)] if left else [(cx + hw, cy), (cx - hw, cy - hh), (cx - hw, cy + hh)]
+            d.polygon(pts, fill=((28, 26, 23) if on else (143, 136, 120)) + (255,))
+            im.resize((72, BH), Image.LANCZOS).save("images/%s_%s.png" % (nm, "on" if on else "off"))
 else:
     print("warning: %s not found, images/step_edit_*.png left as they are (set MPC_VST)" % FONT, file=sys.stderr)
 # RND / CLR buttons, 132 x 39, text baked in: one pair (released, pressed) per colour.
@@ -149,7 +156,7 @@ if os.path.exists(FONT):
             pad(text, TRACKC, on, "pfx%d_%s" % (n + 1, "on" if on else "off"), 22 if "\n" not in text else 19)
         pad("MUTE\nALL", TRACKC, on, "pfx7m_%s" % ("on" if on else "off"), 19)   # pad 7 while nothing is muted
         pad("LOOP 8", TRACKC, on, "pfy1_%s" % ("on" if on else "off")); pad("ROLL", TRACKC, on, "pfy5_%s" % ("on" if on else "off"))   # v1.79.0 / v1.80.0 (the other pfy pads have no pad any more)
-        for key, text in (("pf_hum", "HUMANIZE"), ("pf_build", "BUILD"), ("pf_echo", "ECHO"), ("pf_fade", "FADE\nOUT"),
+        for key, text in (("pf_stopcc", "STOP CC"), ("pf_hum", "HUMANIZE"), ("pf_build", "BUILD"), ("pf_echo", "ECHO"), ("pf_fade", "FADE\nOUT"),
                           ("pf_ghost", "GHOST"), ("pf_afill", "AUTO\nFILL")):   # v1.91.0; v1.94.0
             pad(text, TRACKC, on, "%s_%s" % (key, "on" if on else "off"), 22 if "\n" not in text else 19)
     btn("PERFORM ALL", GREY, False, BTN_W=190, BTN_H=64).save("images/pf_ctrl_off.png"); btn("PERFORM ALL", TRIG, False, BTN_W=190, BTN_H=64).save("images/pf_ctrl_on.png")

@@ -163,6 +163,8 @@ enum {
     P_ST_RRES,                                   /* v2.1: RATCHET RESOLUTION of the selected steps (AUTO, 1/16 .. 1/80) */
     P_PF_ALT, P_PF_AFILL,                        /* v2.2: PERFORM pads ALT BAR, AUTO FILL (not saved) */
     P_PST_PAT,                                   /* v1.1.0: read-only, whose STATEs the PERFORM tab shows: P1..P8 (the pattern playing) */
+    P_PF_STOPCC,                                 /* v1.2.0: PERFORM pad STOP CC: lit = no CC goes out (not saved) */
+    P_NAV_LEFT, P_NAV_RIGHT,                     /* v1.2.0: the arrow buttons left of EUCLIDIAN (momentary, no function yet) */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC, NPF = 9 };
@@ -179,7 +181,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"},
 };
 
 static FILE *g_log;
@@ -842,6 +844,7 @@ static int value_of(Plugin *w, int i) {
     if (i == P_PF_DOWN) return w->seq.downbeat ? 1 : 0;
     if (i == P_PF_ALT) return w->seq.alt_bar ? 1 : 0;   /* v2.2 */
     if (i == P_PF_AFILL) return w->seq.auto_fill ? 1 : 0;
+    if (i == P_PF_STOPCC) return w->seq.stop_cc ? 1 : 0;   /* v1.2.0 */
     if (i >= P_PFY0 && i < P_PFY0 + 8) return w->pfy[i - P_PFY0] ? 1 : 0;
     if (i == P_MSTATE) return w->seq.any_muted() ? 1 : 0;
     if (i == P_MSG) return w->msg;
@@ -1017,6 +1020,7 @@ static void set_value_raw(Plugin *w, int i, int v) {
     if (i == P_PF_DOWN) { w->seq.downbeat = v != 0; return; }
     if (i == P_PF_ALT) { w->seq.set_alt(v != 0, w->song); return; }   /* v2.2 */
     if (i == P_PF_AFILL) { w->seq.auto_fill = v != 0; return; }
+    if (i == P_PF_STOPCC) { w->seq.set_stop_cc(v != 0); return; }   /* v1.2.0 */
     if (i >= P_PFY0 && i < P_PFY0 + 8) { w->pfy[i - P_PFY0] = v != 0; return; }
     if (i >= P_SHUF0 && i < P_SHUF0 + NTRACKS) { w->seq.t[i - P_SHUF0].shuf = v ? 1 : 0; return; }
     if (i == P_SHUF_ALL) { for (int k = 0; k < NTRACKS; k++) w->seq.t[k].shuf = v ? 1 : 0; return; }
@@ -1181,7 +1185,7 @@ static bool is_own(int i) { return i >= 0 && i < P_OWN_COUNT; }   /* not a popup
  * a state holds the mutes themselves. */
 static const int FX_PADS[] = {P_PFX0 + 0, P_PFX0 + 1, P_PFX0 + 2, P_PFX0 + 3, P_PFX0 + 4, P_PFX0 + 7,
                               P_PFY0 + 0, P_PFY0 + 1, P_PFY0 + 2, P_PFY0 + 3, P_PFY0 + 4, P_PFY0 + 6,
-                              P_PF_HUM, P_PF_BUILD, P_PF_ECHO, P_PF_FADE, P_PF_GHOST, P_PF_POLY, P_PF_DOWN, P_PF_ALT, P_PF_AFILL};
+                              P_PF_HUM, P_PF_BUILD, P_PF_ECHO, P_PF_FADE, P_PF_GHOST, P_PF_POLY, P_PF_DOWN, P_PF_ALT, P_PF_AFILL, P_PF_STOPCC};
 enum { NFX_PADS = sizeof FX_PADS / sizeof FX_PADS[0] };
 static int value_of(Plugin *w, int i);
 static void set_value(Plugin *w, int i, int v);
@@ -1846,7 +1850,11 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                 each_sel(w, [&](Step &st) { st.micro = (int8_t)((int)(w->seq.gen_rnd() % (2 * MICRO_MAX + 1)) - MICRO_MAX); });
                 tm_msg(w);
             }
-            if (i == P_RND_RATCH && w->timing_edit) each_sel(w, [&](Step &st) { st.ratch = (uint8_t)(w->seq.gen_rnd() % RATCH_MAX); });
+            if (i == P_RND_RATCH && w->timing_edit)   /* v1.2.0: the number of hits and their RESOLUTION (one hit: AUTO) */
+                each_sel(w, [&](Step &st) {
+                    st.ratch = (uint8_t)(w->seq.gen_rnd() % RATCH_MAX);
+                    st.rres = st.ratch ? (uint8_t)(w->seq.gen_rnd() % (RRES_MAX + 1)) : 0;
+                });
             if (i == P_CLR_TIMING && w->timing_edit) { each_sel(w, [](Step &st) { st.micro = 0; }); tm_msg(w); }   /* back on the grid */
             if (i == P_CLR_RATCH && w->timing_edit) each_sel(w, [](Step &st) { st.ratch = 0; st.rres = 0; });   /* one hit (and RESOLUTION AUTO) */
             if (i == P_EU_RND) {

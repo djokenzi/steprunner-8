@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.1.1 (2026-10-13): low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, arrow buttons. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -246,6 +246,18 @@ Parameters are a window onto the pattern. STEPS tab, top to bottom:
 
 StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.12.0). The whole Trig Seq history
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
+
+### v1.2.0 (in development)
+- RND RATCHETS also draws RATCHET RESOLUTION (AUTO, 1/16 .. 1/80) for each selected step; a step that gets one hit gets
+  AUTO.
+- PERFORM: STOP CC pad (`pf_stopcc`, appended) in the place of HUMANIZE. While lit, `Seq::emit` drops every CC
+  (status 0xBn): locks, base values, pan, PERFORM ALL. Notes play on. Switched off (`set_stop_cc`): every CC with a base
+  value and every pan rest is marked dirty, so they go out on each track's next step. Not saved; a STATE remembers it
+  like the other pads (appended to `FX_PADS`, older versions ignore the bit). `pf_hum` and the HUMANIZE code stay, with
+  no pad.
+- PROGRAM tab: two arrow buttons `nav_left` / `nav_right` (momentary, appended; 72x44, the EUCLIDIAN style, a triangle
+  for text) on the left edge of the top row, in every mode. No function yet.
+- vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
 - Low-RAM skin, after a user report: opening the plugin window added about 25-30% RAM on the MPC. MPC decodes every

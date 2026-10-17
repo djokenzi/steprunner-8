@@ -166,6 +166,17 @@ struct Seq {
      *   auto_fill on the empty steps of the last 4 of each track's length, an extra hit at random (AFILL_PCT % of them,
      *             at AFILL_VEL % of the track's velocity) */
     bool alt_bar = false, auto_fill = false;
+    /* v1.2.0 STOP CC pad (not saved): while it is lit no CC goes out (locks, base values, pan, PERFORM ALL); notes
+     * play on. Switched off: every track's base values and pan rest go out again on its next step (set_stop_cc). */
+    bool stop_cc = false;
+    void set_stop_cc(bool on) {
+        if (!on && stop_cc)
+            for (int i = 0; i < NTRACKS; i++) {
+                for (int j = 0; j < NCC; j++) cc_dirty[i][j] = true;
+                pan_dirty[i] = t[i].panb != 0;
+            }
+        stop_cc = on;
+    }
     int64_t alt_b0 = 0;
     void set_alt(bool on, double song) { if (on && !alt_bar) alt_b0 = (int64_t)std::floor(virt(song) / 4.0); alt_bar = on; }
     int64_t pl_k0[NTRACKS] = {0}; int pl_s0[NTRACKS] = {0};
@@ -334,6 +345,7 @@ struct Seq {
     static double step_dur(const Track &tr) { return 0.25 / SPEEDS[tr.speed < NSPEEDS ? (int)tr.speed : (int)SPEED_1X]; }
 
     void emit(uint8_t status, uint8_t d1, uint8_t d2) {
+        if (stop_cc && (status & 0xF0) == 0xB0) return;   /* STOP CC (v1.2.0) */
         if (nout < (int)(sizeof out / sizeof out[0])) { out[nout].status = status; out[nout].d1 = d1; out[nout].d2 = d2; nout++; }
     }
     uint32_t rnd() { rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; return rng; }
