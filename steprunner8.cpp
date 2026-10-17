@@ -179,7 +179,7 @@ enum {
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC_V1, NPF = 9 };   /* parameter counts: the RND buttons, the PERFORM knobs P_PF0.. (CC 6 / 7: P_PF_CC6 / 7) */
-enum { BIG_NONE = 0, BIG_NOTSAVED, BIG_NODRUM, BIG_NOTHING, BIG_FAIL, BIG_DONE0 = BIG_FAIL, BIG_MAXN = 48 };   /* bigmsg: DONEn = BIG_DONE0 + n (n mappings, 1..48; 40 until v1.92) */
+enum { BIG_NONE = 0, BIG_NOTSAVED, BIG_NODRUM, BIG_NOTHING, BIG_FAIL, BIG_DONE0 = BIG_FAIL, BIG_MAXN = 64 };   /* v1.2.0: 64 (8 a track) */   /* bigmsg: DONEn = BIG_DONE0 + n (n mappings, 1..48; 40 until v1.92) */
 static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK, "track"}, {P_PAGE, "page"}, {P_STEP0, "step0"}, {P_STEP0 + 15, "step15"}, {P_SEL, "sel"},
     {P_ST_COND, "st_cond"}, {P_ST_PROB, "st_prob"}, {P_ST_VEL, "st_vel"}, {P_ST_LEN, "st_len"}, {P_ST_CC0, "st_cc1"}, {P_ST_CC0 + NCC_V1 - 1, "st_cc5"},
@@ -267,7 +267,7 @@ struct Plugin {
     int rmode = 2;                   /* v2.1: the right-hand panel EUCLIDIAN leaves as it is: the last of PATTERN EDIT (0), STEP EDIT / TIMING (1), TRACK EDIT (2) */
     /* v1.2.0: a CC knob turned down to -- stays there (no jump to the base value it rests on otherwise) while the same
      * steps are selected: bit j = CC j, for the selection cc_rest_key (track, page, selection) */
-    uint8_t cc_rest = 0; uint32_t cc_rest_key = 0;
+    uint16_t cc_rest = 0; uint32_t cc_rest_key = 0;   /* bits 0..6 CC 1-7, REST_VEL, REST_PAN (v1.2.0) */
     bool trk_vals = false;           /* v1.2.0: TRACK EDIT's right panel shows TRACK VALUES (not saved, kept across mode changes) */
     int lpage[3] = {0, 0, 0};        /* v1.2.0: the left section's page in PATTERN EDIT [0], TRACK EDIT [1], STEP EDIT [2]: 0 RND STEPS .. RND CC 5, 1 RND COND / TIMING / RATCHETS (not saved) */
     bool clr_mode = false;           /* CLR LOCKS lit: RND VEL .. RND CC 5 clear that lock (CLR VEL ..), RND STEPS is off */
@@ -765,7 +765,7 @@ static int xpj_pad_note(const std::string &js, const std::vector<XTrack> &tracks
  * for them under the copy's name) or needed the whole data folder copied, so the user chose this.
  * xpj_map_text only adds them to the text `js`: the number added, -2 if there is no such drum track. */
 static int xpj_map_text(const Seq &seq, const std::string &track, std::string &js) {
-    static const struct { int id; const char *name; } PRM[NCC_V1 + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {517, "Pan"}};   /* + Pan (v1.93: the track's PAN_CC) */   /* v1.87.0: the pad's Send 1/2 are 522/523 (MPC's MIDI learn MIXER group: Level 518, Pan 517, Pad Mute 526, Pad Solo 527, Send 1-4 522-525); 91/92 (v1.71-1.86) were not found by MPC, which showed the row as the entry before */
+    static const struct { int id; const char *name; } PRM[NCC + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {524, "Send 3"}, {525, "Send 4"}, {517, "Pan"}};   /* v1.2.0: CC 6 / 7 = Send 3 / 4 */   /* + Pan (v1.93: the track's PAN_CC) */   /* v1.87.0: the pad's Send 1/2 are 522/523 (MPC's MIDI learn MIXER group: Level 518, Pan 517, Pad Mute 526, Pad Solo 527, Send 1-4 522-525); 91/92 (v1.71-1.86) were not found by MPC, which showed the row as the entry before */
     std::vector<XEntry> have;
     xpj_scan_text(js, have);
     size_t ins = std::string::npos;
@@ -773,7 +773,7 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
     if (ins == std::string::npos) return -2;
     size_t arr = js.find('[', ins), arr_end = arr == std::string::npos ? arr : xpj_close(js, arr);
     if (arr_end == std::string::npos) return -2;
-    double val[NTRACKS][NCC_V1 + 1]; bool pad[NTRACKS] = {false};   /* CC 1-5 and pan; CC 6 / 7 get no default mapping (v1.2.0) */
+    double val[NTRACKS][NCC + 1]; bool pad[NTRACKS] = {false};   /* CC 1-7 and pan */
     size_t at = js.find('{', arr);
     for (int k = 0; k < NTRACKS && at != std::string::npos && at < arr_end; k++) {
         size_t e = xpj_close(js, at);
@@ -783,13 +783,13 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
         xpj_num(js, at, e, "\"coarseTune\"", ct); xpj_num(js, at, e, "\"fineTune\"", ft);   /* the pad's own (first in its object) */
         /* Tuning as 0..1: -36..+36 semitones (an assumption: 0 = the middle, 0.5; not checked against MPC's own value) */
         double tn = (ct + ft / 100.0 + 36.0) / 72.0; tn = tn < 0.0 ? 0.0 : tn > 1.0 ? 1.0 : tn;
-        val[k][0] = tn; val[k][1] = c; val[k][2] = r; val[k][3] = val[k][4] = 0.0; val[k][5] = 0.5;
+        val[k][0] = tn; val[k][1] = c; val[k][2] = r; val[k][3] = val[k][4] = val[k][5] = val[k][6] = 0.0; val[k][NCC] = 0.5;
         { size_t mx = js.find("\"mixable\"", at); double pv = 0.5;   /* the pad's pan, 0..1 (0.5 = the centre) */
-          if (mx != std::string::npos && mx < e && xpj_num(js, mx, e, "\"pan\"", pv) && pv >= 0.0 && pv <= 1.0) val[k][5] = pv; }
+          if (mx != std::string::npos && mx < e && xpj_num(js, mx, e, "\"pan\"", pv) && pv >= 0.0 && pv <= 1.0) val[k][NCC] = pv; }
         size_t sd = js.find("\"sends\"", at), sb = sd == std::string::npos || sd > e ? std::string::npos : js.find('[', sd);
         if (sb != std::string::npos && sb < e) {
             const char *p = js.c_str() + sb + 1;
-            for (int j = 0; j < 2; j++) { char *q; double v = std::strtod(p, &q); if (q == p) break; val[k][3 + j] = v; p = q; while (*p == ',' || *p == '\n' || *p == ' ' || *p == '\r') p++; }
+            for (int j = 0; j < 4; j++) { char *q; double v = std::strtod(p, &q); if (q == p) break; val[k][3 + j] = v;   /* Send 1-4 (3 / 4 since v1.2.0) */ p = q; while (*p == ',' || *p == '\n' || *p == ' ' || *p == '\r') p++; }
         }
         pad[k] = true;
         at = js.find('{', e);
@@ -800,8 +800,8 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
     if (ce == std::string::npos) return -2;
     bool empty = js.find('{', ca) > ce;
     std::string add; int n = 0; char b[1600];
-    for (int ti = 0; ti < NTRACKS; ti++) if (pad[ti]) for (int j = 0; j < NCC_V1 + 1; j++) {
-        const int ch = seq.t[ti].ch + 1, cc = j < NCC_V1 ? Seq::cc_num(seq.t[ti], j) : PAN_CC[ti];
+    for (int ti = 0; ti < NTRACKS; ti++) if (pad[ti]) for (int j = 0; j < NCC + 1; j++) {
+        const int ch = seq.t[ti].ch + 1, cc = j < NCC ? Seq::cc_num(seq.t[ti], j) : PAN_CC[ti];
         bool dup = false;
         for (const XEntry &e : have) if ((e.ch == ch && e.cc == cc) || (e.tgt == track && e.inst == ti && e.param == PRM[j].id)) dup = true;   /* the CC is taken, or the pad's parameter has a mapping already */
         if (dup) continue;
@@ -851,7 +851,17 @@ static int st_cc_j(int i) { return i >= P_ST_CC0 && i < P_ST_CC0 + NCC_V1 ? i - 
 static int pf_k(int i) { return i >= P_PF0 && i < P_PF0 + NPF ? i - P_PF0 : i == P_PF_CC6 ? Seq::PF_CC0 + 5 : i == P_PF_CC7 ? Seq::PF_CC0 + 6 : -1; }
 static int pf_param(int k) { return k < NPF ? P_PF0 + k : k == Seq::PF_CC0 + 5 ? P_PF_CC6 : P_PF_CC7; }
 enum { NPF_ALL = Seq::PF_COUNT };
+enum { REST_VEL = 8, REST_PAN = 9 };   /* v1.2.0: cc_rest bits of the VELOCITY / PAN lock knobs */
 static uint32_t sel_key(const Plugin *w) { return (uint32_t)w->track | ((uint32_t)w->page << 3) | ((uint32_t)w->selmask << 5) | (w->step_edit ? 1u << 21 : 0); }
+/* v1.2.0: a lock knob with no lock rests on the track's value; once turned down to -- it stays there for this
+ * selection (no jump back). rest_dash: it shows --; rest_turn: note a turn to x, returns whether it showed -- before. */
+static bool rest_dash(const Plugin *w, int b) { return ((w->cc_rest >> b) & 1) && w->cc_rest_key == sel_key(w); }
+static bool rest_turn(Plugin *w, int b, int x) {
+    if (w->cc_rest_key != sel_key(w)) { w->cc_rest = 0; w->cc_rest_key = sel_key(w); }
+    const bool was = (w->cc_rest >> b) & 1;
+    if (x) w->cc_rest &= (uint16_t)~(1u << b); else w->cc_rest |= (uint16_t)(1u << b);
+    return was;
+}
 static int ql_track(const Plugin *w, int i) {
     if (!(w->track_edit || (w->euclid_edit && w->rmode == 2))) return -1;
     if (i == P_ST_VEL) return P_TRK_VEL;
@@ -933,7 +943,7 @@ static int value_of(Plugin *w, int i) {
     if (i >= P_PGSEL0 && i < P_PGSEL0 + 4) return w->page == i - P_PGSEL0 ? 1 : 0;
     if (st_cc_j(i) >= 0) {
         const int j = st_cc_j(i), c = cur_step(w).cc[j];
-        if (!c && ((w->cc_rest >> j) & 1) && w->cc_rest_key == sel_key(w)) return 0;   /* v1.2.0: just turned to --: it stays there */
+        if (!c && rest_dash(w, j)) return 0;   /* v1.2.0: just turned to --: it stays there */
         return c ? c : tr.ccb[j];
     }   /* no lock: the knob rests on the CC's base value (shown in brackets); the step is not touched */
     switch (i) {
@@ -942,9 +952,9 @@ static int value_of(Plugin *w, int i) {
     case P_SEL: return w->sel + 1;
     case P_ST_COND: return cond_pos(cur_step(w).cond);
     case P_ST_PROB: return cur_step(w).prob;
-    case P_ST_VEL: return cur_step(w).vel;
+    case P_ST_VEL: { const int c = cur_step(w).vel; return c || rest_dash(w, REST_VEL) ? c : tr.vel; }   /* v1.2.0: no lock: rests on the track's velocity */
     case P_ST_LEN: return cur_step(w).len;
-    case P_ST_PAN: return cur_step(w).pan;
+    case P_ST_PAN: { const int c = cur_step(w).pan; return c || rest_dash(w, REST_PAN) ? c : tr.panb; }   /* v1.2.0: no lock: rests on the track's pan */
     case P_TRK_LEN: return tr.len;
     case P_TRK_SPEED: return tr.speed;
     case P_TRK_CH: return tr.ch + 1;
@@ -1061,9 +1071,7 @@ static void set_value_raw(Plugin *w, int i, int v) {
         return;
     }
     if (st_cc_j(i) >= 0) { const int j = st_cc_j(i); const uint8_t x = (uint8_t)clampi(v, 0, 128);
-        if (w->cc_rest_key != sel_key(w)) { w->cc_rest = 0; w->cc_rest_key = sel_key(w); }   /* v1.2.0: -- stays put, see value_of */
-        const bool at_dash = (w->cc_rest >> j) & 1;   /* the knob showed --, not the base value */
-        if (x) w->cc_rest &= (uint8_t)~(1u << j); else w->cc_rest |= (uint8_t)(1u << j);
+        const bool at_dash = rest_turn(w, j, x);   /* v1.2.0: the knob showed --, not the base value (see value_of) */
         if (!cur_step(w).cc[j] && x && x == w->seq.t[w->track].ccb[j] && !at_dash) return;   /* the knob only rests on the base value: the host handing that back is not a lock */
         each_sel(w, [=](Step &st) { st.cc[j] = x; });
         return;
@@ -1148,9 +1156,13 @@ static void set_value_raw(Plugin *w, int i, int v) {
     case P_SEL: select_one(w, v - 1); break;
     case P_ST_COND: { const uint8_t x = (uint8_t)cond_at(clampi(v, 0, NCOND - 1)); each_sel(w, [=](Step &st) { st.cond = x; }); break; }
     case P_ST_PROB: { const uint8_t x = (uint8_t)clampi(v, 0, 100); each_sel(w, [=](Step &st) { st.prob = x; }); break; }
-    case P_ST_VEL: { const uint8_t x = (uint8_t)clampi(v, 0, 127); each_sel(w, [=](Step &st) { st.vel = x; }); break; }
+    case P_ST_VEL: { const uint8_t x = (uint8_t)clampi(v, 0, 127); const bool d = rest_turn(w, REST_VEL, x);
+        if (!cur_step(w).vel && x && x == tr.vel && !d) break;   /* the knob only rests on the track's velocity: not a lock (v1.2.0) */
+        each_sel(w, [=](Step &st) { st.vel = x; }); break; }
     case P_ST_LEN: { const uint8_t x = (uint8_t)clampi(v, 0, 64); each_sel(w, [=](Step &st) { st.len = x; }); break; }
-    case P_ST_PAN: { const uint8_t x = (uint8_t)clampi(v, 0, 128); each_sel(w, [=](Step &st) { st.pan = x; }); break; }
+    case P_ST_PAN: { const uint8_t x = (uint8_t)clampi(v, 0, 128); const bool d = rest_turn(w, REST_PAN, x);
+        if (!cur_step(w).pan && x && x == tr.panb && !d) break;   /* the knob only rests on the track's pan: not a lock (v1.2.0) */
+        each_sel(w, [=](Step &st) { st.pan = x; }); break; }
     case P_ST_RATCH: { const uint8_t x = (uint8_t)(clampi(v, 1, RATCH_MAX) - 1); each_sel(w, [=](Step &st) { st.ratch = x; }); break; }
     case P_ST_RRES: { const uint8_t x = (uint8_t)clampi(v, 0, RRES_MAX); each_sel(w, [=](Step &st) { st.rres = x; }); break; }
     case P_TRK_LEN: tr.len = (uint8_t)clampi(v, 1, NSTEPS); w->seq.euclid_apply(w->track); break;
@@ -1396,14 +1408,19 @@ static void display_of(Plugin *w, int i, char *out, size_t n) {
     switch (i) {
     case P_ST_COND: cond_name(cond_at(v), out, n); return;
     case P_ST_PROB: case P_RND_DENS: case P_SHUFFLE: std::snprintf(out, n, "%d%%", v); return;
-    case P_ST_VEL: if (!v) std::snprintf(out, n, "--"); else std::snprintf(out, n, "%d", v); return;
+    case P_ST_VEL: { const int c = cur_step(w).vel; const int t = w->seq.t[w->track].vel;   /* v1.2.0: no lock: the track's in brackets */
+        if (c) std::snprintf(out, n, "%d", c); else std::snprintf(out, n, "(%d)", t); return; }
     case P_ST_LEN: if (!v) std::snprintf(out, n, "--"); else std::snprintf(out, n, "%.2f", v / 4.0); return;
-    case P_ST_PAN:   /* 1..128 = CC 10 value 0..127; 64 is the centre */
-        if (!v) std::snprintf(out, n, "--");
-        else if (v - 1 == 64) std::snprintf(out, n, "C");
-        else if (v - 1 < 64) std::snprintf(out, n, "L%d", 64 - (v - 1));
-        else std::snprintf(out, n, "R%d", (v - 1) - 64);
+    case P_ST_PAN: {   /* 1..128 = CC 10 value 0..127; 64 is the centre. v1.2.0: no lock: the track's pan in brackets */
+        const int c = cur_step(w).pan, p = c ? c : w->seq.t[w->track].panb;
+        char t[16];
+        if (!p) std::snprintf(t, sizeof t, "--");
+        else if (p - 1 == 64) std::snprintf(t, sizeof t, "C");
+        else if (p - 1 < 64) std::snprintf(t, sizeof t, "L%d", 64 - (p - 1));
+        else std::snprintf(t, sizeof t, "R%d", (p - 1) - 64);
+        if (c || !p) std::snprintf(out, n, "%s", t); else std::snprintf(out, n, "(%s)", t);
         return;
+    }
     case P_TRK_GATE: std::snprintf(out, n, "%.2f", v / 4.0); return;
     case P_TRK_PROB: std::snprintf(out, n, "%d%%", v); return;
     case P_TRK_PAN:   /* v1.2.0: as a pan lock; -- = not known (the pad's own, the centre until FETCH CC VALUES) */

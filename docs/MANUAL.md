@@ -303,14 +303,15 @@ STEP EDIT sets the **locks** of individual steps.
 | Control | Values | Without a lock |
 |---|---|---|
 | **CONDITION** | see [10](#10-step-conditions) | always plays |
-| **Velocity** | 1–127 | track velocity |
-| **Pan** | L64 … C … R63 | nothing sent |
+| **Velocity** | 1–127 | track velocity (shown in brackets, e.g. *(100)*) |
+| **Pan** | L64 … C … R63 | the track's pan (shown in brackets once known, e.g. *(L20)*) |
 | **Length** | 0.25–16 steps | track gate |
 | **Probability** | 0–100 % | 100 % |
 | **CC 1–7** | 0–127 | nothing sent (or the base value, see [12.3](#123-base-values)) |
 
 - If a CC has a base value, a step without a lock shows it in brackets, e.g. *(64)*, and the knob starts from there.
-- Turn a CC knob fully down to `--` to remove its lock. The knob stays at `--` (it does not jump to the base value)
+  VELOCITY and PAN do the same with the track's values (TRACK VALUES; pan from FETCH CC VALUES).
+- Turn a knob fully down to `--` to remove its lock. The knob stays at `--` (it does not jump to the track's value)
   until you select another step.
 
 **▶ / ◀** switch the left section to a second page and back: **RND COND / RND TIMING / RND RATCHETS**, as in
@@ -499,8 +500,7 @@ Locks are never changed: they still play on their steps.
 
 All 64 numbers are different, so all eight tracks can share one MIDI channel. None of them is a controller MPC or a
 MIDI device acts on by itself (bank select, modulation, volume, pan, expression, pedals, RPN/NRPN, channel mode).
-CC 6 and CC 7 have no number in TRACK SETUP yet, and CREATE DEFAULT MAP maps CC 1–5 and pan only; map CC 6 / 7 with
-MPC's MIDI learn.
+CC 6 and CC 7 have no number in TRACK SETUP yet. CREATE DEFAULT MAP maps them to the pad's Send 3 and Send 4.
 
 All tracks start on MIDI channel 1 with velocity 100, gate 1 step, length 16 and speed 1X.
 

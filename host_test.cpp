@@ -696,7 +696,7 @@ static void vst_tests() {
           "StepRunner-8 v1.x: uid 'SR-8', product '%s', vendor '%s', version %d", name, disp, a->ver);
     a->d(a, 8, P("st_cond"), 0, name, 0); CHECK(!strcmp(name, "Condition"), "param name '%s'", name);
     a->d(a, 7, P("trk_num"), 0, disp, 0); CHECK(!strcmp(disp, "36"), "T1 note '%s'", disp);
-    a->d(a, 7, P("st_vel"), 0, disp, 0);  CHECK(!strcmp(disp, "--"), "no velocity lock shows '%s'", disp);
+    a->d(a, 7, P("st_vel"), 0, disp, 0);  CHECK(!strcmp(disp, "(100)"), "no velocity lock shows the track's in brackets '%s' (v1.2.0)", disp);
     a->d(a, 7, P("trk_len"), 0, disp, 0); CHECK(!strcmp(disp, "16"), "default length '%s'", disp);
 
     /* the step buttons are a window: T1 page 1, T1 page 4, T6 page 1 hold different steps */
@@ -863,7 +863,7 @@ static void vst_tests() {
         int vv[16], cv[16];
         for (int k = 0; k < 16; k++) {
             set_int(a, "sel", k + 1);
-            a->d(a, 7, P("st_vel"), 0, disp, 0); vv[k] = strcmp(disp, "--") ? atoi(disp) : -1;
+            a->d(a, 7, P("st_vel"), 0, disp, 0); vv[k] = disp[0] != '(' ? atoi(disp) : -1;   /* v1.2.0: no lock reads (track velocity) */
             a->d(a, 7, P("st_cc2"), 0, disp, 0); cv[k] = strcmp(ccv(disp), "--") ? atoi(ccv(disp)) : -1;
         }
         int only = 1;
@@ -878,7 +878,7 @@ static void vst_tests() {
         a->setP(a, P("clr_step"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("clr_step"), 0.0f);
         a->setP(a, P("step9"), 1.0f);                                 /* - 10: one left, the knobs work again */
         a->d(a, 7, P("sel"), 0, disp, 0); a->d(a, 7, P("st_vel"), 0, name, 0);
-        CHECK(!strcmp(disp, "6") && !strcmp(name, "--"), "one step left: EDIT STEP is '%s', CLR LOCKS cleared its velocity ('%s')", disp, name);
+        CHECK(!strcmp(disp, "6") && !strcmp(name, "(100)"), "one step left: EDIT STEP is '%s', CLR LOCKS cleared its velocity ('%s')", disp, name);
         set_int(a, "sel", 3); a->d(a, 7, P("st_vel"), 0, name, 0);
         CHECK(atoi(name) >= 30, "step 3 was not in that selection and kept its lock ('%s')", name);
         set_int(a, "sel", 6);
@@ -2005,7 +2005,7 @@ static void vst_tests() {
         char pan[64]; b->d(b, 7, P("st_pan"), 0, pan, 0);
         CHECK(b->getP(b, P("step1")) > 0.5f && !strcmp(disp, "50") && !strcmp(ccv(name), "127") && !strcmp(pan, "--"), "TSq2 step 2: trig, velocity '%s', fifth CC '%s', pan '%s'", disp, name, pan);
         set_int(b, "sel", 3); b->d(b, 7, P("st_vel"), 0, disp, 0);
-        CHECK(b->getP(b, P("step2")) > 0.5f && !strcmp(disp, "--"), "TSq2 step 3 is not shifted by the missing pan byte ('%s')", disp);
+        CHECK(b->getP(b, P("step2")) > 0.5f && disp[0] == '(', "TSq2 step 3 is not shifted by the missing pan byte ('%s')", disp);
         b->d(b, 24, 0, n, (void *)saved.c_str(), 0);
         set_int(b, "track", 5);
     }
@@ -2171,7 +2171,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         pr("rnd_vel");
         set_int(c, "step_edit", 1); CHECK(OPTC("lbtn") == 3, "still red in STEP EDIT");
         set_int(c, "sel", 1); c->d(c, 7, P("st_vel"), 0, d, 0); char cc[64]; c->d(c, 7, P("st_cc2"), 0, cc, 0);
-        CHECK(!strcmp(d, "--") && !strcmp(cc, "30"), "CLR VEL: the velocity locks of the track are gone (%s), the CC 2 locks stay (%s)", d, cc);
+        CHECK(!strcmp(d, "(100)") && !strcmp(cc, "30"), "CLR VEL: the velocity locks of the track are gone (%s: the track's, v1.2.0), the CC 2 locks stay (%s)", d, cc);
         pr("rnd_cc2"); c->d(c, 7, P("st_cc2"), 0, cc, 0);
         set_int(c, "sel", 5); c->d(c, 7, P("st_cc2"), 0, d, 0);
         CHECK(!strcmp(cc, "--") && !strcmp(d, "40"), "CLR CC 2 in STEP EDIT: the selected step only (%s), the other step keeps %s", cc, d);
@@ -2331,7 +2331,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             std::string old = sv; const size_t q = old.find("\nX 2 "); old.erase(q + 1, old.find('\n', q + 1) - q);
             AEffect *o = VSTPluginMain(host); o->d(o, 24, 0, (intptr_t)old.size(), (void *)old.c_str(), 0);
             set_int(o, "track", 2); set_int(o, "step_edit", 1); set_int(o, "sel", 1);
-            CHECK(iv(o, "st_cc6") == 0 && iv(o, "st_cc7") == 0 && iv(o, "st_vel") == 0, "an older project: no CC 6 / 7 locks (%d %d)", iv(o, "st_cc6"), iv(o, "st_cc7"));
+            CHECK(iv(o, "st_cc6") == 0 && iv(o, "st_cc7") == 0 && iv(o, "st_vel") == 100, "an older project: no CC 6 / 7 locks (%d %d)", iv(o, "st_cc6"), iv(o, "st_cc7"));
             o->d(o, 1, 0, 0, 0, 0);
         }
         set_int(c, "track_edit", 1); set_int(c, "st_cc6", 1 + 70);   /* a Q-Link in TRACK EDIT: the track's CC 6 base */
@@ -2383,7 +2383,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             CHECK(iv("trk_vel") == 70 && iv("trk_cc3") == 34 && iv("trk_gate") == 12 && iv("st_vel") == 70 && !strcmp(d, "70"),
                   "TRACK EDIT: a Q-Link on VELOCITY / CC 3 / LENGTH sets the track's (%d %d %d), and reads it ('%s')", iv("trk_vel"), iv("trk_cc3"), iv("trk_gate"), d);
             set_int(c, "step_edit", 1); set_int(c, "sel", 1);
-            CHECK(iv("st_vel") == 0 && iv("trk_vel") == 70, "STEP EDIT: the same knob is step 1's velocity lock again (%d), the track keeps 70", iv("st_vel"));
+            CHECK(iv("st_vel") == 70 && iv("trk_vel") == 70, "STEP EDIT: the same knob is step 1's velocity lock again (none: it rests on the track's 70: %d)", iv("st_vel"));
             set_int(c, "st_vel", 50); set_int(c, "track_edit", 1);
             CHECK(iv("trk_vel") == 70 && iv("st_vel") == 70, "a lock set in STEP EDIT does not touch the track (%d)", iv("trk_vel"));
             set_int(c, "euclid_edit", 1); pr("trk_vals"); CHECK(panel() == 8, "EUCLIDIAN over TRACK EDIT: TRACK VALUES opens (%d)", panel());
@@ -2527,17 +2527,20 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         pr("srcsel1"); CHECK(OPTC("srchl1") == 2 && OPTC("panel") == 7 && OPTC("bigmsg") == 0 && system("ls build/map/a | grep -q backup") != 0, "a tap only marks the track");
         pr("src_commit");
         c->d(c, 7, P("bkname"), 0, m, 0);
-        CHECK(OPTC("bigmsg") == 52 && OPTC("bigdone") == 1 && !strcmp(m, " ") && OPTC("panel") == 4, "COMMIT on the marked track: big message DONE48 (5 CCs + pan per track, v1.93) (%d), no backup (v2.0) '%s', the list closes", OPTC("bigmsg"), m);
+        CHECK(OPTC("bigmsg") == 68 && OPTC("bigdone") == 1 && !strcmp(m, " ") && OPTC("panel") == 4, "COMMIT on the marked track: big message DONE64 (7 CCs + pan per track, v1.2.0) (%d), no backup (v2.0) '%s', the list closes", OPTC("bigmsg"), m);
         pr("msg_ok"); CHECK(OPTC("bigmsg") == 0 && OPTC("bigdone") == 0, "a tap on the message closes it");
         CHECK(system("! ls build/map/a | grep -q backup && ! cmp -s build/map/a/cctest1.xpj testdata1/cctest1.xpj && test ! -e build/map/a/cctest1.xpj.tmp && ! ls build/map/a | grep -q bak") == 0, "no backup (v2.0), the project itself changed");
-        CHECK(system("python3 -I -c \"import gzip,json;t=gzip.open('build/map/a/cctest1.xpj').read().decode();d=json.loads(t[t.index('{'):])['data'];o=gzip.open('testdata1/cctest1.xpj').read().decode();e=json.loads(o[o.index('{'):])['data'];assert len(d['midiLearnSettings']['controls'])==48 and len(d['samples'])==2 and d['samples']==e['samples'] and d['tracks']==e['tracks']\"") == 0, "every track is as it was, samples included; only the mapping list grew");
+        CHECK(system("python3 -I -c \"import gzip,json;t=gzip.open('build/map/a/cctest1.xpj').read().decode();d=json.loads(t[t.index('{'):])['data'];o=gzip.open('testdata1/cctest1.xpj').read().decode();e=json.loads(o[o.index('{'):])['data'];assert len(d['midiLearnSettings']['controls'])==64 and len(d['samples'])==2 and d['samples']==e['samples'] and d['tracks']==e['tracks']\"") == 0, "every track is as it was, samples included; only the mapping list grew");
         {
             static char *chunk; int n = (int)c->d(c, 23, 0, 0, &chunk, 0); std::string saved(chunk, n);
             CHECK(saved.find("\nS Drum 001\n") != std::string::npos, "the target track is saved with the plugin");
         }
         pr("src_fetch");
         c->d(c, 7, P("msg"), 0, r1, 0); c->d(c, 7, P("st_cc1"), 0, m, 0); c->d(c, 7, P("st_cc3"), 0, r2, 0);
-        CHECK(!strcmp(r1, "Read 40 CC values") && !strcmp(m, "Tuning (64)") && !strcmp(r2, "Filter Re (0)"), "FETCH CC VALUES from the target track: '%s'; T1 '%s', '%s'", r1, m, r2);
+        CHECK(!strcmp(r1, "Read 56 CC values") && !strcmp(m, "Tuning (64)") && !strcmp(r2, "Filter Re (0)"), "FETCH CC VALUES from the target track: '%s'; T1 '%s', '%s'", r1, m, r2);
+        { char c6[64], pn[64]; set_int(c, "step_edit", 1); set_int(c, "sel", 2); c->d(c, 7, P("st_cc6"), 0, c6, 0); c->d(c, 7, P("st_pan"), 0, pn, 0);
+          CHECK(strstr(c6, "(") && pn[0] == '(', "STEP LOCKS after FETCH: CC 6 '%s' (Send 3), pan '%s' (the pad's), in brackets: no lock", c6, pn);
+          set_int(c, "global_edit", 1); }
         {   /* v1.93: the pads' pan comes along (cctest1: A02 in the centre, 0.5 -> 64, saved as 65) */
             static char *ch2; int n2 = (int)c->d(c, 23, 0, 0, &ch2, 0); std::string sv(ch2, n2);
             size_t at = sv.find("\nA 1 ");
@@ -2560,7 +2563,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         pr("msg_ok");
         rc = system("cp testdata1/cctest1.xpj build/map/a/cctest1.xpj && touch -d '2035-01-01' build/map/a/cctest1.xpj");
         pr("src_map"); pr("srcsel1"); pr("src_commit"); c->d(c, 7, P("bkname"), 0, m, 0);
-        CHECK(rc == 0 && OPTC("bigmsg") == 52 && system("! ls build/map/a | grep -q backup") == 0, "written again into a fresh copy, still no backup");
+        CHECK(rc == 0 && OPTC("bigmsg") == 68 && system("! ls build/map/a | grep -q backup") == 0, "written again into a fresh copy, still no backup");
         pr("msg_ok");
         pr("src_map"); set_int(c, "pattern_edit", 1); blocks(c, 2, 0.0);
         CHECK(OPTC("scr") == 0 && OPTC("panel") == 5, "leaving SETUP closes the list");
@@ -2661,7 +2664,7 @@ static void verify_tests() {
         CHECK(rc == 0 && !strcmp(m, "Which project is open?") && (!strcmp(r1, "mine") || !strcmp(r1, "untitled")) && (!strcmp(r2, "mine") || !strcmp(r2, "untitled")) && strcmp(r1, r2) && !strcmp(r3, " "),
               "two copies: '%s' asks, rows '%s' / '%s' / '%s' (no backups)", m, r1, r2, r3);
         prc(!strcmp(r1, "mine") ? "srcsel1" : "srcsel2"); prc("src_commit");
-        CHECK(c->getP(c, P("bigmsg")) > 0.0f && (int)lroundf(c->getP(c, P("bigmsg")) * 44) == 2, "the one picked is read: 9w9 has no drum track (NO DRUM TRACK)");
+        CHECK(c->getP(c, P("bigmsg")) > 0.0f && (int)lroundf(c->getP(c, P("bigmsg")) * (PARAMS[P("bigmsg")].nopts - 1)) == 2, "the one picked is read: 9w9 has no drum track (NO DRUM TRACK)");
         prc("msg_ok"); prc("src_cancel");
         setenv("STEPRUNNER_CURRENT", "build/vfy/cur", 1);
         rc = system("printf '<PROPERTIES><VALUE name=\"lastProjectPath\" val=\"build/vfy/mine.xpj\"/></PROPERTIES>' > build/vfy/cur");

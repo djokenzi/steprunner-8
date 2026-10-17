@@ -147,7 +147,7 @@ opt("lbtn", "Left Buttons", ["ORANGE", "TEAL", "VIOLET", "CLR", "NONE", "VIOLET2
 trig("src_copy", "Copy Mapping")
 trig("src_skip", "Skip Backup")
 opt("bkstep", "Backup Step", onoff)   # retired (v1.64, no backup step); slot kept
-opt("bigmsg", "Big Message", ["NONE", "NOTSAVED", "NODRUM", "NOTHING", "FAIL"] + ["DONE%d" % n for n in range(1, 49)])   # 41..48 v1.93.0 (pan: 6 per track)   # read-only: the big message over the PROGRAM tab (v1.64.0)
+opt("bigmsg", "Big Message", ["NONE", "NOTSAVED", "NODRUM", "NOTHING", "FAIL"] + ["DONE%d" % n for n in range(1, 65)])   # 49..64 v1.2.0 (CC 6 / 7: 8 per track)   # 41..48 v1.93.0 (pan: 6 per track)   # read-only: the big message over the PROGRAM tab (v1.64.0)
 opt("bigdone", "Big Message Done", onoff)   # read-only: the DONE message is up (shows the backup's name)
 trig("msg_ok", "Close Message")
 num("bkname", "Backup Name", 0, 1, 0)   # read-only: its value text is the backup's file name

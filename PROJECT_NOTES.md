@@ -301,7 +301,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   standard ones (test "default CC numbers"). New params appended: `st_cc6/7`, `pf_cc6/7` (`st_cc_j`, `pf_k`, `pf_param`
   map them); `trk_cc1..7` (TRACK VALUES) is contiguous. Saved: CC 6 / 7 locks on an `X t <hex>` line (2 bytes a step),
   the `C` and `B` lines get two more numbers, a state's `P` line two more offsets after cc117 (older versions read only
-  what they know). No CC 6 / 7 in TRACK SETUP (numbers) or CREATE DEFAULT MAP yet; RND buttons for them neither.
+  what they know). CREATE DEFAULT MAP maps CC 6 / 7 to the pad's Send 3 / 4 (524 / 525; values from the pad's
+  `sends`), 8 mappings a track, so DONE goes to 64 (`bigmsg` DONE49..64, `big_done_t49..64`); FETCH CC VALUES reads
+  all seven. No CC 6 / 7 in TRACK SETUP (numbers) yet; RND buttons for them neither. Velocity is not a pad parameter
+  in the project (Level is), so FETCH cannot read it; tracks start at 100.
+  - STEP LOCKS VELOCITY / PAN with no lock rest on the track's velocity / pan (panb) as the CC knobs do on their base,
+    text in brackets, the same "stays at --" rule (`rest_dash` / `rest_turn`, bits REST_VEL / REST_PAN of cc_rest).
   - Layout: STEP LOCKS and TRACK VALUES in six columns 120 px apart (CONDITION / BACK, VEL, PAN, LEN, PROB, CC 1;
     CC 2..CC 7), so neighbouring value boxes touch; PERFORM knobs closer to PERFORM ALL (VEL, PAN, LEN, PROB, CC 1 /
     CC 2..CC 7). Q-Links: 11 on PROGRAM and PERFORM.

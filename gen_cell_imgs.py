@@ -274,7 +274,7 @@ if os.path.exists(FONT):
     # per count (big_done_t1..48), cut from the full picture so it lies exactly over the band.
     DONE_LINES = ["Please close the project and open it again.", "Do not save it first, or the map is lost."]
     big("done_bg", "", DONE_LINES, BTN_GREEN, True)
-    for n in range(1, 49):   # v1.93.0: up to 48 (6 per track)
+    for n in range(1, 65):   # v1.93.0: up to 48 (6 per track); v1.2.0: 64 (8)
         big("done_tmp", "%d VALUE%s MAPPED" % (n, "" if n == 1 else "S"), DONE_LINES, BTN_GREEN, True)
         Image.open("images/big_done_tmp.png").convert("RGB").crop(DONE_TITLE).save("images/big_done_t%d.png" % n, optimize=True)
     os.remove("images/big_done_tmp.png")
