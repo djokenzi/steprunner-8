@@ -66,7 +66,8 @@ Along the top are the mode buttons: **STEP EDIT**, **TRACK EDIT**, **PATTERN EDI
   - **TIMING** in STEP EDIT;
   - **EUCLIDIAN** in TRACK EDIT;
   - nothing in PATTERN EDIT and SETUP.
-- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. They have no function yet.
+- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In TRACK EDIT they switch the
+  left section between its two pages (see [TRACK EDIT](#5-track-edit)); in the other modes they do nothing yet.
 
 ### Left section and right panel
 
@@ -244,7 +245,20 @@ The settings of the selected track:
 | **DIRECTION** | FWD, BWD, BOTH | Forwards, backwards, or back and forth |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
 
-The random buttons act on the selected track. **COPY TRK / PASTE TRK** copy a whole track, keeping the target
+The random buttons act on the selected track. **▶** shows a second page of random buttons, **◀** goes back to the
+first. The page stays as it is when you switch modes.
+
+| Page 2 button | Writes, on every trig of the selected track |
+|---|---|
+| **RND COND** | A random condition (any in the list, "--" included) |
+| **RND TIMING** | A random timing offset (up to ±23/24 of a step) |
+| **RND RATCHETS** | A random number of hits (1–8) and Ratchet Resolution (AUTO with one hit) |
+
+Page 2 ignores *Random Density*: every trig gets a new value. Steps without a trig are not changed. CLR STEPS and
+CLR LOCKS stay on page 2. With CLR LOCKS lit the buttons read **CLR COND / CLR TIMING / CLR RATCHETS** and clear that
+setting from the whole track.
+
+**COPY TRK / PASTE TRK** copy a whole track, keeping the target
 track's channel, note and CC numbers.
 
 ---

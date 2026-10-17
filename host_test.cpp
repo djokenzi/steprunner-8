@@ -2156,6 +2156,37 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         c->d(c, 8, P("eu_len"), 0, d, 0); CHECK(!strcmp(d, "Length"), "the Euclidean length knob is called '%s'", d);
         c->d(c, 1, 0, 0, 0, 0);
     }
+    {   /* v1.2.0: the arrows page TRACK EDIT's left section; page 2: RND COND / RND TIMING / RND RATCHETS on the trigs */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto look = [&](int sel, const char *key) { set_int(c, "step_edit", 1); set_int(c, "sel", sel); c->d(c, 7, P(key), 0, d, 0); set_int(c, "track_edit", 1); return std::string(d); };
+        for (int k = 0; k < 16; k += 2) c->setP(c, P(("step" + std::to_string(k)).c_str()), 1.0f);   /* trigs on 1, 3, 5 .. 15 */
+        set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 2, "TRACK EDIT: page 1 (violet)");
+        pr("nav_right"); CHECK(OPTC("lbtn") == 5 && OPTC("lpanel") == 0, "right arrow: page 2, CLR STEPS / CLR LOCKS stay (lbtn %d)", OPTC("lbtn"));
+        pr("rnd_cond"); pr("rnd_timing"); pr("rnd_ratch");
+        int cond = 0, tm = 0, rt = 0, empty = 0;
+        for (int k = 0; k < 16; k++) {
+            const std::string cs = look(k + 1, "st_cond");
+            c->d(c, 7, P("msg"), 0, d, 0);
+            const std::string rs = look(k + 1, "st_ratch"), rr = look(k + 1, "st_rres");
+            if (k % 2 == 0) { cond += cs != "--"; rt += rs != "1"; }
+            else empty += cs != "--" || rs != "1" || rr != "AUTO";
+        }
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); tm = sv.find("\nM 0 ") != std::string::npos; }
+        CHECK(cond >= 6 && rt >= 5 && tm && !empty, "page 2: conditions (%d of 8), ratchets (%d of 8) and timing on the trigs; empty steps untouched (%d)", cond, rt, empty);
+        CHECK(OPTC("lbtn") == 5, "still page 2 after a trip through STEP EDIT");
+        set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: page 2 reads CLR COND / CLR TIMING / CLR RATCHETS");
+        pr("rnd_cond"); pr("rnd_timing"); pr("rnd_ratch");
+        int left = 0;
+        for (int k = 0; k < 16; k += 2) left += look(k + 1, "st_cond") != "--" || look(k + 1, "st_ratch") != "1" || look(k + 1, "st_rres") != "AUTO";
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM 0 ") != std::string::npos; }
+        CHECK(left == 0 && c->getP(c, P("step0")) > 0.5f, "CLR COND / TIMING / RATCHETS: all gone (%d left), the trigs stay", left);
+        set_int(c, "clr_mode", 0); pr("nav_left"); CHECK(OPTC("lbtn") == 2, "left arrow: back to page 1");
+        pr("nav_right"); set_int(c, "pattern_edit", 1); CHECK(OPTC("lbtn") == 0, "PATTERN EDIT: its own buttons, the arrows do nothing there");
+        pr("nav_left"); set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 5, "back in TRACK EDIT: still page 2 (the left arrow in PATTERN EDIT changed nothing)");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     {   /* FETCH NOTES needs no target track: T1's CC 20 on channel 1 is mapped to pad A01 of Drum 001, so T1 plays that pad's note */
         setenv("STEPRUNNER_XPJ_ROOT", "testdata", 1);
         AEffect *c = VSTPluginMain(host);
@@ -2431,11 +2462,11 @@ static void preset_tests() {
             CHECK(lit("global_edit") && !lit("random_edit") && one(), "RANDOM SETUP off: back to SETUP");
             {   /* v1.0.1: SETUP (and RANDOM SETUP) show the logo on the left, no RND / CLR buttons */
                 set_int(f, "global_edit", 1);
-                const int lp = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                const int lp = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 set_int(f, "random_edit", 1);
-                const int lp2 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb2 = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                const int lp2 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb2 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 set_int(f, "pattern_edit", 1);
-                const int lp3 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb3 = (int)lroundf(f->getP(f, P("lbtn")) * 4);
+                const int lp3 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb3 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 CHECK(lp == 4 && lb == 4 && lp2 == 4 && lb2 == 4 && lp3 == 0 && lb3 == 0,
                       "SETUP / RANDOM SETUP: logo, no RND buttons (%d %d, %d %d); PATTERN EDIT: RND / CLR again (%d %d)", lp, lb, lp2, lb2, lp3, lb3);
             }

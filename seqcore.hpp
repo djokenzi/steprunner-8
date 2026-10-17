@@ -652,6 +652,33 @@ struct Seq {
             else rnd_write(s, what, v);
         }
     }
+    /* v1.2.0, page 2 of TRACK EDIT: X_COND a random condition (any in the list, "--" included), X_TIMING a random offset
+     * (-MICRO_MAX..+MICRO_MAX 24ths), X_RATCH a random RATCHET (1..RATCH_MAX hits) and RESOLUTION (AUTO with one hit), on
+     * every trig of the track (steps 1..length). clear_extra takes them out of all its steps. */
+    enum { X_COND = 0, X_TIMING, X_RATCH };
+    void randomize_extra(int track, int what) {
+        if (track < 0 || track >= NTRACKS) return;
+        Track &tr = t[track];
+        const int len = eff_len(tr);
+        for (int k = 0; k < len; k++) {
+            Step &s = tr.st[k];
+            if (!s.on) continue;
+            if (what == X_COND) s.cond = (uint8_t)cond_at((int)(gen_rnd() % (uint32_t)NCOND));
+            else if (what == X_TIMING) s.micro = (int8_t)((int)(gen_rnd() % (2 * MICRO_MAX + 1)) - MICRO_MAX);
+            else if (what == X_RATCH) {
+                s.ratch = (uint8_t)(gen_rnd() % RATCH_MAX);
+                s.rres = s.ratch ? (uint8_t)(gen_rnd() % (RRES_MAX + 1)) : 0;
+            }
+        }
+    }
+    void clear_extra(int track, int what) {
+        if (track < 0 || track >= NTRACKS) return;
+        for (Step &s : t[track].st) {
+            if (what == X_COND) s.cond = C_NONE;
+            else if (what == X_TIMING) s.micro = 0;
+            else if (what == X_RATCH) { s.ratch = 0; s.rres = 0; }
+        }
+    }
     int rnd_value(const Track &tr) {   /* one value in the track's rnd_min..rnd_max (either order) */
         int lo = tr.rnd_min, hi = tr.rnd_max;
         if (lo > hi) { int x = lo; lo = hi; hi = x; }

@@ -2535,7 +2535,9 @@
     "TEAL",
     "VIOLET",
     "CLR",
-    "NONE"
+    "NONE",
+    "VIOLET2",
+    "CLR2"
    ],
    "default": 0
   },
@@ -3216,6 +3218,11 @@
   {
    "key": "nav_right",
    "name": "Right",
+   "momentary": true
+  },
+  {
+   "key": "rnd_cond",
+   "name": "Random Conditions",
    "momentary": true
   }
  ]

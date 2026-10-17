@@ -128,6 +128,9 @@ if os.path.exists(FONT):
             dim = btn(text, (52, 52, 52), False, ink=(120, 120, 120)); dim.save("images/btn_%s_c.png" % key); dim.save("images/btn_%s_c_on.png" % key)
         else:
             btn(text.replace("RND", "CLR"), CLR_RED, False).save("images/btn_%s_c.png" % key); btn(text.replace("RND", "CLR"), CLR_RED, True).save("images/btn_%s_c_on.png" % key)
+    for key, text in (("rnd_cond", "RND COND"), ("rnd_tm2", "RND TIMING"), ("rnd_rt2", "RND RATCHETS")):   # v1.2.0: page 2 of TRACK EDIT (violet; red CLR ... while CLR LOCKS is lit)
+        btn(text, TRACKC, False).save("images/btn_%s_t.png" % key); btn(text, TRACKC, True).save("images/btn_%s_t_on.png" % key)
+        btn(text.replace("RND", "CLR"), CLR_RED, False).save("images/btn_%s_c.png" % key); btn(text.replace("RND", "CLR"), CLR_RED, True).save("images/btn_%s_c_on.png" % key)
     for n in (16, 32, 48, 64):   # track length shortcuts in TRACK SETUP: grey, in the TRACK EDIT colour only while the track has that length
         btn(str(n), GREY, False, BTN_W=84).save("images/btn_len%d.png" % n); btn(str(n), TRACKC, False, BTN_W=84).save("images/btn_len%d_on.png" % n); btn(str(n), TRIG, False, BTN_W=84).save("images/btn_plen%d_on.png" % n)
     # Euclidean section: ENABLE sits in the title row (grey, green while the track is generated), COMMIT at the bottom
