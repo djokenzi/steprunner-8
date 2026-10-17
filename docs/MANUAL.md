@@ -244,10 +244,20 @@ The settings of the selected track:
 |---|---|---|
 | **TRACK LENGTH 16 / 32 / 48 / 64** | | Quick length buttons (with the same page copying as PATTERN LENGTH) |
 | **Track Length** | 1–64 | Any length, e.g. 13 for a polymetric track |
-| **Track Velocity** | 1–127 | Velocity of trigs without a velocity lock |
-| **Gate** | 0.25–16 steps | Note length of trigs without a length lock |
+| **TRACK VALUES** | | Opens the track's values (below) |
 | **DIRECTION** | FWD, BWD, BOTH | Forwards, backwards, or back and forth |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
+
+**TRACK VALUES** shows the knobs of STEP LOCKS in the same places, but for the whole track. **BACK** (where CONDITION
+is on STEP LOCKS) returns to TRACK EDIT. The panel stays open when you switch modes and come back.
+
+| Knob | Range | Meaning |
+|---|---|---|
+| **Velocity** | 1–127 | Velocity of trigs without a velocity lock |
+| **Pan** | L64 … C … R63 | The pad's pan (sent at once); trigs without a pan lock return to it. `--` = not known yet (see FETCH CC VALUES) |
+| **Length** | 0.25–16 steps | Note length of trigs without a length lock |
+| **Prob** | 0–100 % | Chance of every trig of the track, on top of each step's own probability. NO LOCKS ignores it. |
+| **CC 1–5** | 0–127 | The CC's base value (sent at once); a CC lock returns to it, as in [12.3](#123-base-values). `--` = none |
 
 The random buttons act on the selected track. **▶** shows a second page of random buttons, **◀** goes back to the
 first. The page stays as it is when you switch modes.

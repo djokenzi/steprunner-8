@@ -180,6 +180,8 @@ if os.path.exists(FONT):
     for g in ("A", "B"):
         btn("ENABLE " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_on.png" % g.lower())
         btn("RANDOM " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s_on.png" % g.lower())
+    btn("TRACK VALUES", TRACKC, False, BTN_W=170).save("images/trk_vals.png"); btn("TRACK VALUES", TRACKC, True, BTN_W=170).save("images/trk_vals_on.png")   # v1.2.0
+    btn("BACK", GREY, False).save("images/trk_back.png"); btn("BACK", GREY, True).save("images/trk_back_on.png")
     btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")
     def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small
         im = btn("", col, False, BTN_W=26, BTN_H=26).convert("RGBA"); d = ImageDraw.Draw(im)

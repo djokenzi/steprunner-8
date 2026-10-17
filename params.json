@@ -1267,7 +1267,8 @@
     "GLOBAL",
     "PATTERN",
     "CCEDIT",
-    "SOURCE"
+    "SOURCE",
+    "TRKVAL"
    ],
    "default": 0
   },
@@ -3331,6 +3332,72 @@
     "ON"
    ],
    "default": 0
+  },
+  {
+   "key": "trk_vals",
+   "name": "Track Values",
+   "momentary": true
+  },
+  {
+   "key": "trk_back",
+   "name": "Back",
+   "momentary": true
+  },
+  {
+   "key": "trk_pan",
+   "name": "Track Pan",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_prob",
+   "name": "Track Probability",
+   "min": 0,
+   "max": 100,
+   "default": 100,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc1",
+   "name": "Track CC 1",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc2",
+   "name": "Track CC 2",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc3",
+   "name": "Track CC 3",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc4",
+   "name": "Track CC 4",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc5",
+   "name": "Track CC 5",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
   }
  ]
 }

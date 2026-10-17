@@ -121,6 +121,7 @@ struct Track {
     uint8_t eu_a, eu_b;       /* generator A / B on (only read while eu_on; neither = A, as before v1.2.0) */
     uint8_t eu_len2;          /* length of B's rhythm, 1..64; 0 = as long as A's */
     uint8_t eu_dir1, eu_dir2; /* how A / B run through their rhythm: EU_FWD, EU_BWD, EU_BOTH (back and forth) */
+    uint8_t pcut;             /* v1.2.0 TRACK VALUES PROB: 100 - the chance (%) of every trig of the track; 0 = 100 % */
     /* runtime */
     int64_t next_k;   /* next absolute step index to fire */
     int cur;          /* play-head step, -1 before the first one */
@@ -515,6 +516,7 @@ struct Seq {
         const bool lk = !no_locks;
         bool fires = false;
         if (s.on) fires = no_locks ? !tr.mute : (eval(ti, s, loop) && !tr.mute);
+        if (fires && !no_locks && tr.pcut && (int)(rnd() % 100u) < (int)tr.pcut) fires = false;   /* the track's PROB (v1.2.0) */
         if (downbeat && step % 4 != 0) fires = false;   /* DOWNBEAT ONLY (v1.94) */
         for (int j = 0; j < NCC; j++) {   /* locks first, then the note; a lock that is over goes back to its base */
             if (fires && lk && s.cc[j]) {

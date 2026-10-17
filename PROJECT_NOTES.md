@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B, TRACK VALUES. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -276,6 +276,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
     reading before them. A project without them loads with A = eu_on and B on only if it had pulses on B or AND.
   - Layout: one row per generator (a knob takes 130 px, three a row): ENABLE / RANDOM 80x26 and three 26x26 arrows on
     the left, the knobs at r=26; boolean row and COMMIT at the bottom.
+- TRACK EDIT: the VELOCITY and GATE knobs moved to TRACK VALUES (`trk_vals` button, `Plugin::trk_vals`, panel
+  option TRKVAL, not saved), laid out as STEP LOCKS with BACK (`trk_back`) where CONDITION is. VELOCITY / LENGTH are
+  `trk_vel` / `trk_gate`; PAN (`trk_pan`) is `Track::panb`; PROB (`trk_prob`) is the new `Track::pcut` (100 - %, so a
+  zeroed track means 100 %), rolled after the step's own condition and probability, not under NO LOCKS, saved as a
+  `K t %` line when not 100; CC 1-5 (`trk_cc1..5`) are `Track::ccb` (the same base values TRACK SETUP edits). PAN and the
+  CCs are sent when turned (STOP CC still holds them back).
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

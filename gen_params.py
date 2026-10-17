@@ -58,7 +58,7 @@ trig("rnd_pan", "Random Pan")
 # appended v1.7.0: TRACK EDIT (the right-hand panel shows the track's setup instead of the step locks) and two read-only
 # parameters the skin's when= lines follow: which controls the panel shows, and which title it carries
 opt("track_edit", "Track Edit", onoff)
-opt("panel", "Panel", ["LOCKS", "MULTI", "TRACK", "RANDOM", "GLOBAL", "PATTERN", "CCEDIT", "SOURCE"])       # RANDOM added in v1.10.0 (read-only, so its range may change)
+opt("panel", "Panel", ["LOCKS", "MULTI", "TRACK", "RANDOM", "GLOBAL", "PATTERN", "CCEDIT", "SOURCE", "TRKVAL"])   # TRKVAL: v1.2.0 TRACK VALUES       # RANDOM added in v1.10.0 (read-only, so its range may change)
 opt("ptitle", "Panel Title", ["NORMAL", "EDIT", "TRACK", "RANDOM", "EUCLID", "GLOBAL", "PATTERN", "SOURCE", "MAPTRK", "TIMING"])   # the mode: titles and colours
 # appended v1.8.0: track length shortcuts. ON while the selected track has exactly that length; setting one ON sets it.
 for n in (16, 32, 48, 64): opt("len%d" % n, "Length %d" % n, onoff)
@@ -186,6 +186,11 @@ opt("eu_fwd2", "Euclid B Forward", onoff); opt("eu_bwd2", "Euclid B Backward", o
 opt("eu_dirv2", "Euclid B Direction Look", ["HIDDEN", "OFF", "ON"])   # read-only, as eu_dirv
 opt("eu_opxor", "Euclid XOR", onoff); opt("eu_opor", "Euclid OR", onoff); opt("eu_opand", "Euclid AND", onoff); opt("eu_opsub", "Euclid SUB", onoff)   # lit: the one in use (eu_bool)
 opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF (dim) unless A and B are both on
+# v1.2.0: TRACK VALUES (TRACK EDIT's right panel, as STEP LOCKS but for the track): VELOCITY / LENGTH are trk_vel /
+# trk_gate; PAN the pad's pan (Track::panb), PROB a chance for every trig of the track, CC 1-5 the base values (ccb)
+trig("trk_vals", "Track Values"); trig("trk_back", "Back")
+num("trk_pan", "Track Pan", 0, 128, 0); num("trk_prob", "Track Probability", 0, 100, 100)
+for i in range(5): num("trk_cc%d" % (i + 1), "Track CC %d" % (i + 1), 0, 128, 0)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

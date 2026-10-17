@@ -777,8 +777,8 @@ static void vst_tests() {
         int still = a->getP(a, i) > 0.5f && !automated[i];   /* the finger is still down: not yet */
         blocks(a, 60, ppb);                       /* 0.12 s = 42 blocks */
         int closed = a->getP(a, i) < 0.5f && automated[i] == 1 && display_updates == 1;
-        CHECK(opened && still && closed && !strcmp(disp, PARAMS[t].opts[20]), "popup %s: opens %d, picks the nearest option '%s', open for a moment %d, then closes once %d",
-              PARAMS[i].key, opened, disp, still, closed);
+        CHECK(opened && still && closed && !strcmp(disp, PARAMS[t].opts[20]), "popup %s: opens %d, picks the nearest option '%s', open for a moment %d, then closes once %d (auto %d, upd %d)",
+              PARAMS[i].key, opened, disp, still, closed, automated[i], display_updates);
         a->setP(a, i, 1.0f); a->setP(a, t, 0.0f); a->setP(a, i, 0.0f);   /* picked, then closed by hand before the timer */
         blocks(a, 60, ppb);
         CHECK(automated[i] == 1, "a list closed by hand is not closed again");
@@ -2279,6 +2279,42 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         }
         c->d(c, 1, 0, 0, 0, 0);
     }
+    {   /* v1.2.0: TRACK VALUES: VELOCITY, PAN, LENGTH, PROB and the CC base values of the track, BACK; PAN / CC go out at once */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto panel = [&]() { return (int)lroundf(c->getP(c, P("panel")) * (PARAMS[P("panel")].nopts - 1)); };
+        set_int(c, "track", 2); set_int(c, "track_edit", 1); CHECK(panel() == 2, "TRACK EDIT: the track panel");
+        pr("trk_vals"); CHECK(panel() == 8, "TRACK VALUES: its own panel (%d)", panel());
+        set_int(c, "trk_vel", 90); set_int(c, "trk_gate", 8);
+        int before = steprunner_test_count();
+        set_int(c, "trk_pan", 1 + 20); set_int(c, "trk_cc2", 1 + 77); blocks(c, 1, 0.0);
+        unsigned char m[3]; int pan = -1, cc = -1;
+        for (int k = before; k < steprunner_test_count(); k++) { steprunner_test_get(k, m); if ((m[0] & 0xF0) == 0xB0 && m[1] == PAN_CC[2]) pan = m[2]; if ((m[0] & 0xF0) == 0xB0 && m[1] == Seq::cc_num(Seq().t[2], 1)) cc = m[2]; }
+        c->d(c, 7, P("trk_pan"), 0, d, 0); std::string pd(d); c->d(c, 7, P("trk_cc2"), 0, d, 0); std::string cd(d);
+        CHECK(pan == 20 && cc == 77 && pd == "L44" && cd.find("77") != std::string::npos, "PAN / CC 2 go out at once (%d, %d) and read %s / %s", pan, cc, pd.c_str(), cd.c_str());
+        set_int(c, "trk_prob", 0); c->d(c, 7, P("trk_prob"), 0, d, 0); CHECK(!strcmp(d, "0%"), "PROB 0 %% ('%s')", d);
+        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        AEffect *e = VSTPluginMain(host); e->d(e, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0); set_int(e, "track", 2); blocks(e, 1, 0.0);
+        auto iv = [&](AEffect *x, const char *k) { return (int)lroundf(x->getP(x, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
+        CHECK(iv(e, "trk_vel") == 90 && iv(e, "trk_gate") == 8 && iv(e, "trk_pan") == 21 && iv(e, "trk_prob") == 0 && iv(e, "trk_cc2") == 78,
+              "saved and loaded: vel %d, gate %d, pan %d, prob %d, cc2 %d", iv(e, "trk_vel"), iv(e, "trk_gate"), iv(e, "trk_pan"), iv(e, "trk_prob"), iv(e, "trk_cc2"));
+        e->d(e, 1, 0, 0, 0, 0);
+        set_int(c, "step_edit", 1); CHECK(panel() == 0, "STEP EDIT: STEP LOCKS");
+        set_int(c, "track_edit", 1); CHECK(panel() == 8, "back in TRACK EDIT: still TRACK VALUES");
+        pr("trk_back"); CHECK(panel() == 2, "BACK: the track panel again");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0: the track's PROB in the core: 0 % silences every trig, 100 % changes nothing, NO LOCKS ignores it */
+        Seq s; Track &t0 = s.t[0];
+        for (int k = 0; k < 16; k++) t0.st[k].on = 1;
+        const uint8_t st = 0x90 | (t0.ch & 15);
+        t0.pcut = 100; size_t n0 = run(s, 4.0, st, -1).size();
+        t0.pcut = 50; size_t n50 = run(s, 64.0, st, -1).size();
+        s.no_locks = true; t0.pcut = 100; size_t nl = run(s, 4.0, st, -1).size(); s.no_locks = false;
+        t0.pcut = 0; size_t n100 = run(s, 4.0, st, -1).size();
+        CHECK(n0 == 0 && n100 == 16 && n50 > 100 && n50 < 156 && nl == 16, "track PROB: 0 %% %d trigs, 100 %% %d, 50 %% %d of 256, NO LOCKS %d", (int)n0, (int)n100, (int)n50, (int)nl);
+    }
     {   /* v1.2.0: page 2 in STEP EDIT: the selected steps only, trig or not */
         AEffect *c = VSTPluginMain(host);
         char d[64];
@@ -2573,7 +2609,7 @@ static void preset_tests() {
             }
             CHECK(ok, "each of the four: on, and a second tap keeps it on; always exactly one lit");
             set_int(f, "track_edit", 1); set_int(f, "euclid_edit", 1);
-            CHECK(lit("euclid_edit") && lit("track_edit") && one() && lroundf(f->getP(f, P("panel")) * 7) == 2, "EUCLIDIAN over TRACK EDIT: TRACK EDIT stays lit");
+            CHECK(lit("euclid_edit") && lit("track_edit") && one() && lroundf(f->getP(f, P("panel")) * (PARAMS[P("panel")].nopts - 1)) == 2, "EUCLIDIAN over TRACK EDIT: TRACK EDIT stays lit");
             set_int(f, "euclid_edit", 0);
             CHECK(!lit("euclid_edit") && lit("track_edit") && one(), "EUCLIDIAN off: back to TRACK EDIT");
             set_int(f, "step_edit", 1); set_int(f, "euclid_edit", 1); set_int(f, "step_edit", 0);
@@ -2620,14 +2656,14 @@ static void preset_tests() {
             g->d(g, 1, 0, 0, 0, 0); f->setP(f, P("mute3"), 0.0f); blocks(f, 1, ppb);
         }
         {   /* v2.1.0: EUCLIDIAN changes only the left part; the right one stays the last of PATTERN / STEP / TRACK EDIT */
-            auto panel = [&]() { return (int)lroundf(f->getP(f, P("panel")) * 7); };
+            auto panel = [&]() { return (int)lroundf(f->getP(f, P("panel")) * (PARAMS[P("panel")].nopts - 1)); };
             set_int(f, "euclid_edit", 1); CHECK(panel() == 2, "from TRACK EDIT: the track panel stays (%d)", panel());
             set_int(f, "step_edit", 1); set_int(f, "euclid_edit", 1); CHECK(panel() == 0, "from STEP EDIT: the locks stay (%d)", panel());
             set_int(f, "global_edit", 1); set_int(f, "euclid_edit", 1); CHECK(panel() == 0, "via SETUP: still the last of the three (%d)", panel());
             set_int(f, "pattern_edit", 1); set_int(f, "euclid_edit", 1); CHECK(panel() == 5, "from PATTERN EDIT: the pattern setup (%d)", panel());
             void *c = 0; f->d(f, 23, 0, 0, &c, 0); std::string sv((const char *)c);
             AEffect *g = VSTPluginMain(host); g->d(g, 24, 0, (intptr_t)sv.size() + 1, (void *)sv.c_str(), 0);
-            CHECK(lroundf(g->getP(g, P("panel")) * 7) == 5 && g->getP(g, P("euclid_edit")) == 1.0f, "saved and loaded so");
+            CHECK(lroundf(g->getP(g, P("panel")) * (PARAMS[P("panel")].nopts - 1)) == 5 && g->getP(g, P("euclid_edit")) == 1.0f, "saved and loaded so");
             g->d(g, 1, 0, 0, 0, 0); set_int(f, "track_edit", 1);
         }
         {   /* v1.99: a pattern visited but left with no trig and no lock is still empty */
