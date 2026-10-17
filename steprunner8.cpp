@@ -1922,10 +1922,11 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
              * RND COND / RND TIMING / RND RATCHETS on every trig (steps 1..length), or with CLR LOCKS lit CLR COND /
              * CLR TIMING / CLR RATCHETS on all steps: the selected track in TRACK EDIT, all 8 tracks in PATTERN EDIT.
              * STEP EDIT: the selected steps only, trig or not (as its other RND / CLR buttons). */
-            if ((i == P_SHIFT_L || i == P_SHIFT_R) && lmode(w) != 2) {   /* v1.2.0 SHIFT: the track in TRACK EDIT, all 8 in PATTERN EDIT */
-                const int d = i == P_SHIFT_R ? 1 : -1;
-                if (lmode(w) == 1) w->seq.shift_track(w->track, d);
-                else if (lmode(w) == 0) for (int t = 0; t < NTRACKS; t++) w->seq.shift_track(t, d);
+            if (i == P_SHIFT_L || i == P_SHIFT_R) {   /* v1.2.0 SHIFT: whichever panel shows the buttons: the track's (TRACK EDIT,
+                                                    * also under EUCLIDIAN) moves the track, the pattern's all 8 */
+                const int d = i == P_SHIFT_R ? 1 : -1, pv = value_of(w, P_PANEL);
+                if (pv == 2) w->seq.shift_track(w->track, d);
+                else if (pv == 5) for (int t = 0; t < NTRACKS; t++) w->seq.shift_track(t, d);
             }
             if (i == P_TRK_VALS && w->track_edit) w->trk_vals = true;   /* v1.2.0: TRACK VALUES / BACK */
             if (i == P_TRK_BACK) w->trk_vals = false;

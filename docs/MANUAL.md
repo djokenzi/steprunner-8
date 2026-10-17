@@ -247,7 +247,7 @@ The settings of the selected track:
 | **TRACK LENGTH 16 / 32 / 48 / 64** | | Quick length buttons (with the same page copying as PATTERN LENGTH) |
 | **Track Length** | 1–64 | Any length, e.g. 13 for a polymetric track |
 | **TRACK VALUES** | | Opens the track's values (below) |
-| **SHIFT ◀ / ▶** | | Moves every step of the track one step earlier / later, with its locks, conditions and timing. Steps wrap round the track's length. On a Euclidean track the rhythm moves too. |
+| **SHIFT ◀ / ▶** | | Moves every step of the track one step earlier / later, with its locks, conditions and timing. Steps wrap round the track's length. On a Euclidean track the rhythm moves too. Works in EUCLIDIAN as well. |
 | **DIRECTION** | FWD, BWD, BOTH | Forwards, backwards, or back and forth |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
 

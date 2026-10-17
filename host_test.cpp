@@ -2290,6 +2290,15 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         CHECK(on(1, 0) && on(0, 15) && on(2, 15) && !on(0, 0), "PATTERN EDIT: SHIFT left moves every track (T1 step 1 -> 16)");
         set_int(c, "step_edit", 1); pr("shift_right"); CHECK(on(1, 0), "STEP EDIT: nothing");
         set_int(c, "pattern_edit", 1); pr("undo"); CHECK(on(0, 0) && on(1, 1), "UNDO takes a SHIFT back");
+        set_int(c, "track", 1); set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1); pr("shift_right");
+        CHECK(on(1, 2) && !on(1, 1) && on(0, 0), "EUCLIDIAN (over TRACK EDIT), both generators off: SHIFT moves the track as in TRACK EDIT");
+        set_int(c, "track", 1);   /* on() leaves T1 selected */
+        c->setP(c, P("eu_enable"), 1.0f); blocks(c, 1, 0.0); set_int(c, "eu_pl1", 4); set_int(c, "eu_len", 16); pr("shift_right");
+        { std::string r; for (int k = 0; k < 16; k++) r += on(1, k) ? 'x' : '.';
+          CHECK(on(1, 1) && on(1, 5) && !on(1, 0), "A on: SHIFT moves the generated rhythm (x...x... -> .x...x..): %s, panel %d", r.c_str(), (int)lroundf(c->getP(c, P("panel")) * (PARAMS[P("panel")].nopts - 1))); }
+        set_int(c, "track", 1); c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0); set_int(c, "pattern_edit", 1); set_int(c, "euclid_edit", 1); pr("shift_left");
+        { std::string r; for (int k = 0; k < 16; k++) r += on(0, k) ? 'x' : '.';
+          CHECK(on(0, 15) && !on(0, 0), "EUCLIDIAN over PATTERN EDIT: SHIFT moves the pattern: %s, panel %d", r.c_str(), (int)lroundf(c->getP(c, P("panel")) * (PARAMS[P("panel")].nopts - 1))); }
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0: TRACK VALUES: VELOCITY, PAN, LENGTH, PROB and the CC base values of the track, BACK; PAN / CC go out at once */

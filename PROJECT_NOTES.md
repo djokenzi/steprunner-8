@@ -284,7 +284,8 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   CCs are sent when turned (STOP CC still holds them back).
 - SHIFT ◀ / ▶ (`shift_left` / `shift_right`) in TRACK EDIT (the track) and PATTERN EDIT (all 8): `Seq::shift_track`
   rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
-  by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). Nothing in STEP EDIT.
+  by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). It follows the panel that shows the
+  buttons (`panel` TRACK or PATTERN), so it works under EUCLIDIAN too; nothing in STEP EDIT.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
