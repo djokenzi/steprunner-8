@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B, TRACK VALUES, SHIFT. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B, TRACK VALUES, SHIFT, CC 6 / CC 7. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -294,6 +294,17 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
   by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). It follows the panel that shows the
   buttons (`panel` TRACK or PATTERN), so it works under EUCLIDIAN too; nothing in STEP EDIT.
+- The step cells are green in EUCLIDIAN even while no generator is on (they took the PATTERN EDIT orange before).
+- CC 6 and CC 7 per track: `NCC` 7 (data), `NCC_V1` 5 (the CC BASE block, the saved step bytes, the CC 1-5
+  parameters, which stay where they are). Default numbers 46 + track / 54 + track (`CC67_DEFAULT`, `Track::tix`): LSB
+  slots of the undefined controllers 14..29; with CC 1-5 and pan, 64 different numbers on one channel, none of the
+  standard ones (test "default CC numbers"). New params appended: `st_cc6/7`, `pf_cc6/7` (`st_cc_j`, `pf_k`, `pf_param`
+  map them); `trk_cc1..7` (TRACK VALUES) is contiguous. Saved: CC 6 / 7 locks on an `X t <hex>` line (2 bytes a step),
+  the `C` and `B` lines get two more numbers, a state's `P` line two more offsets after cc117 (older versions read only
+  what they know). No CC 6 / 7 in TRACK SETUP (numbers) or CREATE DEFAULT MAP yet; RND buttons for them neither.
+  - Layout: STEP LOCKS and TRACK VALUES in six columns 120 px apart (CONDITION / BACK, VEL, PAN, LEN, PROB, CC 1;
+    CC 2..CC 7), so neighbouring value boxes touch; PERFORM knobs closer to PERFORM ALL (VEL, PAN, LEN, PROB, CC 1 /
+    CC 2..CC 7). Q-Links: 11 on PROGRAM and PERFORM.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

@@ -22,7 +22,9 @@
 
 namespace seqcore {
 
-enum { NTRACKS = 8, NSTEPS = 64, NCC = 5 };
+enum { NTRACKS = 8, NSTEPS = 64, NCC = 7 };   /* v1.2.0: 7 CCs per track (5 until v1.1.1) */
+enum { NCC_V1 = 5 };   /* the first five: the CC BASE block (ccbase .. ccbase + 4), the five in a saved step, the CC 1-5 parameters */
+static const uint8_t CC67_DEFAULT[2] = {46, 54};   /* v1.2.0: CC 6 / CC 7 of track i: 46 + i / 54 + i (unused LSB numbers of 14..29) */
 /* Each track sends its five CC locks on its own block of five consecutive controller numbers, ccbase .. ccbase + 4, so
  * all tracks can share one MIDI channel. Defaults: T1-T6 sit in ranges the MIDI spec leaves undefined (20-31, 85-90,
  * 102-119), T7 and T8 in the general purpose ones; none touches bank select, mod wheel, volume, pan, pedals or the
@@ -31,7 +33,7 @@ static const uint8_t CC_BASE_DEFAULT[8] = {20, 25, 85, 102, 107, 112, 14, 80};
 /* v1.93: each track's pan goes out on a controller of its own (all MIDI "undefined" ones), mapped to its pad's Pan (517)
  * by CREATE DEFAULT MAP. Until v1.92 it was CC 10, which MPC takes as the whole track's pan (all pads at once). */
 static const uint8_t PAN_CC[8] = {30, 31, 90, 117, 118, 119, 3, 9};
-enum { CC_BASE_OLD = 20, CC_BASE_MAX = 127 - (NCC - 1) };
+enum { CC_BASE_OLD = 20, CC_BASE_MAX = 127 - (NCC_V1 - 1) };
 
 /* trig conditions as saved in projects: fixed codes, append only. The order the LIST shows them in is COND_ORDER. */
 enum { C_NONE = 0, C_FILL, C_NFILL, C_PRE, C_NPRE, C_NEI, C_NNEI, C_1ST, C_N1ST, C_AB0 };
@@ -90,7 +92,7 @@ enum { MICRO_MAX = 23, RATCH_MAX = 8, SCATTER_MAX = 8, HUMAN_T = 4, HUMAN_V = 16
 static const double ECHO_DT = 0.5;    /* ECHO (v1.91): the repeats are an eighth note apart */
 static const double FADE_BEATS = 4.0; /* FADE OUT (v1.91): one 4/4 bar down to silence */
 static const double BUILD_BEAT = 1.0; /* BUILD (v1.91): one hit more every beat, up to RATCH_MAX */
-enum { STEP_BYTES_V2 = 5 + NCC, STEP_BYTES = STEP_BYTES_V2 + 1, CC_PAN = 10 };   /* saved as: on cond prob vel len cc[5] pan (pan since chunk TSq3) */
+enum { STEP_BYTES_V2 = 5 + NCC_V1, STEP_BYTES = STEP_BYTES_V2 + 1, CC_PAN = 10 };   /* saved as: on cond prob vel len cc[5] pan (pan since chunk TSq3) */
 
 struct Track {
     Step st[NSTEPS];
@@ -105,7 +107,8 @@ struct Track {
     uint8_t shuf;     /* 1 = this track follows the global shuffle */
     uint8_t dir;      /* play direction (v1.76): DIR_FWD 1, DIR_BWD 2, both = back and forth; never 0 */
     uint8_t panb;     /* the pad's own pan + 1, read from the project (v1.93); 0 = not known (the centre, 64) */
-    uint8_t ccbase;   /* first of the five CC numbers this track's CC locks are sent on, 0..CC_BASE_MAX */
+    uint8_t ccbase;   /* first of the five CC numbers this track's CC locks 1-5 are sent on, 0..CC_BASE_MAX */
+    uint8_t tix;      /* v1.2.0: the track's own index 0..7 (CC 6 / CC 7 default numbers); never copied to another track */
     uint8_t ccn[NCC]; /* each CC lock's own controller number + 1 (EDIT CC); 0 = ccbase + j */
     uint8_t ccb[NCC]; /* base value + 1 of each CC (what the controlled parameter is set to); 0 = none: locks are never taken back */
     /* Euclidean generator (Seq::euclid_*): while eu_on, the trigs of steps 1..len are generated from these */
@@ -271,7 +274,7 @@ struct Seq {
             uint8_t mute = keep_mute ? now.mute : src[i].mute;
             if (now.mute != mute || now.num != src[i].num || now.ch != src[i].ch) note_off(t[i]), now = t[i];
             double was = step_dur(now);
-            t[i] = src[i];
+            t[i] = src[i]; t[i].tix = (uint8_t)i;
             t[i].mute = mute;
             keep_runtime(t[i], now);
             double is = step_dur(t[i]);
@@ -306,7 +309,7 @@ struct Seq {
         for (int i = 0; i < NTRACKS; i++) {
             Track &tr = t[i];
             tr.len = 16; tr.speed = SPEED_1X; tr.ch = 0; tr.gate = 4;
-            tr.num = notes[i]; tr.vel = 100; tr.ccbase = CC_BASE_DEFAULT[i];
+            tr.num = notes[i]; tr.vel = 100; tr.ccbase = CC_BASE_DEFAULT[i]; tr.tix = (uint8_t)i;
             tr.eu_pl1 = 4;
             tr.rnd_dens = 50; tr.rnd_min = 0; tr.rnd_max = 127; tr.shuf = 1; tr.dir = DIR_FWD;
             lp_k0[i] = 0;
@@ -320,6 +323,7 @@ struct Seq {
     /* The controller number of a track's CC lock j: its own (EDIT CC), or the old block ccbase + j. */
     static int cc_num(const Track &tr, int j) {
         if (tr.ccn[j]) return (tr.ccn[j] - 1) & 127;
+        if (j >= NCC_V1) return CC67_DEFAULT[j - NCC_V1] + (tr.tix & 7);   /* v1.2.0: CC 6 / CC 7 */
         return (tr.ccbase > CC_BASE_MAX ? (int)CC_BASE_MAX : (int)tr.ccbase) + j;
     }
     /* where a track is in its playback (not part of the pattern): kept when the pattern under it is swapped */
@@ -335,7 +339,7 @@ struct Seq {
         Track now = t[i];
         double was = step_dur(now);
         t[i] = src;
-        t[i].ch = now.ch; t[i].num = now.num; t[i].ccbase = now.ccbase; std::memcpy(t[i].ccn, now.ccn, sizeof now.ccn); std::memcpy(t[i].ccb, now.ccb, sizeof now.ccb); t[i].mute = now.mute; t[i].panb = now.panb;
+        t[i].ch = now.ch; t[i].num = now.num; t[i].ccbase = now.ccbase; t[i].tix = now.tix; std::memcpy(t[i].ccn, now.ccn, sizeof now.ccn); std::memcpy(t[i].ccb, now.ccb, sizeof now.ccb); t[i].mute = now.mute; t[i].panb = now.panb;
         keep_runtime(t[i], now);   /* v2.11: the ratchet, REVERSE and SCATTER state too (a copy taken mid-ratchet fired a burst) */
         double is = step_dur(t[i]);
         if (is != was) { t[i].next_k = (int64_t)std::ceil((double)now.next_k * was / is - 1e-9); if (t[i].next_k < 0) t[i].next_k = 0; }

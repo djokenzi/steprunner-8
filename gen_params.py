@@ -190,8 +190,11 @@ opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF
 # trk_gate; PAN the pad's pan (Track::panb), PROB a chance for every trig of the track, CC 1-5 the base values (ccb)
 trig("trk_vals", "Track Values"); trig("trk_back", "Back")
 num("trk_pan", "Track Pan", 0, 128, 0); num("trk_prob", "Track Probability", 0, 100, 100)
-for i in range(5): num("trk_cc%d" % (i + 1), "Track CC %d" % (i + 1), 0, 128, 0)
+for i in range(7): num("trk_cc%d" % (i + 1), "Track CC %d" % (i + 1), 0, 128, 0)   # CC 6 / 7 also v1.2.0
 trig("shift_left", "Shift Left"); trig("shift_right", "Shift Right")   # v1.2.0: every step one step earlier / later: the track (TRACK EDIT) or all 8 (PATTERN EDIT)
+# v1.2.0: CC 6 and CC 7 (default numbers 46 + track / 54 + track): their step locks and PERFORM ALL knobs
+num("st_cc6", "CC 6", 0, 128, 0); num("st_cc7", "CC 7", 0, 128, 0)
+num("pf_cc6", "CC 6", -127, 127, 0); num("pf_cc7", "CC 7", -127, 127, 0)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

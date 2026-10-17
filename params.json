@@ -3400,6 +3400,22 @@
    "display": "int"
   },
   {
+   "key": "trk_cc6",
+   "name": "Track CC 6",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "trk_cc7",
+   "name": "Track CC 7",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
    "key": "shift_left",
    "name": "Shift Left",
    "momentary": true
@@ -3408,6 +3424,38 @@
    "key": "shift_right",
    "name": "Shift Right",
    "momentary": true
+  },
+  {
+   "key": "st_cc6",
+   "name": "CC 6",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "st_cc7",
+   "name": "CC 7",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc6",
+   "name": "CC 6",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc7",
+   "name": "CC 7",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
   }
  ]
 }

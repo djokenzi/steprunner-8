@@ -99,14 +99,15 @@ static void core_tests() {
         bool used[128] = {false}, clash = false, reserved = false;
         for (int i = 0; i < 8; i++) {
             ok &= s.t[i].ccbase == bases[i];
-            for (int j = 0; j < NCC; j++) {
-                int n = s.t[i].ccbase + j;
+            for (int j = 0; j <= NCC; j++) {   /* v1.2.0: CC 1-7 and the pan CC */
+                int n = j < NCC ? Seq::cc_num(s.t[i], j) : PAN_CC[i];
                 clash |= used[n]; used[n] = true;
                 reserved |= n == 0 || n == 1 || n == 7 || n == 10 || n == 11 || n == 32 || (n >= 64 && n <= 69) || (n >= 96 && n <= 101) || n >= 120;
             }
         }
-        CHECK(!clash && !reserved, "default CC blocks: 40 different numbers, none of them bank select / mod / volume / pan / expression / pedals / RPN / channel mode");
-        CHECK(ok && NTRACKS == 8 && NCC == 5, "8 tracks on notes 36..43 (pads A01..A08), CC bases 20 25 85 102 107 112 14 80");
+        CHECK(!clash && !reserved, "default CC numbers: 64 different (CC 1-7 and pan of 8 tracks, one channel), none of them bank select / mod / volume / pan / expression / pedals / RPN / channel mode");
+        { bool c67 = true; for (int i = 0; i < 8; i++) c67 &= Seq::cc_num(s.t[i], 5) == 46 + i && Seq::cc_num(s.t[i], 6) == 54 + i;
+          CHECK(ok && c67 && NTRACKS == 8 && NCC == 7, "8 tracks on notes 36..43 (pads A01..A08), CC bases 20 25 85 102 107 112 14 80, CC 6 46-53, CC 7 54-61"); }
         CHECK(NCOND == 44, "44 trig conditions");
         int a, b;
         CHECK(cond_ab(C_AB0, &a, &b) && a == 1 && b == 2 && cond_ab(NCOND - 1, &a, &b) && a == 8 && b == 8, "A:B runs 1:2 .. 8:8");
@@ -1059,7 +1060,7 @@ static void vst_tests() {
         set_int(a, "euclid_edit", 1);
         CHECK(a->getP(a, P("step_edit")) == 1.0f && OPT3("lpanel") == 1 && OPT3("ptitle") == 4 && OPT3("panel") == 0,
               "EUCLIDIAN on: left section = generator, step locks stay on the right, STEP EDIT stays lit (v1.0.0)");
-        CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) < 8, "EUCLIDIAN, not enabled: cells keep the normal colour");
+        CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) / 8 == 3, "EUCLIDIAN, not enabled: the cells are green too (v1.2.0; the normal colour before)");
         a->setP(a, P("eu_enable"), 1.0f);
         CHECK(lroundf(a->getP(a, P("cell1") + 9) * 32) >= 24, "enabled: cells in the Euclidean colour");
         set_int(a, "euclid_edit", 0);
@@ -1439,7 +1440,7 @@ static void vst_tests() {
         press("cc_commit");
         CHECK(OPT3("panel") == 2 && (int)lroundf(a->getP(a, P("ccn1")) * 127) == 71 && (int)lroundf(a->getP(a, P("ccn4")) * 127) == 3 && (int)lroundf(a->getP(a, P("ccn2")) * 127) == 26,
               "COMMIT: CC 1 = 71, CC 4 = 3, the others as they were");
-        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 27 28 4 30\n") != 0, "the track's own CC numbers are saved"); }
+        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 27 28 4 30 48 56\n") != 0, "the track's own CC numbers are saved"); }
         /* numbers already in use are marked, not refused */
         set_int(a, "track", 5); int t6cc = (int)lroundf(a->getP(a, P("ccn1")) * 127);
         set_int(a, "track", 7); int t8cc = (int)lroundf(a->getP(a, P("ccn5")) * 127);
@@ -1450,9 +1451,9 @@ static void vst_tests() {
         CHECK(a->getP(a, P("ccuse2")) == 1.0f && (int)lroundf(a->getP(a, P("ccn2")) * 127) == 20, "CC 20 is T1's on the same channel: marked, and still chosen");
         set_int(a, "ccn2", 10); CHECK(a->getP(a, P("ccuse2")) == 1.0f, "CC 10 is pan");
         set_int(a, "ccn2", 117); CHECK(a->getP(a, P("ccuse2")) == 1.0f, "CC 117 is T4's pan (v1.93.0)");
-        set_int(a, "ccn2", 50); CHECK(a->getP(a, P("ccuse2")) == 0.0f, "CC 50 is free");
+        set_int(a, "ccn2", 62); CHECK(a->getP(a, P("ccuse2")) == 0.0f, "CC 62 is free (50 is T5's CC 6 since v1.2.0)");
         set_int(a, "ccn2", 71); CHECK(a->getP(a, P("ccuse2")) == 1.0f && a->getP(a, P("ccuse1")) == 1.0f, "the same number twice on one track marks both");
-        set_int(a, "ccn2", 50); CHECK(a->getP(a, P("ccuse2")) == 0.0f && a->getP(a, P("ccuse1")) == 0.0f, "CC 50 is free");
+        set_int(a, "ccn2", 62); CHECK(a->getP(a, P("ccuse2")) == 0.0f && a->getP(a, P("ccuse1")) == 0.0f, "CC 62 is free");
         set_int(a, "ccn2", 20); set_int(a, "trk_ch", 5);
         CHECK(a->getP(a, P("ccuse2")) == 1.0f, "T1's CC 20 is marked on another MIDI channel too");
         set_int(a, "ccn3", t6cc); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC %d is T6's first number: marked from T2", t6cc);
@@ -1670,7 +1671,7 @@ static void vst_tests() {
         CHECK(a->getP(a, P("pf_ctrl")) == 1.0f && !strcmp(d1, "+20") && !strcmp(d2, "-15") && !strcmp(d3, "+0%") && !strcmp(d4, "-20"), "a state saved with PERFORM ALL on brings it back: %s %s %s, pan %s", d1, d2, d3, d4);
         tap("pst1"); CHECK(a->getP(a, P("pf_ctrl")) == 0.0f, "one saved with it off switches it off");
         { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); const char *c = (const char *)cx;
-          CHECK(strstr(c, "\nV00 t 0 ") && strstr(c, "\nV00 s 0 ") && strstr(c, "\nV01 P 1 0 20 0 -20 0 -15 0 0 0 0\n") && strstr(c, "\nV07 G ") && !strstr(c, "\nV02 "), "states are saved with the project");
+          CHECK(strstr(c, "\nV00 t 0 ") && strstr(c, "\nV00 s 0 ") && strstr(c, "\nV01 P 1 0 20 0 -20 0 -15 0 0 0 0 0 0\n") && strstr(c, "\nV07 G ") && !strstr(c, "\nV02 "), "states are saved with the project");
           std::string sv(c);
           AEffect *b = VSTPluginMain(host);
           b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
@@ -2058,7 +2059,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
     {
         static char *chunk; int n = (int)a->d(a, 23, 0, 0, &chunk, 0);
         std::string saved(chunk, n);
-        CHECK(saved.find("\nB 0 65 0 1 0 0\n") != std::string::npos, "the chunk has the base line for T1");
+        CHECK(saved.find("\nB 0 65 0 1 0 0 0 0\n") != std::string::npos, "the chunk has the base line for T1");
         AEffect *b = VSTPluginMain(host);
         b->d(b, 24, 0, n, (void *)saved.c_str(), 0);
         b->d(b, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "64"), "reloaded: BASE 1 = '%s'", disp);
@@ -2294,7 +2295,9 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         CHECK(on(1, 0) && on(0, 15) && on(2, 15) && !on(0, 0), "PATTERN EDIT: SHIFT left moves every track (T1 step 1 -> 16)");
         set_int(c, "step_edit", 1); pr("shift_right"); CHECK(on(1, 0), "STEP EDIT: nothing");
         set_int(c, "pattern_edit", 1); pr("undo"); CHECK(on(0, 0) && on(1, 1), "UNDO takes a SHIFT back");
-        set_int(c, "track", 1); set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1); pr("shift_right");
+        set_int(c, "track", 1); set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
+        { const int cs = (int)lroundf(c->getP(c, P("cell1")) * (PARAMS[P("cell1")].nopts - 1)); CHECK(cs / 8 == 3, "EUCLIDIAN, both generators off: the cells are green (state %d)", cs); }
+        pr("shift_right");
         CHECK(on(1, 2) && !on(1, 1) && on(0, 0), "EUCLIDIAN (over TRACK EDIT), both generators off: SHIFT moves the track as in TRACK EDIT");
         set_int(c, "track", 1);   /* on() leaves T1 selected */
         c->setP(c, P("eu_enable"), 1.0f); blocks(c, 1, 0.0); set_int(c, "eu_pl1", 4); set_int(c, "eu_len", 16); pr("shift_right");
@@ -2303,6 +2306,38 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "track", 1); c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0); set_int(c, "pattern_edit", 1); set_int(c, "euclid_edit", 1); pr("shift_left");
         { std::string r; for (int k = 0; k < 16; k++) r += on(0, k) ? 'x' : '.';
           CHECK(on(0, 15) && !on(0, 0), "EUCLIDIAN over PATTERN EDIT: SHIFT moves the pattern: %s, panel %d", r.c_str(), (int)lroundf(c->getP(c, P("panel")) * (PARAMS[P("panel")].nopts - 1))); }
+        c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0 CC 6 / CC 7: a lock goes out on 46 + track / 54 + track, is saved on an X line and loaded; base and PERFORM ALL too */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        const double ppb = (120.0 / 60.0) * (128.0 / 44100.0);
+        auto iv = [&](AEffect *x, const char *k) { return (int)lroundf(x->getP(x, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
+        set_int(c, "track", 2); c->setP(c, P("step0"), 1.0f);
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); set_int(c, "st_cc6", 1 + 33); set_int(c, "st_cc7", 1 + 99);
+        c->d(c, 7, P("st_cc6"), 0, d, 0); CHECK(!strcmp(d, "33"), "CC 6 lock on T3 step 1: '%s'", d);
+        int before = steprunner_test_count();
+        g_ti.flags = kPlaying | kTempo | kPpq; g_ti.ppqPos = 0.0; blocks(c, 60, ppb); g_ti.flags = kTempo | kPpq; blocks(c, 2, ppb);
+        unsigned char m[3]; int v48 = -1, v56 = -1;
+        for (int k = before; k < steprunner_test_count(); k++) { steprunner_test_get(k, m); if ((m[0] & 0xF0) == 0xB0 && m[1] == 48) v48 = m[2]; if ((m[0] & 0xF0) == 0xB0 && m[1] == 56) v56 = m[2]; }
+        CHECK(v48 == 33 && v56 == 99, "T3: CC 6 goes out on CC 48 (%d), CC 7 on CC 56 (%d), on the track's channel", v48, v56);
+        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        CHECK(sv.find("\nX 2 ") != std::string::npos, "saved on an X line");
+        AEffect *e = VSTPluginMain(host); e->d(e, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+        set_int(e, "track", 2); set_int(e, "step_edit", 1); set_int(e, "sel", 1);
+        CHECK(iv(e, "st_cc6") == 34 && iv(e, "st_cc7") == 100, "and loaded (%d %d)", iv(e, "st_cc6") - 1, iv(e, "st_cc7") - 1);
+        e->d(e, 1, 0, 0, 0, 0);
+        {   /* without the X line (a project from v1.1.1): no CC 6 / 7 locks */
+            std::string old = sv; const size_t q = old.find("\nX 2 "); old.erase(q + 1, old.find('\n', q + 1) - q);
+            AEffect *o = VSTPluginMain(host); o->d(o, 24, 0, (intptr_t)old.size(), (void *)old.c_str(), 0);
+            set_int(o, "track", 2); set_int(o, "step_edit", 1); set_int(o, "sel", 1);
+            CHECK(iv(o, "st_cc6") == 0 && iv(o, "st_cc7") == 0 && iv(o, "st_vel") == 0, "an older project: no CC 6 / 7 locks (%d %d)", iv(o, "st_cc6"), iv(o, "st_cc7"));
+            o->d(o, 1, 0, 0, 0, 0);
+        }
+        set_int(c, "track_edit", 1); set_int(c, "st_cc6", 1 + 70);   /* a Q-Link in TRACK EDIT: the track's CC 6 base */
+        CHECK(iv(c, "trk_cc6") == 71, "TRACK EDIT: the CC 6 Q-Link sets the track's CC 6 base (%d)", iv(c, "trk_cc6") - 1);
+        set_int(c, "pf_ctrl", 1); set_int(c, "pf_cc6", 10); c->d(c, 7, P("pf_cc6"), 0, d, 0);
+        CHECK(!strcmp(d, "+10") || strstr(d, "+10"), "PERFORM ALL: CC 6 knob '%s'", d);
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0: TRACK VALUES: VELOCITY, PAN, LENGTH, PROB and the CC base values of the track, BACK; PAN / CC go out at once */
