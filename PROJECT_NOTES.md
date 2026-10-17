@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN EDIT / TRACK EDIT page 2 (◀ ▶). v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶). v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -257,11 +257,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   no pad.
 - PROGRAM tab: two arrow buttons `nav_left` / `nav_right` (momentary, appended; 72x44, the EUCLIDIAN style, a triangle
   for text) on the left edge of the top row, in every mode.
-- The left section of TRACK EDIT and PATTERN EDIT has two pages (`Plugin::lpage[2]`, one per mode (`lmode`), not
-  saved, kept across mode changes; ◀ / ▶ act only in those two modes). Page 2: RND COND (`rnd_cond`, appended), RND TIMING and RND RATCHETS (the TIMING mode's `rnd_timing` /
+- The left section of PATTERN, TRACK and STEP EDIT has two pages (`Plugin::lpage[3]`, one per mode (`lmode`), not
+  saved, kept across mode changes; ◀ / ▶ act only in those three modes, not in TIMING). Page 2: RND COND (`rnd_cond`, appended), RND TIMING and RND RATCHETS (the TIMING mode's `rnd_timing` /
   `rnd_ratch` keys, other pictures) on every trig of the track's length, no density (`Seq::randomize_extra`); with
   CLR LOCKS lit CLR COND / CLR TIMING / CLR RATCHETS on all 64 steps (`Seq::clear_extra`). In PATTERN EDIT the same three buttons
-  (orange) act on all 8 tracks, CLR ... too. `lbtn` got three options, VIOLET2, CLR2 and ORANGE2, so the page-1 buttons hide and CLR STEPS / CLR LOCKS (`lpanel:RANDOM`) stay. Undo covers it (Snap).
+  (orange) act on all 8 tracks, CLR ... too. In STEP EDIT (teal) both act on the selected steps only, trig or not (the
+  mask argument). `lbtn` got four options, VIOLET2, CLR2, ORANGE2 and TEAL2, so the page-1 buttons hide and CLR STEPS / CLR LOCKS (`lpanel:RANDOM`) stay. Undo covers it (Snap).
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

@@ -255,7 +255,7 @@ struct Plugin {
     int close_frames[NPARAMS] = {0}; /* popup flags: audio frames left before an open list closes after a pick (audio thread + setParameter) */
     bool track_edit = false;         /* TRACK EDIT: the panel shows the track setup */
     int rmode = 2;                   /* v2.1: the right-hand panel EUCLIDIAN leaves as it is: the last of PATTERN EDIT (0), STEP EDIT / TIMING (1), TRACK EDIT (2) */
-    int lpage[2] = {0, 0};           /* v1.2.0: the left section's page in PATTERN EDIT [0] and TRACK EDIT [1]: 0 RND STEPS .. RND CC 5, 1 RND COND / TIMING / RATCHETS (not saved) */
+    int lpage[3] = {0, 0, 0};        /* v1.2.0: the left section's page in PATTERN EDIT [0], TRACK EDIT [1], STEP EDIT [2]: 0 RND STEPS .. RND CC 5, 1 RND COND / TIMING / RATCHETS (not saved) */
     bool clr_mode = false;           /* CLR LOCKS lit: RND VEL .. RND CC 5 clear that lock (CLR VEL ..), RND STEPS is off */
     bool shuf_edit = false;          /* SHUFFLE EDIT in the pattern setup: the row of track buttons is shown */
     bool global_edit = true;         /* SETUP: the screen a new plugin opens on (v1.0.0 2026-10-11; Trig Seq v1.99-v2.12: TRACK EDIT) */
@@ -821,10 +821,10 @@ static bool cc_in_use(Plugin *w, int j) {
     }
     return false;
 }
-/* v1.2.0: which mode's left section has two pages: 0 PATTERN EDIT, 1 TRACK EDIT, -1 any other mode */
+/* v1.2.0: which mode's left section has two pages: 0 PATTERN EDIT, 1 TRACK EDIT, 2 STEP EDIT, -1 any other mode */
 static int lmode(const Plugin *w) {
-    if (w->step_edit || w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit) return -1;
-    return w->track_edit ? 1 : 0;
+    if (w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit) return -1;
+    return w->step_edit ? 2 : w->track_edit ? 1 : 0;
 }
 static bool lpage2(const Plugin *w) { const int m = lmode(w); return m >= 0 && w->lpage[m] == 1; }
 static int value_of(Plugin *w, int i) {
@@ -924,7 +924,7 @@ static int value_of(Plugin *w, int i) {
     case P_BKSTEP: return 0;   /* the backup step is gone (v1.64.0) */
     case P_BIGMSG: return w->big;
     case P_BIGDONE: return w->big > BIG_DONE0 ? 1 : 0;
-    case P_LBTN: return w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit ? 4 : lpage2(w) ? (w->clr_mode ? 6 : lmode(w) ? 5 : 7) : w->clr_mode ? 3 : w->step_edit ? 1 : w->track_edit ? 2 : 0;   /* ORANGE / TEAL / VIOLET / CLR (red) / NONE / VIOLET2 / CLR2 / ORANGE2 (v1.2.0: page 2 of TRACK EDIT / PATTERN EDIT) */
+    case P_LBTN: return w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit ? 4 : lpage2(w) ? (w->clr_mode ? 6 : lmode(w) == 2 ? 8 : lmode(w) == 1 ? 5 : 7) : w->clr_mode ? 3 : w->step_edit ? 1 : w->track_edit ? 2 : 0;   /* ORANGE / TEAL / VIOLET / CLR (red) / NONE / VIOLET2 / CLR2 / ORANGE2 / TEAL2 (v1.2.0: page 2 of TRACK / PATTERN / STEP EDIT) */
     case P_EU_ENABLE: return tr.eu_on ? 1 : 0;
     case P_EU_PL1: return tr.eu_pl1;
     case P_EU_RO1: return tr.eu_ro1;
@@ -1865,16 +1865,18 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                 });
             if (i == P_CLR_TIMING && w->timing_edit) { each_sel(w, [](Step &st) { st.micro = 0; }); tm_msg(w); }   /* back on the grid */
             if (i == P_CLR_RATCH && w->timing_edit) each_sel(w, [](Step &st) { st.ratch = 0; st.rres = 0; });   /* one hit (and RESOLUTION AUTO) */
-            /* v1.2.0: the arrows page the left section of PATTERN EDIT and TRACK EDIT (each keeps its own page). Page 2:
+            /* v1.2.0: the arrows page the left section of PATTERN, TRACK and STEP EDIT (each keeps its own page). Page 2:
              * RND COND / RND TIMING / RND RATCHETS on every trig (steps 1..length), or with CLR LOCKS lit CLR COND /
-             * CLR TIMING / CLR RATCHETS on all steps: the selected track in TRACK EDIT, all 8 tracks in PATTERN EDIT */
+             * CLR TIMING / CLR RATCHETS on all steps: the selected track in TRACK EDIT, all 8 tracks in PATTERN EDIT.
+             * STEP EDIT: the selected steps only, trig or not (as its other RND / CLR buttons). */
             if ((i == P_NAV_LEFT || i == P_NAV_RIGHT) && lmode(w) >= 0) w->lpage[lmode(w)] = i == P_NAV_RIGHT ? 1 : 0;
             if ((i == P_RND_COND || i == P_RND_TIMING || i == P_RND_RATCH) && lpage2(w)) {
                 const int what = i == P_RND_COND ? Seq::X_COND : i == P_RND_TIMING ? Seq::X_TIMING : Seq::X_RATCH;
                 if (!w->clr_mode) w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
+                const uint64_t mask = lmode(w) == 2 ? (uint64_t)w->selmask << (w->page * 16) : 0;   /* 0: the whole track */
                 for (int t = 0; t < NTRACKS; t++) {
-                    if (lmode(w) == 1 && t != w->track) continue;
-                    if (w->clr_mode) w->seq.clear_extra(t, what); else w->seq.randomize_extra(t, what);
+                    if (lmode(w) != 0 && t != w->track) continue;
+                    if (w->clr_mode) w->seq.clear_extra(t, what, mask); else w->seq.randomize_extra(t, what, mask);
                 }
             }
             if (i == P_EU_RND) {
@@ -2203,7 +2205,7 @@ static bool chunk_read(Plugin *w, const std::string &s) {
     w->seq.pf_undo_ok = false;
     w->seq.shuffle = 50;   /* projects from before v1.21.0 have no G line */
     hist_reset(w);   /* a loaded project starts a new history */
-    w->cc117 = 0; w->shift = false; w->cc_edit = false; w->pclear = false; w->src.clear(); w->src_mode = 0; w->shuf_edit = false; w->clr_mode = false; w->lpage[0] = w->lpage[1] = 0; src_name(w); for (int ti = 0; ti < NTRACKS; ti++) for (int j = 0; j < NCC; j++) w->ccname[ti][j].clear(); w->src_gen++;
+    w->cc117 = 0; w->shift = false; w->cc_edit = false; w->pclear = false; w->src.clear(); w->src_mode = 0; w->shuf_edit = false; w->clr_mode = false; w->lpage[0] = w->lpage[1] = w->lpage[2] = 0; src_name(w); for (int ti = 0; ti < NTRACKS; ti++) for (int j = 0; j < NCC; j++) w->ccname[ti][j].clear(); w->src_gen++;
     for (int pp = 0; pp < NPATS; pp++) { pst_clear_pat(w, pp); }
     w->pstclip_ok = false;
     std::unique_ptr<Seq> stq[NSTATES], ptq[NPATS], stv[NPATS][NSTATES];   /* the states and patterns as they are read (stq: v1.68.0-1.0.2 "Q" states) */

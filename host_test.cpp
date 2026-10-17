@@ -56,6 +56,13 @@ static int P(const char *key) {
     return 0;
 }
 static int fails = 0;
+/* v1.2.0: the TIMING offset of step k (0..63) of track t in a saved chunk: its "M t" line (micro byte, ratchet byte per step) */
+static int micro_in(const std::string &sv, int t, int k) {
+    const std::string tag = "\nM " + std::to_string(t) + " ";
+    const size_t q = sv.find(tag);
+    if (q == std::string::npos) return 0;
+    return (int)(int8_t)strtol(sv.substr(q + tag.size() + 4 * k, 2).c_str(), nullptr, 16);
+}
 #define CHECK(c, ...) do { int ok_ = (c); printf("%s ", ok_ ? "ok  " : "FAIL"); printf(__VA_ARGS__); printf("\n"); fails += !ok_; } while (0)
 
 /* ---- core helpers ---- */
@@ -2173,19 +2180,19 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             if (k % 2 == 0) { cond += cs != "--"; rt += rs != "1"; }
             else empty += cs != "--" || rs != "1" || rr != "AUTO";
         }
-        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); tm = sv.find("\nM 0 ") != std::string::npos; }
-        CHECK(cond >= 6 && rt >= 5 && tm && !empty, "page 2: conditions (%d of 8), ratchets (%d of 8) and timing on the trigs; empty steps untouched (%d)", cond, rt, empty);
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); for (int k = 0; k < 16; k++) { if (k % 2 == 0) tm += micro_in(sv, 0, k) != 0; else empty += micro_in(sv, 0, k) != 0; } }
+        CHECK(cond >= 6 && rt >= 5 && tm >= 6 && !empty, "page 2: conditions (%d of 8), ratchets (%d of 8) and timing (%d of 8) on the trigs; empty steps untouched (%d)", cond, rt, tm, empty);
         CHECK(OPTC("lbtn") == 5, "still page 2 after a trip through STEP EDIT");
         set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: page 2 reads CLR COND / CLR TIMING / CLR RATCHETS");
         pr("rnd_cond"); pr("rnd_timing"); pr("rnd_ratch");
         int left = 0;
         for (int k = 0; k < 16; k += 2) left += look(k + 1, "st_cond") != "--" || look(k + 1, "st_ratch") != "1" || look(k + 1, "st_rres") != "AUTO";
-        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM 0 ") != std::string::npos; }
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM 0 ") != std::string::npos; }   /* no timing and no ratchet left: no M line at all */
         CHECK(left == 0 && c->getP(c, P("step0")) > 0.5f, "CLR COND / TIMING / RATCHETS: all gone (%d left), the trigs stay", left);
         set_int(c, "clr_mode", 0); pr("nav_left"); CHECK(OPTC("lbtn") == 2, "left arrow: back to page 1");
         pr("nav_right"); set_int(c, "pattern_edit", 1); CHECK(OPTC("lbtn") == 0, "PATTERN EDIT keeps its own page: page 1 (orange)");
         set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 5, "back in TRACK EDIT: still page 2");
-        set_int(c, "step_edit", 1); pr("nav_right"); CHECK(OPTC("lbtn") == 1, "STEP EDIT: the arrows do nothing");
+        set_int(c, "step_edit", 1); CHECK(OPTC("lbtn") == 1, "STEP EDIT keeps its own page: page 1 (teal)");
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0: the same page 2 in PATTERN EDIT, on all 8 tracks */
@@ -2204,16 +2211,45 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             trk_hit += n > 0;
             empty += look(t, 2, "st_cond") != "--" || look(t, 2, "st_ratch") != "1";
         }
-        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); int m = 0; for (int t = 0; t < 8; t++) m += sv.find("\nM " + std::to_string(t) + " ") != std::string::npos;
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); int m = 0; for (int t = 0; t < 8; t++) { int n = 0; for (int k = 0; k < 16; k += 4) n += micro_in(sv, t, k) != 0; m += n > 0; empty += micro_in(sv, t, 1) != 0; }
           CHECK(trk_hit == 8 && m == 8 && !empty, "page 2 in PATTERN EDIT: every track got conditions / ratchets (%d) and timing (%d); empty steps untouched (%d)", trk_hit, m, empty); }
         set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: CLR COND / CLR TIMING / CLR RATCHETS");
         pr("rnd_cond"); pr("rnd_ratch"); pr("rnd_timing");
         int left = 0;
         for (int t = 0; t < 8; t++) for (int k = 0; k < 16; k += 4) left += look(t, k + 1, "st_cond") != "--" || look(t, k + 1, "st_ratch") != "1" || look(t, k + 1, "st_rres") != "AUTO";
-        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM ") != std::string::npos; }
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM ") != std::string::npos; }   /* no timing and no ratchet left anywhere */
         CHECK(left == 0, "CLR COND / TIMING / RATCHETS in PATTERN EDIT: gone from all 8 tracks (%d left)", left);
         set_int(c, "clr_mode", 0); set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 2, "TRACK EDIT keeps its own page: page 1");
         set_int(c, "pattern_edit", 1); pr("nav_left"); CHECK(OPTC("lbtn") == 0, "left arrow: PATTERN EDIT page 1");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0: page 2 in STEP EDIT: the selected steps only, trig or not */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto get = [&](int sel, const char *key) { set_int(c, "sel", sel); c->d(c, 7, P(key), 0, d, 0); return std::string(d); };
+        c->setP(c, P("step2"), 1.0f); c->setP(c, P("step4"), 1.0f);   /* trigs on 3 and 5 */
+        set_int(c, "step_edit", 1); CHECK(OPTC("lbtn") == 1, "STEP EDIT: page 1 (teal)");
+        pr("nav_right"); CHECK(OPTC("lbtn") == 8 && OPTC("lpanel") == 0, "right arrow: page 2 in teal (lbtn %d)", OPTC("lbtn"));
+        int hit3 = 0, hit2 = 0, other = 0;
+        for (int r = 0; r < 6; r++) {   /* step 3 (a trig) and step 2 (none), one at a time; step 5 never selected */
+            set_int(c, "sel", 3); pr("rnd_cond"); pr("rnd_ratch");
+            hit3 += get(3, "st_cond") != "--" || get(3, "st_ratch") != "1";
+            set_int(c, "sel", 2); pr("rnd_cond"); pr("rnd_ratch");
+            hit2 += get(2, "st_cond") != "--" || get(2, "st_ratch") != "1";
+            other += get(5, "st_cond") != "--" || get(5, "st_ratch") != "1";
+        }
+        set_int(c, "sel", 3); pr("rnd_timing");
+        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        CHECK(hit3 >= 5 && hit2 >= 5 && !other && micro_in(sv, 0, 2) != 0 && micro_in(sv, 0, 1) == 0, "page 2 in STEP EDIT: the selected step, trig (%d of 6) or not (%d of 6), and timing on step 3 only; an unselected step untouched (%d)", hit3, hit2, other);
+        set_int(c, "sel", 3); set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: CLR COND / CLR TIMING / CLR RATCHETS");
+        pr("rnd_cond"); pr("rnd_ratch"); pr("rnd_timing");
+        const std::string c3 = get(3, "st_cond"), r3 = get(3, "st_ratch"), c2 = get(2, "st_cond"), r2 = get(2, "st_ratch");
+        cx = 0; c->d(c, 23, 0, 0, &cx, 0); sv = (char *)cx;
+        CHECK(c3 == "--" && r3 == "1" && micro_in(sv, 0, 2) == 0 && (c2 != "--" || r2 != "1"), "CLR in STEP EDIT: step 3 cleared (%s, %s, timing %d), step 2 (not selected) keeps its values (%s, %s)", c3.c_str(), r3.c_str(), micro_in(sv, 0, 2), c2.c_str(), r2.c_str());
+        set_int(c, "clr_mode", 0); set_int(c, "timing_edit", 1); CHECK(OPTC("lbtn") == 4, "TIMING: its own section, no page 2");
+        set_int(c, "timing_edit", 0); CHECK(OPTC("lbtn") == 8, "TIMING off: back to STEP EDIT page 2");
+        pr("nav_left"); CHECK(OPTC("lbtn") == 1, "left arrow: STEP EDIT page 1");
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* FETCH NOTES needs no target track: T1's CC 20 on channel 1 is mapped to pad A01 of Drum 001, so T1 plays that pad's note */

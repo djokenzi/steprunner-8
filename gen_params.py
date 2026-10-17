@@ -143,7 +143,7 @@ trig("src_fetch", "Fetch CC Values")
 trig("src_notes", "Fetch Notes")
 opt("shuf_edit", "Shuffle Edit", onoff)
 opt("clr_mode", "Clear Locks Mode", onoff)
-opt("lbtn", "Left Buttons", ["ORANGE", "TEAL", "VIOLET", "CLR", "NONE", "VIOLET2", "CLR2", "ORANGE2"])   # v1.2.0: VIOLET2 / ORANGE2 / CLR2 = the second page of the left section (TRACK EDIT / PATTERN EDIT)   # read-only, for the skin: the look of the RND buttons
+opt("lbtn", "Left Buttons", ["ORANGE", "TEAL", "VIOLET", "CLR", "NONE", "VIOLET2", "CLR2", "ORANGE2", "TEAL2"])   # v1.2.0: VIOLET2 / ORANGE2 / TEAL2 / CLR2 = the second page of the left section (TRACK / PATTERN / STEP EDIT)   # read-only, for the skin: the look of the RND buttons
 trig("src_copy", "Copy Mapping")
 trig("src_skip", "Skip Backup")
 opt("bkstep", "Backup Step", onoff)   # retired (v1.64, no backup step); slot kept
@@ -178,7 +178,7 @@ opt("st_rres", "Ratchet Resolution", ["AUTO", "1/16", "1/32", "1/48", "1/64", "1
 opt("pf_alt", "Alt Bar", onoff); opt("pf_afill", "Auto Fill", onoff)   # v2.2.0 PERFORM pads
 opt("pst_pat", "States Pattern", ["P%d" % k for k in range(1, 9)])   # read-only, v1.1.0: whose STATEs the PERFORM tab shows (the pattern playing)
 opt("pf_stopcc", "Stop CC", onoff)   # v1.2.0 PERFORM pad STOP CC: lit = no CC goes out (replaces the HUMANIZE pad; pf_hum stays)
-trig("nav_left", "Left"); trig("nav_right", "Right")   # v1.2.0: the arrow buttons left of EUCLIDIAN: the left section's page 1 / 2 (PATTERN EDIT, TRACK EDIT)
+trig("nav_left", "Left"); trig("nav_right", "Right")   # v1.2.0: the arrow buttons left of EUCLIDIAN: the left section's page 1 / 2 (PATTERN, TRACK, STEP EDIT)
 trig("rnd_cond", "Random Conditions")   # v1.2.0: RND COND, page 2 of the left section
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)

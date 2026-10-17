@@ -66,8 +66,8 @@ Along the top are the mode buttons: **STEP EDIT**, **TRACK EDIT**, **PATTERN EDI
   - **TIMING** in STEP EDIT;
   - **EUCLIDIAN** in TRACK EDIT;
   - nothing in PATTERN EDIT and SETUP.
-- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In PATTERN EDIT and TRACK EDIT
-  they switch the left section between its two pages (see [TRACK EDIT](#5-track-edit)). Each of the two modes keeps
+- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In PATTERN EDIT, TRACK EDIT and
+  STEP EDIT they switch the left section between its two pages (see [TRACK EDIT](#5-track-edit)). Each mode keeps
   its own page. In the other modes they do nothing yet.
 
 ### Left section and right panel
@@ -293,6 +293,10 @@ STEP EDIT sets the **locks** of individual steps.
 
 - If a CC has a base value, a step without a lock shows it in brackets, e.g. *(64)*.
 - Turn a CC knob fully down to `--` to remove its lock.
+
+**▶ / ◀** switch the left section to a second page and back: **RND COND / RND TIMING / RND RATCHETS**, as in
+[TRACK EDIT](#5-track-edit), but on the **selected steps** only, with or without a trig (like the other RND buttons in
+STEP EDIT). With CLR LOCKS lit, **CLR COND / CLR TIMING / CLR RATCHETS** clear the selected steps.
 
 ![CONDITION list](manual/condition-list.png)
 
