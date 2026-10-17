@@ -203,7 +203,7 @@ PATTERN EDIT holds the settings of the whole pattern:
 - **PATTERN LENGTH 16 / 32 / 48 / 64**: sets the length of all 8 tracks. When tracks get longer, their existing
   pages are copied onto the new, empty pages. Pages that already hold trigs are never overwritten.
 - **SHIFT ◀ / ▶**: moves every track of the pattern one step earlier / later (each round its own length), as SHIFT in
-  TRACK EDIT. UNDO takes it back.
+  TRACK EDIT. UNDO takes it back. Hidden while SHUFFLE EDIT is on.
 - **COPY PTN / PASTE PTN**: copy the playing pattern and paste it over the playing pattern. Its eight states go along
   and replace the states of the pattern you paste into.
 - In PATTERN EDIT the random buttons act on **all 8 tracks**. CLR STEPS and CLR LOCKS still clear only the selected

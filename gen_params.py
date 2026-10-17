@@ -197,6 +197,7 @@ num("st_cc6", "CC 6", 0, 128, 0); num("st_cc7", "CC 7", 0, 128, 0)
 num("pf_cc6", "CC 6", -127, 127, 0); num("pf_cc7", "CC 7", -127, 127, 0)
 trig("rnd_cc6", "Random CC 6"); trig("rnd_cc7", "Random CC 7")   # v1.2.0: page 2 of the left section (CLR CC 6 / 7 while CLR LOCKS is lit)
 opt("navv", "Arrows Look", ["NONE", "RIGHT", "LEFT"])   # read-only, v1.2.0: which arrow has a page to go to (NONE: neither, both dim)
+opt("pshiftv", "Pattern Shift Look", ["HIDDEN", "ON"])   # read-only, v1.2.0: PATTERN EDIT's SHIFT, hidden while SHUFFLE EDIT is on
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

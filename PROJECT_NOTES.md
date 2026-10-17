@@ -292,7 +292,8 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
     cleared by `select_one`) until another step is selected; the text still shows the base in brackets.
 - SHIFT ◀ / ▶ (`shift_left` / `shift_right`) in TRACK EDIT (the track) and PATTERN EDIT (all 8): `Seq::shift_track`
   rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
-  by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). It follows the panel that shows the
+  by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). PATTERN EDIT's SHIFT is hidden (and inert)
+  while SHUFFLE EDIT is on (read-only `pshiftv`): its row of tracks sits there. It follows the panel that shows the
   buttons (`panel` TRACK or PATTERN), so it works under EUCLIDIAN too; nothing in STEP EDIT.
 - The step cells are green only while a generator runs; in EUCLIDIAN with none on they take the colour of the mode under
   it (`rmode`: STEP EDIT teal, TRACK EDIT violet, PATTERN EDIT orange; before they always took the orange).
@@ -316,9 +317,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
     with CREATE DEFAULT MAP). FETCH reads the saved project file: changes on the MPC count only once the project is saved.
   - STEP LOCKS VELOCITY / PAN with no lock rest on the track's velocity / pan (panb) as the CC knobs do on their base,
     text in brackets, the same "stays at --" rule (`rest_dash` / `rest_turn`, bits REST_VEL / REST_PAN of cc_rest).
-  - Layout: STEP LOCKS and TRACK VALUES in six columns 120 px apart (CONDITION / BACK, VEL, PAN, LEN, PROB, CC 1;
-    CC 2..CC 7), so neighbouring value boxes touch; PERFORM knobs closer to PERFORM ALL (VEL, PAN, LEN, PROB, CC 1 /
-    CC 2..CC 7). Q-Links: 11 on PROGRAM and PERFORM.
+  - Layout (the owner's, from Skin Studio, 2026-10-18): STEP LOCKS / TRACK VALUES: CONDITION / BACK, VEL, PAN, LEN,
+    PROB on top (r=32, 120 px apart), CC 1..CC 7 below (r=32, 90 px apart); PERFORM: VEL, PAN, LEN, PROB on top, CC 1..
+    CC 7 below (99 px apart). A knob's touch box is 130 px wide, so at 90 / 99 px neighbours share 40 / 31 px of it
+    (newer tools' skin_check reports it); the knobs themselves do not touch. Q-Links: 11 on PROGRAM and PERFORM.
+    Button pictures regenerated for the sizes changed there: EUCLIDIAN ENABLE / RANDOM 100x30, arrows 30x30,
+    TRACK VALUES and BACK 120x39.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

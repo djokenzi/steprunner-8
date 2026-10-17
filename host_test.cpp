@@ -2294,6 +2294,14 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "pattern_edit", 1); pr("shift_left");
         CHECK(on(1, 0) && on(0, 15) && on(2, 15) && !on(0, 0), "PATTERN EDIT: SHIFT left moves every track (T1 step 1 -> 16)");
         set_int(c, "step_edit", 1); pr("shift_right"); CHECK(on(1, 0), "STEP EDIT: nothing");
+        {   /* PATTERN EDIT's SHIFT hides (and does nothing) while SHUFFLE EDIT is on */
+            auto look = [&]() { return (int)lroundf(c->getP(c, P("pshiftv"))); };
+            set_int(c, "pattern_edit", 1); const int l0 = look();
+            set_int(c, "shuf_edit", 1); const int l1 = look(); pr("shift_right"); const bool still = on(1, 0) && !on(1, 1);
+            set_int(c, "pattern_edit", 1); set_int(c, "shuf_edit", 0); const int l2 = look();
+            set_int(c, "track_edit", 1); const int l3 = look();
+            CHECK(l0 == 1 && l1 == 0 && still && l2 == 1 && l3 == 0, "PATTERN EDIT SHIFT: shown (%d), hidden under SHUFFLE EDIT (%d, no shift there), back (%d); not on TRACK EDIT's panel (%d)", l0, l1, l2, l3);
+        }
         set_int(c, "pattern_edit", 1); pr("undo"); CHECK(on(0, 0) && on(1, 1), "UNDO takes a SHIFT back");
         set_int(c, "track", 1); set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
         { const int cs = (int)lroundf(c->getP(c, P("cell1")) * (PARAMS[P("cell1")].nopts - 1)); CHECK(cs / 8 == 2, "EUCLIDIAN over TRACK EDIT, both generators off: the cells are violet, not green (state %d)", cs); }

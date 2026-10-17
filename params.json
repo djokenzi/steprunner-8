@@ -3492,6 +3492,15 @@
     "LEFT"
    ],
    "default": 0
+  },
+  {
+   "key": "pshiftv",
+   "name": "Pattern Shift Look",
+   "options": [
+    "HIDDEN",
+    "ON"
+   ],
+   "default": 0
   }
  ]
 }

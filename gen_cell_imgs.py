@@ -179,28 +179,28 @@ if os.path.exists(FONT):
         sh = seg(on, "SHIFT", 120); ImageDraw.Draw(sh).rectangle([0, 0, sh.size[0] - 1, sh.size[1] - 1], outline=(150, 150, 150, 255), width=2)
         sh.save("images/shift_%s.png" % ("on" if on else "off"))
     btn("RANDOM", GREY, False).save("images/eu_rnd.png"); btn("RANDOM", GREY, True).save("images/eu_rnd_on.png")
-    # v1.2.0: EUCLIDIAN with two generators, one row each: ENABLE / RANDOM 80x26 (13 px text), the direction as three
-    # 26x26 arrows (FWD, BWD, BOTH), boolean 74x32, COMMIT 118x32; _d = dim (that generator off, or not both on for the
+    # v1.2.0: EUCLIDIAN with two generators, one row each: ENABLE / RANDOM 100x30 (14 px text), the direction as three
+    # 30x30 arrows (sizes from the owner's layout, 2026-10-18) (FWD, BWD, BOTH), boolean 74x32, COMMIT 118x32; _d = dim (that generator off, or not both on for the
     # boolean ones), _dl = dim but the one in use
     DIM, DIM_INK = (52, 52, 52), (110, 110, 110)
     for g in ("A", "B"):
-        btn("ENABLE " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_on.png" % g.lower())
-        btn("RANDOM " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s_on.png" % g.lower())
+        btn("ENABLE " + g, GREY, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_enable%s_on.png" % g.lower())
+        btn("RANDOM " + g, GREY, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=100, BTN_H=30, size=14).save("images/eu2_rnd%s_on.png" % g.lower())
     for nm, sgn in (("l", -1), ("r", 1)):   # v1.2.0 SHIFT: grey 78x39, a triangle (as DIRECTION's size)
         for on in (False, True):
             im = btn("", GREY, on, BTN_W=78, BTN_H=39).convert("RGBA"); d = ImageDraw.Draw(im)
             cx, cy, r = 39, 19.5, 9
             d.polygon([(cx - sgn * r, cy - r), (cx - sgn * r, cy + r), (cx + sgn * r, cy)], fill=(253, 243, 234, 255))
             im.save("images/shift_%s%s.png" % (nm, "_on" if on else ""))
-    btn("TRACK VALUES", GREY, False, BTN_W=170).save("images/trk_vals.png"); btn("TRACK VALUES", GREY, True, BTN_W=170).save("images/trk_vals_on.png")   # v1.2.0
-    btn("BACK", GREY, False).save("images/trk_back.png"); btn("BACK", GREY, True).save("images/trk_back_on.png")
+    btn("TRACK VALUES", GREY, False, BTN_W=120, size=13).save("images/trk_vals.png"); btn("TRACK VALUES", GREY, True, BTN_W=120, size=13).save("images/trk_vals_on.png")   # v1.2.0
+    btn("BACK", GREY, False, BTN_W=120).save("images/trk_back.png"); btn("BACK", GREY, True, BTN_W=120).save("images/trk_back_on.png")
     btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")
     def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small
-        im = btn("", col, False, BTN_W=26, BTN_H=26).convert("RGBA"); d = ImageDraw.Draw(im)
-        tri = lambda cx, sgn, r: d.polygon([(cx - sgn * r, 13 - r), (cx - sgn * r, 13 + r), (cx + sgn * r, 13)], fill=ink + (255,))
-        if kind == "fwd": tri(13.5, 1, 6)
-        elif kind == "bwd": tri(12.5, -1, 6)
-        else: tri(8, -1, 4.5); tri(18, 1, 4.5)
+        im = btn("", col, False, BTN_W=30, BTN_H=30).convert("RGBA"); d = ImageDraw.Draw(im)
+        tri = lambda cx, sgn, r: d.polygon([(cx - sgn * r, 15 - r), (cx - sgn * r, 15 + r), (cx + sgn * r, 15)], fill=ink + (255,))
+        if kind == "fwd": tri(15.5, 1, 7)
+        elif kind == "bwd": tri(14.5, -1, 7)
+        else: tri(9.5, -1, 5); tri(20.5, 1, 5)
         return im
     for k in ("fwd", "bwd", "both"):
         arrows(GREY, (253, 243, 234), k).save("images/eu2_%s.png" % k); arrows(EUC, (253, 243, 234), k).save("images/eu2_%s_on.png" % k)
