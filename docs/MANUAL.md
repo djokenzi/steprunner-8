@@ -66,8 +66,9 @@ Along the top are the mode buttons: **STEP EDIT**, **TRACK EDIT**, **PATTERN EDI
   - **TIMING** in STEP EDIT;
   - **EUCLIDIAN** in TRACK EDIT;
   - nothing in PATTERN EDIT and SETUP.
-- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In TRACK EDIT they switch the
-  left section between its two pages (see [TRACK EDIT](#5-track-edit)); in the other modes they do nothing yet.
+- The two arrow buttons **◀ ▶** on the far left of the top row are shown in every mode. In PATTERN EDIT and TRACK EDIT
+  they switch the left section between its two pages (see [TRACK EDIT](#5-track-edit)). Each of the two modes keeps
+  its own page. In the other modes they do nothing yet.
 
 ### Left section and right panel
 
@@ -205,6 +206,9 @@ PATTERN EDIT holds the settings of the whole pattern:
   and replace the states of the pattern you paste into.
 - In PATTERN EDIT the random buttons act on **all 8 tracks**. CLR STEPS and CLR LOCKS still clear only the selected
   track.
+- **▶ / ◀** switch to the second page of random buttons and back: **RND COND / RND TIMING / RND RATCHETS**, as in
+  [TRACK EDIT](#5-track-edit), but on every trig of **all 8 tracks**. With CLR LOCKS lit, **CLR COND / CLR TIMING /
+  CLR RATCHETS** also clear all 8 tracks (unlike CLR VEL … CLR CC 5 on page 1, which clear the selected track).
 
 ### Patterns 1–8
 

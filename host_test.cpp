@@ -2183,8 +2183,37 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM 0 ") != std::string::npos; }
         CHECK(left == 0 && c->getP(c, P("step0")) > 0.5f, "CLR COND / TIMING / RATCHETS: all gone (%d left), the trigs stay", left);
         set_int(c, "clr_mode", 0); pr("nav_left"); CHECK(OPTC("lbtn") == 2, "left arrow: back to page 1");
-        pr("nav_right"); set_int(c, "pattern_edit", 1); CHECK(OPTC("lbtn") == 0, "PATTERN EDIT: its own buttons, the arrows do nothing there");
-        pr("nav_left"); set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 5, "back in TRACK EDIT: still page 2 (the left arrow in PATTERN EDIT changed nothing)");
+        pr("nav_right"); set_int(c, "pattern_edit", 1); CHECK(OPTC("lbtn") == 0, "PATTERN EDIT keeps its own page: page 1 (orange)");
+        set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 5, "back in TRACK EDIT: still page 2");
+        set_int(c, "step_edit", 1); pr("nav_right"); CHECK(OPTC("lbtn") == 1, "STEP EDIT: the arrows do nothing");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0: the same page 2 in PATTERN EDIT, on all 8 tracks */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto look = [&](int trk, int sel, const char *key) { set_int(c, "track", trk); set_int(c, "step_edit", 1); set_int(c, "sel", sel); c->d(c, 7, P(key), 0, d, 0); set_int(c, "pattern_edit", 1); return std::string(d); };
+        for (int t = 0; t < 8; t++) { set_int(c, "track", t); for (int k = 0; k < 16; k += 4) c->setP(c, P(("step" + std::to_string(k)).c_str()), 1.0f); }   /* trigs on 1, 5, 9, 13 of every track */
+        set_int(c, "track", 0); set_int(c, "pattern_edit", 1); CHECK(OPTC("lbtn") == 0, "PATTERN EDIT: page 1 (orange)");
+        pr("nav_right"); CHECK(OPTC("lbtn") == 7 && OPTC("lpanel") == 0, "right arrow: page 2 in orange (lbtn %d)", OPTC("lbtn"));
+        pr("rnd_cond"); pr("rnd_ratch"); pr("rnd_timing");
+        int trk_hit = 0, empty = 0;
+        for (int t = 0; t < 8; t++) {
+            int n = 0;
+            for (int k = 0; k < 16; k += 4) n += look(t, k + 1, "st_cond") != "--" || look(t, k + 1, "st_ratch") != "1";
+            trk_hit += n > 0;
+            empty += look(t, 2, "st_cond") != "--" || look(t, 2, "st_ratch") != "1";
+        }
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); int m = 0; for (int t = 0; t < 8; t++) m += sv.find("\nM " + std::to_string(t) + " ") != std::string::npos;
+          CHECK(trk_hit == 8 && m == 8 && !empty, "page 2 in PATTERN EDIT: every track got conditions / ratchets (%d) and timing (%d); empty steps untouched (%d)", trk_hit, m, empty); }
+        set_int(c, "clr_mode", 1); blocks(c, 1, 0.0); CHECK(OPTC("lbtn") == 6, "CLR LOCKS lit: CLR COND / CLR TIMING / CLR RATCHETS");
+        pr("rnd_cond"); pr("rnd_ratch"); pr("rnd_timing");
+        int left = 0;
+        for (int t = 0; t < 8; t++) for (int k = 0; k < 16; k += 4) left += look(t, k + 1, "st_cond") != "--" || look(t, k + 1, "st_ratch") != "1" || look(t, k + 1, "st_rres") != "AUTO";
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx); left += sv.find("\nM ") != std::string::npos; }
+        CHECK(left == 0, "CLR COND / TIMING / RATCHETS in PATTERN EDIT: gone from all 8 tracks (%d left)", left);
+        set_int(c, "clr_mode", 0); set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 2, "TRACK EDIT keeps its own page: page 1");
+        set_int(c, "pattern_edit", 1); pr("nav_left"); CHECK(OPTC("lbtn") == 0, "left arrow: PATTERN EDIT page 1");
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* FETCH NOTES needs no target track: T1's CC 20 on channel 1 is mapped to pad A01 of Drum 001, so T1 plays that pad's note */
