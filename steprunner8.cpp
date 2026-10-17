@@ -838,7 +838,20 @@ static int lmode(const Plugin *w) {
     return w->step_edit ? 2 : w->track_edit ? 1 : 0;
 }
 static bool lpage2(const Plugin *w) { const int m = lmode(w); return m >= 0 && w->lpage[m] == 1; }
+/* v1.2.0: the PROGRAM tab's Q-Links are on the STEP LOCKS knobs (layout.conf qlinks: the mapping is fixed in the skin).
+ * While the track's panel shows (TRACK EDIT, TRACK VALUES, EUCLIDIAN over TRACK EDIT) those knobs stand for the track's
+ * own values: a Q-Link turn sets them and the knob reads them. Returns the TRACK VALUES parameter, or -1. */
+static int ql_track(const Plugin *w, int i) {
+    if (!(w->track_edit || (w->euclid_edit && w->rmode == 2))) return -1;
+    if (i == P_ST_VEL) return P_TRK_VEL;
+    if (i == P_ST_PAN) return P_TRK_PAN;
+    if (i == P_ST_LEN) return P_TRK_GATE;
+    if (i == P_ST_PROB) return P_TRK_PROB;
+    if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) return P_TRK_CC0 + (i - P_ST_CC0);
+    return -1;
+}
 static int value_of(Plugin *w, int i) {
+    if (ql_track(w, i) >= 0) return value_of(w, ql_track(w, i));
     Track &tr = w->seq.t[w->track];
     if (i >= P_STEP0 && i < P_STEP0 + 16) return tr.st[w->page * 16 + (i - P_STEP0)].on ? 1 : 0;
     if (i >= P_CELL0 && i < P_CELL0 + 16) {
@@ -1015,6 +1028,11 @@ static void set_value(Plugin *w, int i, int v) {
     else set_value_raw(w, i, v);
 }
 static void set_value_raw(Plugin *w, int i, int v) {
+    if (ql_track(w, i) >= 0) {   /* v1.2.0: a Q-Link on a STEP LOCKS knob while the track's panel shows: the track's value */
+        const int j = ql_track(w, i);
+        set_value_raw(w, j, clampi(v, (int)PARAMS[j].min, (int)PARAMS[j].max));
+        return;
+    }
     Track &tr = w->seq.t[w->track];
     if (i >= P_STEP0 && i < P_STEP0 + 16) {
         tr.st[w->page * 16 + (i - P_STEP0)].on = v ? 1 : 0;
@@ -1284,6 +1302,7 @@ static void hist_step(Plugin *w, bool redo) {
 }
 
 static void display_of(Plugin *w, int i, char *out, size_t n) {
+    if (ql_track(w, i) >= 0) { display_of(w, ql_track(w, i), out, n); return; }   /* v1.2.0: what the Q-Link really turns */
     std::lock_guard<std::mutex> lk(w->lock);
     int v = value_of(w, i);
     if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) {   /* no lock: the CC's base value in brackets, if it has one, so the user sees where the CC rests */
@@ -1928,7 +1947,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                 if (pv == 2) w->seq.shift_track(w->track, d);
                 else if (pv == 5) for (int t = 0; t < NTRACKS; t++) w->seq.shift_track(t, d);
             }
-            if (i == P_TRK_VALS && w->track_edit) w->trk_vals = true;   /* v1.2.0: TRACK VALUES / BACK */
+            if (i == P_TRK_VALS && value_of(w, P_PANEL) == 2) w->trk_vals = true;   /* v1.2.0: TRACK VALUES / BACK (under EUCLIDIAN too) */
             if (i == P_TRK_BACK) w->trk_vals = false;
             if ((i == P_NAV_LEFT || i == P_NAV_RIGHT) && lmode(w) >= 0) w->lpage[lmode(w)] = i == P_NAV_RIGHT ? 1 : 0;
             if ((i == P_RND_COND || i == P_RND_TIMING || i == P_RND_RATCH) && lpage2(w)) {

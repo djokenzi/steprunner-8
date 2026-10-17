@@ -281,7 +281,12 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   `trk_vel` / `trk_gate`; PAN (`trk_pan`) is `Track::panb`; PROB (`trk_prob`) is the new `Track::pcut` (100 - %, so a
   zeroed track means 100 %), rolled after the step's own condition and probability, not under NO LOCKS, saved as a
   `K t %` line when not 100; CC 1-5 (`trk_cc1..5`) are `Track::ccb` (the same base values TRACK SETUP edits). PAN and the
-  CCs are sent when turned (STOP CC still holds them back).
+  CCs are sent when turned (STOP CC still holds them back). The button is grey and opens from EUCLIDIAN over TRACK EDIT
+  too (`panel` TRACK).
+  - Q-Links: the skin's Q-Link map is fixed per page (`qlinks "PROGRAM" = st_vel ..`), so the plugin remaps instead:
+    `ql_track()` turns st_vel / st_pan / st_len / st_prob / st_cc1..5 into trk_vel / trk_pan / trk_gate / trk_prob /
+    trk_cc1..5 in value_of, set_value_raw and display_of while the track's panel shows (TRACK EDIT, or EUCLIDIAN with
+    rmode 2). Elsewhere they are the step's locks. Not yet tried on the device.
 - SHIFT ◀ / ▶ (`shift_left` / `shift_right`) in TRACK EDIT (the track) and PATTERN EDIT (all 8): `Seq::shift_track`
   rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
   by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). It follows the panel that shows the

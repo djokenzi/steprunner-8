@@ -186,7 +186,7 @@ if os.path.exists(FONT):
             cx, cy, r = 39, 19.5, 9
             d.polygon([(cx - sgn * r, cy - r), (cx - sgn * r, cy + r), (cx + sgn * r, cy)], fill=(253, 243, 234, 255))
             im.save("images/shift_%s%s.png" % (nm, "_on" if on else ""))
-    btn("TRACK VALUES", TRACKC, False, BTN_W=170).save("images/trk_vals.png"); btn("TRACK VALUES", TRACKC, True, BTN_W=170).save("images/trk_vals_on.png")   # v1.2.0
+    btn("TRACK VALUES", GREY, False, BTN_W=170).save("images/trk_vals.png"); btn("TRACK VALUES", GREY, True, BTN_W=170).save("images/trk_vals_on.png")   # v1.2.0
     btn("BACK", GREY, False).save("images/trk_back.png"); btn("BACK", GREY, True).save("images/trk_back_on.png")
     btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")
     def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small

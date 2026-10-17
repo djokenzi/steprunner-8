@@ -252,7 +252,12 @@ The settings of the selected track:
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
 
 **TRACK VALUES** shows the knobs of STEP LOCKS in the same places, but for the whole track. **BACK** (where CONDITION
-is on STEP LOCKS) returns to TRACK EDIT. The panel stays open when you switch modes and come back.
+is on STEP LOCKS) returns to TRACK EDIT. The panel stays open when you switch modes and come back, and it opens from
+EUCLIDIAN too.
+
+**Q-Links:** on the PROGRAM tab the Q-Links turn the STEP LOCKS knobs (Velocity, Pan, Length, Prob, CC 1–5). In TRACK
+EDIT, and in EUCLIDIAN opened from TRACK EDIT, the same Q-Links turn the track's values instead; in STEP EDIT and the
+other modes they are the step's locks again.
 
 | Knob | Range | Meaning |
 |---|---|---|

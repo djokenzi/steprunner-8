@@ -1930,11 +1930,14 @@ static void vst_tests() {
     set_int(a, "rnd_min", 70); set_int(a, "rnd_max", 80);
     a->setP(a, P("rnd_vel"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("rnd_vel"), 0.0f);
     a->setP(a, P("rnd_cc4"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("rnd_cc4"), 0.0f);
+    const bool was_trk = a->getP(a, P("track_edit")) > 0.5f;
+    if (was_trk) set_int(a, "step_edit", 1);   /* v1.2.0: in TRACK EDIT these knobs are the track's values (Q-Links) */
     set_int(a, "sel", 6);
     a->d(a, 7, P("st_vel"), 0, disp, 0); int rv = atoi(disp);
     a->d(a, 7, P("st_cc4"), 0, disp, 0); int rc = atoi(ccv(disp));
     a->d(a, 7, P("st_cc1"), 0, name, 0);
     CHECK(rv >= 70 && rv <= 80 && rc >= 70 && rc <= 80 && !strcmp(ccv(name), "--"), "RND VEL / RND CC 4: step 6 velocity %d, CC 23 = %d, CC 20 still '%s'", rv, rc, name);
+    if (was_trk) set_int(a, "track_edit", 1);
     set_int(a, "track", 0);
     a->d(a, 7, P("st_vel"), 0, disp, 0);
     CHECK(a->getP(a, P("step0")) < 0.5f, "T1 was not randomized");
@@ -1995,6 +1998,7 @@ static void vst_tests() {
             CHECK(!strcmp(d1, "20-24") && !strcmp(d2, "61-65") && !strcmp(d3, "14-18"), "track line without a CC base: %s; with one: %s; a track not in the chunk keeps its default: %s", d1, d2, d3);
             c->d(c, 1, 0, 0, 0, 0);
         }
+        set_int(b, "step_edit", 1);   /* v1.2.0: the step's locks, not the track's values (Q-Links in TRACK EDIT) */
         set_int(b, "sel", 2);
         b->d(b, 7, P("st_vel"), 0, disp, 0); b->d(b, 7, P("st_cc5"), 0, name, 0);
         char pan[64]; b->d(b, 7, P("st_pan"), 0, pan, 0);
@@ -2325,6 +2329,21 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "step_edit", 1); CHECK(panel() == 0, "STEP EDIT: STEP LOCKS");
         set_int(c, "track_edit", 1); CHECK(panel() == 8, "back in TRACK EDIT: still TRACK VALUES");
         pr("trk_back"); CHECK(panel() == 2, "BACK: the track panel again");
+        {   /* v1.2.0 Q-Links: the STEP LOCKS knobs stand for the track's values while the track's panel shows */
+            auto iv = [&](const char *k) { return (int)lroundf(c->getP(c, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
+            set_int(c, "st_vel", 70); set_int(c, "st_cc3", 1 + 33); set_int(c, "st_len", 12);
+            c->d(c, 7, P("st_vel"), 0, d, 0);
+            CHECK(iv("trk_vel") == 70 && iv("trk_cc3") == 34 && iv("trk_gate") == 12 && iv("st_vel") == 70 && !strcmp(d, "70"),
+                  "TRACK EDIT: a Q-Link on VELOCITY / CC 3 / LENGTH sets the track's (%d %d %d), and reads it ('%s')", iv("trk_vel"), iv("trk_cc3"), iv("trk_gate"), d);
+            set_int(c, "step_edit", 1); set_int(c, "sel", 1);
+            CHECK(iv("st_vel") == 0 && iv("trk_vel") == 70, "STEP EDIT: the same knob is step 1's velocity lock again (%d), the track keeps 70", iv("st_vel"));
+            set_int(c, "st_vel", 50); set_int(c, "track_edit", 1);
+            CHECK(iv("trk_vel") == 70 && iv("st_vel") == 70, "a lock set in STEP EDIT does not touch the track (%d)", iv("trk_vel"));
+            set_int(c, "euclid_edit", 1); pr("trk_vals"); CHECK(panel() == 8, "EUCLIDIAN over TRACK EDIT: TRACK VALUES opens (%d)", panel());
+            set_int(c, "st_prob", 40); CHECK(iv("trk_prob") == 40, "and the Q-Links still set the track (%d)", iv("trk_prob"));
+            pr("trk_back"); set_int(c, "pattern_edit", 1); set_int(c, "st_vel", 30); set_int(c, "track_edit", 1);
+            CHECK(iv("trk_vel") == 70, "PATTERN EDIT: the knob is a step lock again, the track keeps 70 (%d)", iv("trk_vel"));
+        }
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0 SHIFT in the core: steps 1..length wrap round with their locks; past the length untouched; a generated track moves its rhythm */
