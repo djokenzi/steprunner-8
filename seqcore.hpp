@@ -116,6 +116,11 @@ struct Track {
     uint8_t eu_op;            /* how the two generators combine: E_OR, E_AND, E_XOR, E_SUB */
     uint8_t eu_len;           /* length of the generated rhythm, 1..64, repeated over the track; 0 = the track's own length */
     uint64_t eu_backup;       /* the trigs (bit k = step k) from before it was enabled, for Discard */
+    /* v1.2.0: generator A (eu_pl1, eu_ro1, eu_len) and B (eu_pl2, eu_ro2, eu_len2) each on or off, each with its own
+     * direction; with both on, eu_op combines them. eu_on = at least one is on (the track's trigs are generated). */
+    uint8_t eu_a, eu_b;       /* generator A / B on (only read while eu_on; neither = A, as before v1.2.0) */
+    uint8_t eu_len2;          /* length of B's rhythm, 1..64; 0 = as long as A's */
+    uint8_t eu_dir1, eu_dir2; /* how A / B run through their rhythm: EU_FWD, EU_BWD, EU_BOTH (back and forth) */
     /* runtime */
     int64_t next_k;   /* next absolute step index to fire */
     int cur;          /* play-head step, -1 before the first one */
@@ -338,10 +343,17 @@ struct Seq {
     static int round_len(const Track &tr) { const int n = eff_len(tr); return (tr.dir & DIR_PP) == DIR_PP && n > 1 ? 2 * n - 2 : n; }
     /* The length a track plays: its own, or the Euclidean rhythm's while the generator is on and that is longer. */
     static int eff_len(const Track &tr) {
-        int n = tr.len < 1 ? 1 : tr.len > NSTEPS ? (int)NSTEPS : (int)tr.len;
-        if (tr.eu_on && tr.eu_len > n) n = tr.eu_len > NSTEPS ? (int)NSTEPS : (int)tr.eu_len;
+        int n = own_len(tr);
+        if (gen_a(tr) && eu_m1(tr) > n) n = eu_m1(tr);
+        if (gen_b(tr) && eu_m2(tr) > n) n = eu_m2(tr);
         return n;
     }
+    static int own_len(const Track &tr) { return tr.len < 1 ? 1 : tr.len > NSTEPS ? (int)NSTEPS : (int)tr.len; }
+    /* v1.2.0: which generators run, and the length of each rhythm (A: its own or the track's; B: its own or A's) */
+    static bool gen_a(const Track &tr) { return tr.eu_on && (tr.eu_a || !tr.eu_b); }
+    static bool gen_b(const Track &tr) { return tr.eu_on && tr.eu_b; }
+    static int eu_m1(const Track &tr) { return tr.eu_len ? (tr.eu_len > NSTEPS ? (int)NSTEPS : (int)tr.eu_len) : own_len(tr); }
+    static int eu_m2(const Track &tr) { return tr.eu_len2 ? (tr.eu_len2 > NSTEPS ? (int)NSTEPS : (int)tr.eu_len2) : eu_m1(tr); }
     static double step_dur(const Track &tr) { return 0.25 / SPEEDS[tr.speed < NSPEEDS ? (int)tr.speed : (int)SPEED_1X]; }
 
     void emit(uint8_t status, uint8_t d1, uint8_t d2) {
@@ -696,12 +708,22 @@ struct Seq {
     }
 
     /* ---- Euclidean generator -------------------------------------------------------------------------------------
-     * The UI has one generator since v1.29 (PULSE eu_pl1, ROTATE eu_ro1; ENABLE and RND clear the rest); the second one,
-     * TRO and the operator are still played for old projects. Two generators spread eu_pl1 / eu_pl2 pulses as evenly as possible over the track's length, each rotated by its
-     * own amount; the two are combined (OR, AND, XOR, SUB = 1 and not 2) and the result is rotated by eu_tro. While
-     * eu_on, that result IS the track's trigs for steps 1..len (locks and conditions of the steps are left alone);
+     * Two generators, A and B (v1.2.0; Trig Seq had them too, the UI showed only A from v1.29 to v1.1.1). Each spreads
+     * its pulses as evenly as possible over its own rhythm length (eu_m1 / eu_m2, repeated over the track), rotated by
+     * its own amount, and runs through it forwards, backwards or back and forth (eu_dir1 / eu_dir2). With both on they
+     * are combined (OR, AND, XOR, SUB = A and not B); eu_tro (no knob since v1.29, kept for old projects) rotates both.
+     * While eu_on, that result IS the track's trigs for steps 1..len (locks and conditions of the steps are left alone);
      * euclid_apply() must be called again after any of the settings or the length changes. */
     enum { E_OR = 0, E_AND, E_XOR, E_SUB, E_NOPS };
+    enum { EU_FWD = 0, EU_BWD, EU_BOTH };
+    /* is step k of the track a pulse of one generator (rhythm length m, direction dir) */
+    static bool eu_gen(int k, int pulses, int rot, int m, int dir, int tro) {
+        if (m < 1) return false;
+        int j;
+        if (dir == EU_BOTH && m > 1) { const int per = 2 * m - 2, q = ((k - tro) % per + per) % per; j = q < m ? q : per - q; }
+        else { j = ((k - tro) % m + m) % m; if (dir == EU_BWD) j = m - 1 - j; }
+        return eu_pulse(j, pulses, rot, m);
+    }
     static bool eu_pulse(int k, int pulses, int rot, int n) {
         if (pulses <= 0 || n <= 0) return false;
         if (pulses > n) pulses = n;
@@ -731,12 +753,14 @@ struct Seq {
     void euclid_apply(int track) {
         Track &tr = t[track];
         if (!tr.eu_on) return;
-        int n = eff_len(tr);
-        int m = tr.eu_len ? (tr.eu_len > NSTEPS ? (int)NSTEPS : (int)tr.eu_len) : n;   /* the rhythm's own length: it repeats over the track */
+        const int n = eff_len(tr), m1 = eu_m1(tr), m2 = eu_m2(tr);
+        const bool ga = gen_a(tr), gb = gen_b(tr);
         for (int k = 0; k < n; k++) {
-            int j = (((k % m) - tr.eu_tro) % m + m) % m;
-            bool a = eu_pulse(j, tr.eu_pl1, tr.eu_ro1, m), b = eu_pulse(j, tr.eu_pl2, tr.eu_ro2, m), r;
-            switch (tr.eu_op) {
+            const bool a = ga && eu_gen(k, tr.eu_pl1, tr.eu_ro1, m1, tr.eu_dir1, tr.eu_tro);
+            const bool b = gb && eu_gen(k, tr.eu_pl2, tr.eu_ro2, m2, tr.eu_dir2, tr.eu_tro);
+            bool r;
+            if (!(ga && gb)) r = a || b;   /* one generator: its rhythm */
+            else switch (tr.eu_op) {
             case E_AND: r = a && b; break;
             case E_XOR: r = a != b; break;
             case E_SUB: r = a && !b; break;
@@ -745,31 +769,44 @@ struct Seq {
             tr.st[k].on = r ? 1 : 0;
         }
     }
-    void euclid_enable(int track) {      /* remember the trigs as they are, then let the generator write them */
+    /* switch generator g (0 A, 1 B) on: the first one on remembers the trigs as they are, then the generators write them */
+    void euclid_enable(int track, int g = 0) {
         Track &tr = t[track];
-        if (tr.eu_on) return;
-        tr.eu_backup = 0;
-        for (int k = 0; k < NSTEPS; k++) if (tr.st[k].on) tr.eu_backup |= (uint64_t)1 << k;
-        tr.eu_on = 1;
+        if (!tr.eu_on) {
+            tr.eu_backup = 0;
+            for (int k = 0; k < NSTEPS; k++) if (tr.st[k].on) tr.eu_backup |= (uint64_t)1 << k;
+            tr.eu_on = 1; tr.eu_a = 0; tr.eu_b = 0;
+        } else if (!tr.eu_a && !tr.eu_b) tr.eu_a = 1;   /* an old project: A was on */
+        if (g) { tr.eu_b = 1; if (!tr.eu_len2) tr.eu_len2 = (uint8_t)eu_m1(tr); } else tr.eu_a = 1;
         euclid_apply(track);
+    }
+    /* switch generator g off; with neither left on, the trigs from before come back */
+    void euclid_disable(int track, int g = 0) {
+        Track &tr = t[track];
+        if (!tr.eu_on) return;
+        if (!tr.eu_a && !tr.eu_b) tr.eu_a = 1;
+        if (g) tr.eu_b = 0; else tr.eu_a = 0;
+        if (!tr.eu_a && !tr.eu_b) euclid_discard(track); else euclid_apply(track);
     }
     void euclid_discard(int track) {     /* back to the trigs from before Enable */
         Track &tr = t[track];
         if (!tr.eu_on) return;
         for (int k = 0; k < NSTEPS; k++) tr.st[k].on = (tr.eu_backup >> k) & 1;
-        tr.eu_on = 0;
+        tr.eu_on = 0; tr.eu_a = 0; tr.eu_b = 0;
     }
-    void euclid_random(int track) {      /* a random rhythm: length 3..64, 1..length-1 pulses (always fewer than the length), any rotation; enables the generator */
+    /* a random rhythm for generator g: length 3..64, 1..length-1 pulses (always fewer than the length), any rotation;
+     * switches that generator on. The other one is left as it is. */
+    void euclid_random(int track, int g = 0) {
         Track &tr = t[track];
         int len = (gen_rnd() & 1u) ? 3 + (int)(gen_rnd() % 14u)                       /* half of the time 3..16 */
                                    : 17 + (int)(gen_rnd() % (uint32_t)(NSTEPS - 16));   /* the other half 17..64 */
-        tr.eu_len = (uint8_t)len;
-        tr.eu_pl1 = (uint8_t)(1 + (int)(gen_rnd() % (uint32_t)(len - 1)));
-        tr.eu_ro1 = (uint8_t)(gen_rnd() % (uint32_t)len);
-        tr.eu_pl2 = 0; tr.eu_ro2 = 0; tr.eu_tro = 0; tr.eu_op = E_OR;
-        if (tr.eu_on) euclid_apply(track); else euclid_enable(track);
+        const uint8_t pl = (uint8_t)(1 + (int)(gen_rnd() % (uint32_t)(len - 1))), ro = (uint8_t)(gen_rnd() % (uint32_t)len);
+        if (g) { tr.eu_len2 = (uint8_t)len; tr.eu_pl2 = pl; tr.eu_ro2 = ro; }
+        else { tr.eu_len = (uint8_t)len; tr.eu_pl1 = pl; tr.eu_ro1 = ro; }
+        tr.eu_tro = 0;
+        euclid_enable(track, g);
     }
-    void euclid_commit(int track) { t[track].len = (uint8_t)eff_len(t[track]); t[track].eu_on = 0; }   /* a longer rhythm keeps its length as the track's */   /* keep what the generator wrote; it stops following the settings */
+    void euclid_commit(int track) { t[track].len = (uint8_t)eff_len(t[track]); t[track].eu_on = 0; t[track].eu_a = 0; t[track].eu_b = 0; }   /* a longer rhythm keeps its length as the track's */   /* keep what the generator wrote; it stops following the settings */
 
     void clear_track(int track) {
         Track &tr = t[track];

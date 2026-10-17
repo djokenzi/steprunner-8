@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶). v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -263,6 +263,19 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   CLR LOCKS lit CLR COND / CLR TIMING / CLR RATCHETS on all 64 steps (`Seq::clear_extra`). In PATTERN EDIT the same three buttons
   (orange) act on all 8 tracks, CLR ... too. In STEP EDIT (teal) both act on the selected steps only, trig or not (the
   mask argument). `lbtn` got four options, VIOLET2, CLR2, ORANGE2 and TEAL2, so the page-1 buttons hide and CLR STEPS / CLR LOCKS (`lpanel:RANDOM`) stay. Undo covers it (Snap).
+- EUCLIDIAN has two generators again, A and B, each with ENABLE, RANDOM, PULSE, ROTATE, LENGTH and its own direction;
+  XOR / OR / AND / SUB combine them when both are on (`Track::eu_op`, buttons `eu_opxor .. eu_opsub`). New `Track`
+  fields `eu_a`, `eu_b` (which is on; `eu_on` = at least one), `eu_len2` (0 = A's length), `eu_dir1`, `eu_dir2`
+  (`Seq::EU_FWD / EU_BWD / EU_BOTH`, back and forth = 2m - 2 steps). `eff_len` takes the longer of the running rhythms.
+  `eu_tro` has no knob (kept for old projects). New params (appended): `eu_ena2`, `eu_rnd2`, `eu_len2`, `eu_fwd2`,
+  `eu_bwd2`, `eu_both2`, `eu_dirv2` (read-only), the four boolean buttons, `eu_opv` (read-only). Renamed (key and slot
+  unchanged): Pulse A, Rotate A, Length A, Pulse B, Rotate B.
+  - Behaviour change: `eu_fwd / eu_bwd / eu_both` now set A's rhythm direction; until v1.1.1 they set the track's
+    direction (TRACK EDIT has its own FWD / BWD / BOTH).
+  - Saved: the `e` line gets five more numbers (A on, B on, B's length, A's and B's direction); older versions stop
+    reading before them. A project without them loads with A = eu_on and B on only if it had pulses on B or AND.
+  - Layout: one row per generator (a knob takes 130 px, three a row): ENABLE / RANDOM 80x26 and three 26x26 arrows on
+    the left, the knobs at r=26; boolean row and COMMIT at the bottom.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

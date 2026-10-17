@@ -73,11 +73,11 @@ num("trk_ccbase", "CC Base", 0, 123, 20)
 opt("euclid_edit", "Euclidian", onoff)
 opt("lpanel", "Left Panel", ["RANDOM", "EUCLID", "HIDDEN", "TIMING", "LOGO"])          # read-only, for the skin: what the left-hand section shows
 opt("eu_enable", "Euclid Enable", onoff)                    # ON while the selected track's trigs come from the generator
-num("eu_pl1", "Pulse", 0, 64, 4)
-num("eu_ro1", "Rotate", 0, 63, 0)
+num("eu_pl1", "Pulse A", 0, 64, 4)   # "Pulse" until v1.1.1
+num("eu_ro1", "Rotate A", 0, 63, 0)
 num("eu_tro", "TRO", 0, 63, 0)
-num("eu_pl2", "PL2", 0, 64, 0)
-num("eu_ro2", "RO2", 0, 63, 0)
+num("eu_pl2", "Pulse B", 0, 64, 0)   # v1.2.0: generator B (no knob, "PL2" / "RO2", v1.29 .. v1.1.1)
+num("eu_ro2", "Rotate B", 0, 63, 0)
 num("eu_bool", "BOOL", 0, 3, 0)                             # shown as OR / AND / XOR / SUB
 trig("eu_discard", "Euclid Discard")
 trig("eu_commit", "Euclid Commit")
@@ -114,7 +114,7 @@ for i in range(1, 9): opt("mpad%d" % i, "Mute Pad %d" % i, ["IDLE", "HIT", "MUTE
 num("pf_cc117", "CC 117", 0, 127, 0)   # retired v1.72.0 (no knob, nothing sent)
 trig("pcopy", "Copy Page"); trig("ppaste", "Paste Page")
 opt("shift", "Shift", onoff)
-num("eu_len", "Length", 1, 64, 16)
+num("eu_len", "Length A", 1, 64, 16)   # "Length" until v1.1.1
 trig("eu_rnd", "Euclid Random")
 
 for i in range(1, 5): opt("pgst%d" % i, "Page %d State" % i, ["IDLE", "SHOWN", "PLAYING", "SHOWN PLAYING", "HIDDEN"])   # read-only, for the skin
@@ -180,6 +180,12 @@ opt("pst_pat", "States Pattern", ["P%d" % k for k in range(1, 9)])   # read-only
 opt("pf_stopcc", "Stop CC", onoff)   # v1.2.0 PERFORM pad STOP CC: lit = no CC goes out (replaces the HUMANIZE pad; pf_hum stays)
 trig("nav_left", "Left"); trig("nav_right", "Right")   # v1.2.0: the arrow buttons left of EUCLIDIAN: the left section's page 1 / 2 (PATTERN, TRACK, STEP EDIT)
 trig("rnd_cond", "Random Conditions")   # v1.2.0: RND COND, page 2 of the left section
+# v1.2.0: EUCLIDIAN generator B (PULSE B / ROTATE B are eu_pl2 / eu_ro2 above) and the boolean buttons
+opt("eu_ena2", "Euclid Enable B", onoff); trig("eu_rnd2", "Euclid Random B"); num("eu_len2", "Length B", 1, 64, 16)
+opt("eu_fwd2", "Euclid B Forward", onoff); opt("eu_bwd2", "Euclid B Backward", onoff); opt("eu_both2", "Euclid B Back and Forth", onoff)
+opt("eu_dirv2", "Euclid B Direction Look", ["HIDDEN", "OFF", "ON"])   # read-only, as eu_dirv
+opt("eu_opxor", "Euclid XOR", onoff); opt("eu_opor", "Euclid OR", onoff); opt("eu_opand", "Euclid AND", onoff); opt("eu_opsub", "Euclid SUB", onoff)   # lit: the one in use (eu_bool)
+opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF (dim) unless A and B are both on
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

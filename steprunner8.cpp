@@ -166,6 +166,11 @@ enum {
     P_PF_STOPCC,                                 /* v1.2.0: PERFORM pad STOP CC: lit = no CC goes out (not saved) */
     P_NAV_LEFT, P_NAV_RIGHT,                     /* v1.2.0: the arrow buttons left of EUCLIDIAN: TRACK EDIT's left section, page 1 / 2 */
     P_RND_COND,                                  /* v1.2.0: RND COND (CLR COND while CLR LOCKS is lit), page 2 of TRACK EDIT's left section */
+    P_EU_ENA2, P_EU_RND2, P_EU_LEN2,             /* v1.2.0: EUCLIDIAN generator B: ENABLE B, RANDOM B, LENGTH B (PULSE B / ROTATE B: P_EU_PL2 / P_EU_RO2) */
+    P_EU_FWD2, P_EU_BWD2, P_EU_BOTH2,            /* v1.2.0: B's direction; P_EU_FWD.. are A's since v1.2.0 (the track's before) */
+    P_EU_DIRV2,                                  /* v1.2.0: read-only, how B's look: HIDDEN / OFF (dim) / ON */
+    P_EU_OP0, P_EU_OP_END = P_EU_OP0 + 4,        /* v1.2.0: XOR, OR, AND, SUB: how A and B combine (lit = Track::eu_op) */
+    P_EU_OPV = P_EU_OP_END,                      /* v1.2.0: read-only, how they look: HIDDEN / OFF (dim, not both on) / ON */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC, NPF = 9 };
@@ -182,7 +187,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"},
 };
 
 static FILE *g_log;
@@ -822,6 +827,7 @@ static bool cc_in_use(Plugin *w, int j) {
     return false;
 }
 /* v1.2.0: which mode's left section has two pages: 0 PATTERN EDIT, 1 TRACK EDIT, 2 STEP EDIT, -1 any other mode */
+static const uint8_t EU_OPS[4] = {Seq::E_XOR, Seq::E_OR, Seq::E_AND, Seq::E_SUB};   /* v1.2.0: the boolean buttons, left to right */
 static int lmode(const Plugin *w) {
     if (w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit) return -1;
     return w->step_edit ? 2 : w->track_edit ? 1 : 0;
@@ -870,6 +876,12 @@ static int value_of(Plugin *w, int i) {
     if (i == P_PF_CC117) return 0;   /* retired v1.72.0: no knob, nothing sent */
     if (i == P_SHIFT) return w->shift ? 1 : 0;
     if (i == P_EU_LEN) return tr.eu_len ? tr.eu_len : tr.len;
+    if (i == P_EU_LEN2) return Seq::eu_m2(tr);   /* v1.2.0: B's own length, or A's */
+    if (i == P_EU_ENA2) return Seq::gen_b(tr) ? 1 : 0;
+    if (i == P_EU_FWD2 || i == P_EU_BWD2 || i == P_EU_BOTH2) return Seq::gen_b(tr) && tr.eu_dir2 == i - P_EU_FWD2 ? 1 : 0;
+    if (i == P_EU_DIRV2) return !w->euclid_edit ? 0 : Seq::gen_b(tr) ? 2 : 1;
+    if (i >= P_EU_OP0 && i < P_EU_OP_END) return tr.eu_op == EU_OPS[i - P_EU_OP0] ? 1 : 0;
+    if (i == P_EU_OPV) return !w->euclid_edit ? 0 : Seq::gen_a(tr) && Seq::gen_b(tr) ? 2 : 1;
     if (i >= P_MPAD0 && i < P_MPAD_END) return w->seq.t[i - P_MPAD0].mute ? 2 : 0;   /* retired with the blink (v1.28.0): no widget uses it */
     if (i >= P_SHUF0 && i < P_SHUF0 + NTRACKS) return w->seq.t[i - P_SHUF0].shuf ? 1 : 0;
     if (i == P_GLOB_CH) return w->seq.t[0].ch + 1;
@@ -911,8 +923,8 @@ static int value_of(Plugin *w, int i) {
     }
     case P_TRK_BOTH: return (tr.dir & DIR_PP) == DIR_PP ? 1 : 0;
     case P_EU_FWD: case P_EU_BWD: case P_EU_BOTH:   /* lit only while the generator is on */
-        return tr.eu_on && (tr.dir & DIR_PP) == (i == P_EU_FWD ? DIR_FWD : i == P_EU_BWD ? DIR_BWD : DIR_PP) ? 1 : 0;
-    case P_EU_DIRV: return !w->euclid_edit ? 0 : tr.eu_on ? 2 : 1;
+        return Seq::gen_a(tr) && tr.eu_dir1 == i - P_EU_FWD ? 1 : 0;   /* v1.2.0: A's direction (the track's before) */
+    case P_EU_DIRV: return !w->euclid_edit ? 0 : Seq::gen_a(tr) ? 2 : 1;
     case P_RTRK: return w->random_edit ? 1 + w->track : 0;   /* v1.85: RANDOM SETTINGS names the track */
     case P_TTL: return w->random_edit ? 10 + w->track : !w->global_edit ? 0 : w->cc_edit ? 2 + w->track : w->src_mode ? 0 : 1;   /* v2.0 */
     case P_SLOTV: return w->step_edit ? 1 : (w->track_edit || w->euclid_edit) ? 0 : 2;   /* v1.84: TIMING sits in the EUCLID place in STEP EDIT (and TIMING) only; v1.0.0: EUCLIDIAN on TRACK EDIT only (and while it is on), else nothing */
@@ -925,7 +937,7 @@ static int value_of(Plugin *w, int i) {
     case P_BIGMSG: return w->big;
     case P_BIGDONE: return w->big > BIG_DONE0 ? 1 : 0;
     case P_LBTN: return w->euclid_edit || w->timing_edit || w->global_edit || w->random_edit ? 4 : lpage2(w) ? (w->clr_mode ? 6 : lmode(w) == 2 ? 8 : lmode(w) == 1 ? 5 : 7) : w->clr_mode ? 3 : w->step_edit ? 1 : w->track_edit ? 2 : 0;   /* ORANGE / TEAL / VIOLET / CLR (red) / NONE / VIOLET2 / CLR2 / ORANGE2 / TEAL2 (v1.2.0: page 2 of TRACK / PATTERN / STEP EDIT) */
-    case P_EU_ENABLE: return tr.eu_on ? 1 : 0;
+    case P_EU_ENABLE: return Seq::gen_a(tr) ? 1 : 0;   /* v1.2.0: generator A */
     case P_EU_PL1: return tr.eu_pl1;
     case P_EU_RO1: return tr.eu_ro1;
     case P_EU_TRO: return tr.eu_tro;
@@ -1062,6 +1074,9 @@ static void set_value_raw(Plugin *w, int i, int v) {
     if (i >= P_CCN0 && i < P_CCN0 + NCC) { if (w->cc_edit) w->ccdraft[i - P_CCN0] = clampi(v, 0, 127); return; }
     if (i == P_SHIFT) { w->shift = v != 0 && w->step_edit; return; }
     if (i == P_EU_LEN) { tr.eu_len = (uint8_t)clampi(v, 1, NSTEPS); w->seq.euclid_apply(w->track); return; }
+    if (i == P_EU_LEN2) { tr.eu_len2 = (uint8_t)clampi(v, 1, NSTEPS); w->seq.euclid_apply(w->track); return; }   /* v1.2.0 */
+    if (i == P_EU_FWD2 || i == P_EU_BWD2 || i == P_EU_BOTH2) { if (v && Seq::gen_b(tr)) { tr.eu_dir2 = (uint8_t)(i - P_EU_FWD2); w->seq.euclid_apply(w->track); } return; }
+    if (i >= P_EU_OP0 && i < P_EU_OP_END) { if (v) { tr.eu_op = EU_OPS[i - P_EU_OP0]; w->seq.euclid_apply(w->track); } return; }
     if (i == P_PF_CTRL) { if (v != 0) w->seq.perform_begin(); else w->seq.perform_discard();   /* off without COMMIT: everything back as it was */ for (int k = 0; k < NPF; k++) w->raw[P_PF0 + k] = -1.0f; return; }   /* on: offsets start at 0 over the current state; off by hand: what was set stays (as COMMIT) */
     switch (i) {
     /* a selection of several steps does not carry over to another track or page */
@@ -1086,8 +1101,8 @@ static void set_value_raw(Plugin *w, int i, int v) {
     case P_PAT_FWD: case P_PAT_BWD: case P_PAT_BOTH:   /* every track that way; a tap on the lit one changes nothing */
         if (v) { const uint8_t d = i == P_PAT_FWD ? DIR_FWD : i == P_PAT_BWD ? DIR_BWD : DIR_PP; for (int k = 0; k < NTRACKS; k++) w->seq.t[k].dir = d; }
         break;
-    case P_EU_FWD: case P_EU_BWD: case P_EU_BOTH:   /* the EUCLIDIAN section's: nothing while ENABLE is off (v1.83) */
-        if (v && tr.eu_on) tr.dir = i == P_EU_FWD ? DIR_FWD : i == P_EU_BWD ? DIR_BWD : DIR_PP;
+    case P_EU_FWD: case P_EU_BWD: case P_EU_BOTH:   /* generator A's direction (v1.2.0; the track's v1.83 .. v1.1.1): nothing while A is off */
+        if (v && Seq::gen_a(tr)) { tr.eu_dir1 = (uint8_t)(i - P_EU_FWD); w->seq.euclid_apply(w->track); }
         break;
     case P_TRK_FWD: case P_TRK_BWD: case P_TRK_BOTH:   /* FWD, BWD or BOTH (v1.82: one of three; a tap on the lit one changes nothing) */
         if (v) tr.dir = i == P_TRK_FWD ? DIR_FWD : i == P_TRK_BWD ? DIR_BWD : DIR_PP;
@@ -1631,7 +1646,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
     const param_t *p = &PARAMS[i];
     { std::lock_guard<std::mutex> lk(w->lock); if (popup_set(w->open, i, n)) { w->close_frames[i] = 0; return; } }   /* v2.12: the audio thread closes lists under the lock too */
     if (!is_own(i) || i == P_RUN) return;
-    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_PST_PAT || i == P_EU_DIRV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
+    if ((i >= P_CELL0 && i < P_CELL0 + 16) || i == P_MULTI || i == P_PANEL || i == P_PTITLE || i == P_SCR || i == P_LBTN || i == P_BKSTEP || i == P_PST_ACT || i == P_PST_PAT || i == P_EU_DIRV || i == P_EU_DIRV2 || i == P_EU_OPV || i == P_SLOTV || i == P_RTRK || i == P_TTL || (i >= P_PATV0 && i < P_PATV_END) || i == P_BIGMSG || i == P_BIGDONE || i == P_BKNAME || (i >= P_SRCHL0 && i < P_SRCHL_END) || i == P_LPANEL || i == P_MSTATE || i == P_MSG || (i >= P_SRCPROJ && i < P_SRCSEL0) || (i >= P_PGST0 && i < P_PGST_END) || (i >= P_CCUSE0 && i < P_CCUSE_END) || (i >= P_MPAD0 && i < P_MPAD_END)) { std::lock_guard<std::mutex> lk(w->lock); w->told[i] = clamp01(n); return; }   /* read-only: the next block puts the host's widget back */
     if (i >= P_STEP0 && i < P_STEP0 + 16) {
         /* A tap on a TRIGS cell. The host's toggle flips its own value and sends it, so a value that differs from the real
          * one is a tap; the same value is an echo and changes nothing. STEP EDIT off: the tap flips the trig (and selects the
@@ -1654,13 +1669,17 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
         else { set_value(w, i, on ? 1 : 0); w->told[i] = shown_norm(w, i); }
         return;
     }
-    if (i == P_EU_ENABLE) {   /* on: the generator takes over the selected track's trigs; off: the trigs from before come back */
+    if (i == P_EU_ENABLE || i == P_EU_ENA2) {   /* ENABLE A / B (v1.2.0): on, that generator writes the selected track's trigs (with
+                                                  * the other one, if on); off with neither left on: the trigs from before come back */
         std::lock_guard<std::mutex> lk(w->lock);
-        if (n > 0.5f) {   /* one generator only: what the removed knobs (PL2, RO2, TRO, BOOL) may have left behind is cleared */
-            Track &et = w->seq.t[w->track];
-            if (!et.eu_on) { et.eu_pl2 = 0; et.eu_ro2 = 0; et.eu_tro = 0; et.eu_op = 0; if (!et.eu_len) et.eu_len = et.len; }
-            w->seq.euclid_enable(w->track);
-        } else w->seq.euclid_discard(w->track);
+        const int g = i == P_EU_ENA2 ? 1 : 0;
+        Track &et = w->seq.t[w->track];
+        if (n > 0.5f) {
+            if (!et.eu_len) et.eu_len = et.len;
+            if (g && !et.eu_on) et.eu_tro = 0;   /* no knob since v1.29: what an old project left behind goes */
+            if (g && !Seq::gen_b(et) && !et.eu_pl2) et.eu_pl2 = 4;   /* B with no pulses would add nothing: start where A starts */
+            w->seq.euclid_enable(w->track, g);
+        } else w->seq.euclid_disable(w->track, g);
         w->raw[i] = -1.0f;
         w->told[i] = clamp01(n);
         return;
@@ -1879,9 +1898,9 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                     if (w->clr_mode) w->seq.clear_extra(t, what, mask); else w->seq.randomize_extra(t, what, mask);
                 }
             }
-            if (i == P_EU_RND) {
+            if (i == P_EU_RND || i == P_EU_RND2) {   /* RANDOM A / RANDOM B (v1.2.0): that generator only */
                 w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
-                w->seq.euclid_random(w->track);
+                w->seq.euclid_random(w->track, i == P_EU_RND2 ? 1 : 0);
             }
             if (i == P_UNDO) { hist_step(w, false); flush(w); }
             if (i == P_REDO) { hist_step(w, true); flush(w); }
@@ -2085,7 +2104,8 @@ static void write_tracks(const Track *T, std::string &s, const std::string &pre)
             for (int j = 0; j < STEP_BYTES; j++) { s += hex[raw[j] >> 4]; s += hex[raw[j] & 15]; }
         }
         s += '\n';
-        std::snprintf(b, sizeof b, "e %d %d %d %d %d %d %d %d %llx %d\n", i, tr.eu_on, tr.eu_pl1, tr.eu_pl2, tr.eu_ro1, tr.eu_ro2, tr.eu_tro, tr.eu_op, (unsigned long long)tr.eu_backup, tr.eu_len);
+        std::snprintf(b, sizeof b, "e %d %d %d %d %d %d %d %d %llx %d %d %d %d %d %d\n", i, tr.eu_on, tr.eu_pl1, tr.eu_pl2, tr.eu_ro1, tr.eu_ro2, tr.eu_tro, tr.eu_op, (unsigned long long)tr.eu_backup, tr.eu_len,
+                      tr.eu_a, tr.eu_b, tr.eu_len2, tr.eu_dir1, tr.eu_dir2);   /* v1.2.0: A on, B on, B's length, A's and B's direction (older versions stop reading before them) */
         s += pre; s += b;
         if (tr.dir != DIR_FWD) { std::snprintf(b, sizeof b, "D %d %d\n", i, tr.dir); s += pre; s += b; }   /* direction (v1.76.0), when not forwards */
         if (tr.panb) { std::snprintf(b, sizeof b, "A %d %d\n", i, tr.panb); s += pre; s += b; }   /* the pad's own pan + 1 (v1.93.0), when known */
@@ -2111,8 +2131,9 @@ static bool track_line(Seq &q, const std::string &line, int sb) {
         if (line.size() > 2 && line[0] == 'e') {
             unsigned long long bk = 0;
             int el = 0;   /* absent before v1.31.0: the rhythm is as long as the track */
-            if (std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d %llx %d", &a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6], &a[7], &bk, &el) >= 9
-                && a[0] >= 0 && a[0] < NTRACKS) {
+            int x[5] = {0, 0, 0, 0, 0};   /* v1.2.0: A on, B on, B's length, A's and B's direction */
+            const int got = std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d %llx %d %d %d %d %d %d", &a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6], &a[7], &bk, &el, &x[0], &x[1], &x[2], &x[3], &x[4]);
+            if (got >= 9 && a[0] >= 0 && a[0] < NTRACKS) {
                 Track &tr = q.t[a[0]];
                 tr.eu_on = a[1] ? 1 : 0;
                 tr.eu_pl1 = (uint8_t)clampi(a[2], 0, NSTEPS); tr.eu_pl2 = (uint8_t)clampi(a[3], 0, NSTEPS);
@@ -2120,6 +2141,13 @@ static bool track_line(Seq &q, const std::string &line, int sb) {
                 tr.eu_tro = (uint8_t)clampi(a[6], 0, NSTEPS - 1); tr.eu_op = (uint8_t)clampi(a[7], 0, Seq::E_NOPS - 1);
                 tr.eu_backup = (uint64_t)bk;
                 tr.eu_len = (uint8_t)clampi(el, 0, NSTEPS);
+                if (got >= 15) {
+                    tr.eu_a = x[0] ? 1 : 0; tr.eu_b = x[1] ? 1 : 0; tr.eu_len2 = (uint8_t)clampi(x[2], 0, NSTEPS);
+                    tr.eu_dir1 = (uint8_t)clampi(x[3], 0, 2); tr.eu_dir2 = (uint8_t)clampi(x[4], 0, 2);
+                } else {   /* before v1.2.0 both always played, on A's length; B only mattered with pulses or AND */
+                    tr.eu_a = tr.eu_on; tr.eu_b = tr.eu_on && (tr.eu_pl2 || tr.eu_op == Seq::E_AND);
+                    tr.eu_len2 = 0; tr.eu_dir1 = tr.eu_dir2 = 0;
+                }
             }
         } else if (line.size() > 2 && line[0] == 'B') {   /* base values of the track's CCs (value + 1, 0 = off) */
             if (std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d", &a[0], &a[1], &a[2], &a[3], &a[4], &a[5]) == 6 && a[0] >= 0 && a[0] < NTRACKS)
@@ -2322,7 +2350,7 @@ static intptr_t dispatcher(AEffect *e, int32_t op, int32_t idx, intptr_t v, void
     case effGetVendorString: copy_str(p, PLUG_VENDOR, 32); return 1;
     case effGetVendorVersion: return PLUG_VERSION;
     case effGetVstVersion: return 2400;
-    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_PST_PAT && idx != P_EU_DIRV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
+    case effCanBeAutomated: return idx >= 0 && idx < NPARAMS && idx != P_RUN && idx != P_MULTI && idx != P_PANEL && idx != P_PTITLE && idx != P_SCR && idx != P_LBTN && idx != P_BKSTEP && idx != P_PST_ACT && idx != P_PST_PAT && idx != P_EU_DIRV && idx != P_EU_DIRV2 && idx != P_EU_OPV && idx != P_SLOTV && idx != P_RTRK && idx != P_TTL && !(idx >= P_PATV0 && idx < P_PATV_END) && idx != P_BIGMSG && idx != P_BIGDONE && idx != P_BKNAME && !(idx >= P_SRCHL0 && idx < P_SRCHL_END) && idx != P_LPANEL && idx != P_MSTATE && idx != P_MSG && !(idx >= P_SRCPROJ && idx < P_SRCSEL0) && !(idx >= P_PGST0 && idx < P_PGST_END) && !(idx >= P_CCUSE0 && idx < P_CCUSE_END) && !(idx >= P_MPAD0 && idx < P_MPAD_END) && !(idx >= P_CELL0 && idx < P_CELL0 + 16);
     case effGetParamName:
         /* Names are static. On the device (v1.11.0) names that followed the track were shown as they were when the plugin
          * loaded and never refreshed, audioMasterUpdateDisplay or not; so whatever changes goes into the VALUE text

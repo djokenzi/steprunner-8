@@ -329,20 +329,31 @@ Tap **TIMING** again to go back to STEP EDIT.
 
 ![EUCLIDIAN](manual/euclidian.png)
 
-Tap **EUCLIDIAN** in TRACK EDIT. It generates an evenly spread rhythm on the selected track.
+Tap **EUCLIDIAN** in TRACK EDIT. It generates evenly spread rhythms on the selected track, with two generators:
+**A** (top row) and **B** (bottom row). Each has the same controls:
 
 | Control | What it does |
 |---|---|
-| **ENABLE** | On: the generator writes the track's trigs (cells turn green). Off: your previous trigs come back. |
-| **Pulse** | Number of hits (0–64) |
-| **Rotate** | Shifts the rhythm by steps |
-| **Length** | Length of the rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
-| **RANDOM** | Random length, pulses and rotation; switches ENABLE on |
-| **COMMIT** | Keeps the generated trigs as normal trigs and leaves EUCLIDIAN |
-| **FWD / BWD / BOTH** | Direction of the track (while ENABLE is on) |
+| **ENABLE A / B** | On: that generator writes the track's trigs (cells turn green). With both off, your previous trigs come back. |
+| **Pulse A / B** | Number of hits (0–64) |
+| **Rotate A / B** | Shifts that rhythm by steps |
+| **Length A / B** | Length of that rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
+| **RANDOM A / B** | Random length, pulses and rotation for that generator; switches it on. The other generator is left as it is. |
+| **▶ / ◀ / ◀▶** | How that generator runs through its rhythm: forwards, backwards, or back and forth (while it is on). The track itself keeps the direction set in TRACK EDIT. |
+
+When both generators are on, the bottom row decides what happens to the steps (dim while only one is on):
+
+| Button | A step gets a trig when… |
+|---|---|
+| **XOR** | exactly one of the two has a hit there |
+| **OR** | A or B (or both) has a hit there |
+| **AND** | both have a hit there |
+| **SUB** | A has a hit there and B does not |
+
+**COMMIT** keeps the generated trigs as normal trigs and leaves EUCLIDIAN.
 
 Step conditions and locks stay as they are; only the trigs are generated. If you leave EUCLIDIAN without COMMIT, the
-generator keeps running on that track (green cells) and is saved with the project. Tap EUCLIDIAN or TRACK EDIT to leave.
+generators keep running on that track (green cells) and is saved with the project. Tap EUCLIDIAN or TRACK EDIT to leave.
 
 ---
 

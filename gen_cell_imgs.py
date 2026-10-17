@@ -88,7 +88,7 @@ else:
 BTN_W, BTN_H = 132, 39
 BUTTONS = [("rnd_trig", "RND STEPS"), ("rnd_vel", "RND VEL"), ("rnd_len", "RND LEN"), ("rnd_pan", "RND PAN"), ("rnd_cc1", "RND CC 1"), ("rnd_cc2", "RND CC 2"),
            ("rnd_cc3", "RND CC 3"), ("rnd_cc4", "RND CC 4"), ("rnd_cc5", "RND CC 5"), ("clr_step", "CLR LOCKS"), ("clr_trk", "CLR STEPS")]
-def btn(text, col, pressed, ink=(253, 243, 234), BTN_W=BTN_W, BTN_H=BTN_H):
+def btn(text, col, pressed, ink=(253, 243, 234), BTN_W=BTN_W, BTN_H=BTN_H, size=15):   # size: v1.2.0
     if pressed: col = tuple(min(255, int(c * 1.3) + 20) for c in col)
     im = Image.new("RGBA", (BTN_W * SS, BTN_H * SS), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -101,8 +101,8 @@ def btn(text, col, pressed, ink=(253, 243, 234), BTN_W=BTN_W, BTN_H=BTN_H):
     mask = im.split()[3]
     im = Image.composite(Image.alpha_composite(im, sheen), im, mask)
     d = ImageDraw.Draw(im)
-    font = ImageFont.truetype(FONT.replace("SemiBold", "Bold"), 15 * SS)
-    track = 0.08 * 15 * SS
+    font = ImageFont.truetype(FONT.replace("SemiBold", "Bold"), size * SS)
+    track = 0.08 * size * SS
     wid = sum(d.textlength(ch, font=font) for ch in text) + track * (len(text) - 1)
     x = (BTN_W * SS - wid) / 2
     for ch in text:
@@ -173,6 +173,27 @@ if os.path.exists(FONT):
         sh = seg(on, "SHIFT", 120); ImageDraw.Draw(sh).rectangle([0, 0, sh.size[0] - 1, sh.size[1] - 1], outline=(150, 150, 150, 255), width=2)
         sh.save("images/shift_%s.png" % ("on" if on else "off"))
     btn("RANDOM", GREY, False).save("images/eu_rnd.png"); btn("RANDOM", GREY, True).save("images/eu_rnd_on.png")
+    # v1.2.0: EUCLIDIAN with two generators, one row each: ENABLE / RANDOM 80x26 (13 px text), the direction as three
+    # 26x26 arrows (FWD, BWD, BOTH), boolean 74x32, COMMIT 118x32; _d = dim (that generator off, or not both on for the
+    # boolean ones), _dl = dim but the one in use
+    DIM, DIM_INK = (52, 52, 52), (110, 110, 110)
+    for g in ("A", "B"):
+        btn("ENABLE " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_on.png" % g.lower())
+        btn("RANDOM " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s_on.png" % g.lower())
+    btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")
+    def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small
+        im = btn("", col, False, BTN_W=26, BTN_H=26).convert("RGBA"); d = ImageDraw.Draw(im)
+        tri = lambda cx, sgn, r: d.polygon([(cx - sgn * r, 13 - r), (cx - sgn * r, 13 + r), (cx + sgn * r, 13)], fill=ink + (255,))
+        if kind == "fwd": tri(13.5, 1, 6)
+        elif kind == "bwd": tri(12.5, -1, 6)
+        else: tri(8, -1, 4.5); tri(18, 1, 4.5)
+        return im
+    for k in ("fwd", "bwd", "both"):
+        arrows(GREY, (253, 243, 234), k).save("images/eu2_%s.png" % k); arrows(EUC, (253, 243, 234), k).save("images/eu2_%s_on.png" % k)
+        arrows(DIM, DIM_INK, k).save("images/eu2_%s_d.png" % k)
+    for k, nm in (("xor", "XOR"), ("or", "OR"), ("and", "AND"), ("sub", "SUB")):
+        btn(nm, GREY, False, BTN_W=74, BTN_H=32).save("images/eu2_%s.png" % k); btn(nm, EUC, False, BTN_W=74, BTN_H=32).save("images/eu2_%s_on.png" % k)
+        btn(nm, DIM, False, ink=DIM_INK, BTN_W=74, BTN_H=32).save("images/eu2_%s_d.png" % k); btn(nm, (40, 70, 40), False, ink=(140, 170, 140), BTN_W=74, BTN_H=32).save("images/eu2_%s_dl.png" % k)
     for i in range(1, 9):   # STATE 1..8 (v1.68.0: eight, 140 wide): grey while empty, orange while they hold a state
         btn("STATE %d" % i, GREY, False, BTN_W=140, BTN_H=60).save("images/pst%d_off.png" % i); btn("STATE %d" % i, TRIG, False, BTN_W=140, BTN_H=60).save("images/pst%d_on.png" % i)   # v1.98.0: 140x60
     btn("CLEAR STATE", GREY, False, BTN_W=140, BTN_H=48).save("images/pclear_off.png"); btn("CLEAR STATE", (200, 48, 48), False, BTN_W=140, BTN_H=48).save("images/pclear_on.png")   # v2.6.0: CLEAR STATE   # v1.98.0: 140x48

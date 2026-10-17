@@ -1481,7 +1481,7 @@
   },
   {
    "key": "eu_pl1",
-   "name": "Pulse",
+   "name": "Pulse A",
    "min": 0,
    "max": 64,
    "default": 4,
@@ -1489,7 +1489,7 @@
   },
   {
    "key": "eu_ro1",
-   "name": "Rotate",
+   "name": "Rotate A",
    "min": 0,
    "max": 63,
    "default": 0,
@@ -1505,7 +1505,7 @@
   },
   {
    "key": "eu_pl2",
-   "name": "PL2",
+   "name": "Pulse B",
    "min": 0,
    "max": 64,
    "default": 0,
@@ -1513,7 +1513,7 @@
   },
   {
    "key": "eu_ro2",
-   "name": "RO2",
+   "name": "Rotate B",
    "min": 0,
    "max": 63,
    "default": 0,
@@ -2061,7 +2061,7 @@
   },
   {
    "key": "eu_len",
-   "name": "Length",
+   "name": "Length A",
    "min": 1,
    "max": 64,
    "default": 16,
@@ -3226,6 +3226,111 @@
    "key": "rnd_cond",
    "name": "Random Conditions",
    "momentary": true
+  },
+  {
+   "key": "eu_ena2",
+   "name": "Euclid Enable B",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_rnd2",
+   "name": "Euclid Random B",
+   "momentary": true
+  },
+  {
+   "key": "eu_len2",
+   "name": "Length B",
+   "min": 1,
+   "max": 64,
+   "default": 16,
+   "display": "int"
+  },
+  {
+   "key": "eu_fwd2",
+   "name": "Euclid B Forward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_bwd2",
+   "name": "Euclid B Backward",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_both2",
+   "name": "Euclid B Back and Forth",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_dirv2",
+   "name": "Euclid B Direction Look",
+   "options": [
+    "HIDDEN",
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_opxor",
+   "name": "Euclid XOR",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_opor",
+   "name": "Euclid OR",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_opand",
+   "name": "Euclid AND",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_opsub",
+   "name": "Euclid SUB",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_opv",
+   "name": "Euclid Boolean Look",
+   "options": [
+    "HIDDEN",
+    "OFF",
+    "ON"
+   ],
+   "default": 0
   }
  ]
 }

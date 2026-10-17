@@ -325,12 +325,25 @@ static void core_tests() {
         CHECK(n5 == 5 && std::string("x.xx.xx.x.xx.xx.").find(pat(8)) != std::string::npos && pat(8)[0] == 'x', "E(5,8) = %s: 5 pulses, a rotation of x.xx.xx. starting on step 1", pat(8).c_str());
         tr.eu_pl1 = 3; tr.eu_ro1 = 1; s.euclid_apply(2);
         CHECK(pat(8) == ".x..x..x", "rotation 1 moves it one step later: %s", pat(8).c_str());
-        tr.eu_ro1 = 0; tr.eu_pl2 = 4; s.euclid_apply(2);                 /* generator 2: x.x.x.x. */
+        tr.eu_ro1 = 0; tr.eu_pl2 = 4; tr.eu_a = 1; tr.eu_b = 1; s.euclid_apply(2);   /* generator B (v1.2.0: its own switch): x.x.x.x. */
         CHECK(pat(8) == "x.xxx.x.", "OR  of x..x..x. and x.x.x.x. = %s", pat(8).c_str());
         tr.eu_op = Seq::E_AND; s.euclid_apply(2); CHECK(pat(8) == "x.....x.", "AND = %s", pat(8).c_str());
         tr.eu_op = Seq::E_XOR; s.euclid_apply(2); CHECK(pat(8) == "..xxx...", "XOR = %s", pat(8).c_str());
         tr.eu_op = Seq::E_SUB; s.euclid_apply(2); CHECK(pat(8) == "...x....", "SUB (1 and not 2) = %s", pat(8).c_str());
         tr.eu_tro = 2; s.euclid_apply(2);          CHECK(pat(8) == ".....x..", "track rotation 2 moves the result: %s", pat(8).c_str());
+        tr.eu_op = Seq::E_AND; tr.eu_tro = 0; tr.eu_b = 0; s.euclid_apply(2);
+        CHECK(pat(8) == "x..x..x.", "B off: A alone, whatever the operator (%s)", pat(8).c_str());
+        tr.eu_a = 0; tr.eu_b = 1; s.euclid_apply(2);
+        CHECK(pat(8) == "x.x.x.x.", "A off, B on: B alone (%s)", pat(8).c_str());
+        tr.eu_a = 1; tr.eu_b = 0; tr.eu_dir1 = Seq::EU_BWD; s.euclid_apply(2);
+        CHECK(pat(8) == ".x..x..x", "A backwards: E(3,8) mirrored (%s)", pat(8).c_str());
+        tr.eu_dir1 = Seq::EU_BOTH; tr.eu_len = 4; tr.eu_pl1 = 1; tr.len = 8; s.euclid_apply(2);   /* 1 pulse in 4, back and forth: 0 1 2 3 2 1 | 0 1 */
+        CHECK(pat(8) == "x.....x.", "A back and forth over 4: the pulse every 6 steps (%s)", pat(8).c_str());
+        tr.eu_dir1 = Seq::EU_FWD; tr.eu_len = 0; tr.eu_pl1 = 3; tr.eu_b = 1; tr.eu_op = Seq::E_OR; tr.eu_len2 = 4; tr.eu_pl2 = 1; s.euclid_apply(2);
+        CHECK(pat(8) == "x..xx.x.", "B with its own length 4 (1 pulse): OR with E(3,8) = %s", pat(8).c_str());
+        tr.eu_len2 = 12; s.euclid_apply(2);
+        CHECK(Seq::eff_len(tr) == 12 && pat(12) == "x..x..x.x..x", "B longer than the track: the track plays 12 steps, A repeats over them (%d, %s)", Seq::eff_len(tr), pat(12).c_str());
+        tr.eu_b = 0; tr.eu_len2 = 0;
         tr.eu_op = Seq::E_OR; tr.eu_tro = 0; tr.eu_pl2 = 0; tr.eu_pl1 = 64; tr.len = 5; s.euclid_apply(2);
         CHECK(pat(5) == "xxxxx", "more pulses than steps: every step (%s)", pat(5).c_str());
         tr.eu_pl1 = 0; s.euclid_apply(2);
@@ -1612,7 +1625,7 @@ static void vst_tests() {
         set_int(a, "track", 1); set_int(a, "eu_bwd", 1); CHECK(opt("trk_fwd") && !opt("eu_fwd"), "EUCLIDIAN FWD / BWD / BOTH do nothing while ENABLE is off (v1.83.0)");
         set_int(a, "euclid_edit", 1); CHECK(lroundf(a->getP(a, P("eu_dirv")) * 2) == 1, "and look dim");
         a->setP(a, P("eu_enable"), 1.0f); blocks(a, 1, ppb); set_int(a, "eu_both", 1);
-        CHECK(opt("trk_both") && opt("eu_both") && lroundf(a->getP(a, P("eu_dirv")) * 2) == 2, "ENABLE on: they work");
+        CHECK(!opt("trk_both") && opt("eu_both") && lroundf(a->getP(a, P("eu_dirv")) * 2) == 2, "ENABLE on: they work, on A's rhythm, not the track's direction (v1.2.0)");
         a->setP(a, P("eu_enable"), 0.0f); blocks(a, 1, ppb); set_int(a, "euclid_edit", 0); set_int(a, "trk_fwd", 1); set_int(a, "track", 0);
         set_int(a, "global_edit", 1); set_int(a, "random_edit", 1);
         CHECK(opt("global_edit") && opt("random_edit"), "RANDOM SETUP (in SETUP): SETUP stays lit");
@@ -2160,7 +2173,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "euclid_edit", 1); CHECK(OPTC("lbtn") == 4, "EUCLIDIAN: no RND buttons");
         set_int(c, "pattern_edit", 1); set_int(c, "clr_mode", 0); CHECK(OPTC("lbtn") == 0, "CLR LOCKS off: orange again");
         set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 2, "TRACK EDIT: violet");
-        c->d(c, 8, P("eu_len"), 0, d, 0); CHECK(!strcmp(d, "Length"), "the Euclidean length knob is called '%s'", d);
+        c->d(c, 8, P("eu_len"), 0, d, 0); CHECK(!strcmp(d, "Length A"), "the Euclidean length knob is called '%s' (v1.2.0: Length A)", d);
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0: the arrows page TRACK EDIT's left section; page 2: RND COND / RND TIMING / RND RATCHETS on the trigs */
@@ -2221,6 +2234,49 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         CHECK(left == 0, "CLR COND / TIMING / RATCHETS in PATTERN EDIT: gone from all 8 tracks (%d left)", left);
         set_int(c, "clr_mode", 0); set_int(c, "track_edit", 1); CHECK(OPTC("lbtn") == 2, "TRACK EDIT keeps its own page: page 1");
         set_int(c, "pattern_edit", 1); pr("nav_left"); CHECK(OPTC("lbtn") == 0, "left arrow: PATTERN EDIT page 1");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0: EUCLIDIAN generator B: ENABLE B, RANDOM B, its own length and direction, the boolean buttons; saved */
+        AEffect *c = VSTPluginMain(host);
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto lit = [&](AEffect *e, const char *k) { return e->getP(e, P(k)) > 0.5f; };
+        auto look = [&](AEffect *e, const char *k) { return (int)lroundf(e->getP(e, P(k)) * 2); };
+        auto pat = [&](AEffect *e, int n) { std::string r; for (int k = 0; k < n; k++) r += e->getP(e, P(("step" + std::to_string(k)).c_str())) > 0.5f ? 'x' : '.'; return r; };
+        set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
+        CHECK(look(c, "eu_dirv2") == 1 && look(c, "eu_opv") == 1 && !lit(c, "eu_ena2"), "EUCLIDIAN: B off, its direction and the boolean buttons dim");
+        c->setP(c, P("eu_enable"), 1.0f); blocks(c, 1, 0.0); set_int(c, "eu_pl1", 3); set_int(c, "eu_len", 8);
+        c->setP(c, P("eu_ena2"), 1.0f); blocks(c, 1, 0.0);
+        CHECK(lit(c, "eu_enable") && lit(c, "eu_ena2") && look(c, "eu_opv") == 2 && look(c, "eu_dirv2") == 2 && lit(c, "eu_opor"), "ENABLE B: both on, OR lit, the boolean buttons work");
+        set_int(c, "eu_pl2", 4); set_int(c, "eu_len2", 8);
+        CHECK(pat(c, 8) == "x.xxx.x.", "A E(3,8) OR B E(4,8): %s", pat(c, 8).c_str());
+        set_int(c, "eu_opxor", 1); CHECK(pat(c, 8) == "..xxx..." && lit(c, "eu_opxor") && !lit(c, "eu_opor"), "XOR: %s", pat(c, 8).c_str());
+        set_int(c, "eu_opand", 1); CHECK(pat(c, 8) == "x.....x.", "AND: %s", pat(c, 8).c_str());
+        set_int(c, "eu_opsub", 1); CHECK(pat(c, 8) == "...x....", "SUB: %s", pat(c, 8).c_str());
+        set_int(c, "eu_opor", 1); set_int(c, "eu_bwd2", 1); set_int(c, "eu_pl2", 1);
+        CHECK(lit(c, "eu_bwd2") && !lit(c, "eu_fwd2") && pat(c, 8) == "x..x..xx", "B backwards (1 pulse in 8: step 8): %s", pat(c, 8).c_str());
+        CHECK(!lit(c, "trk_bwd") && lit(c, "eu_fwd"), "the track still plays forwards, A's direction unchanged");
+        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        AEffect *e = VSTPluginMain(host); e->d(e, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+        set_int(e, "track_edit", 1); set_int(e, "euclid_edit", 1); blocks(e, 1, 0.0);
+        CHECK(lit(e, "eu_enable") && lit(e, "eu_ena2") && lit(e, "eu_bwd2") && lit(e, "eu_opor") && pat(e, 8) == "x..x..xx", "saved and loaded: both on, B backwards, OR (%s)", pat(e, 8).c_str());
+        e->d(e, 1, 0, 0, 0, 0);
+        c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0);
+        CHECK(!lit(c, "eu_enable") && lit(c, "eu_ena2") && pat(c, 8) == ".......x" && look(c, "eu_opv") == 1, "A off: B alone (%s), the boolean buttons dim", pat(c, 8).c_str());
+        pr("eu_rnd2"); CHECK(lit(c, "eu_ena2") && !lit(c, "eu_enable"), "RANDOM B: B only");
+        pr("eu_rnd"); CHECK(lit(c, "eu_enable") && lit(c, "eu_ena2"), "RANDOM A: A on again, B stays");
+        c->setP(c, P("eu_ena2"), 0.0f); blocks(c, 1, 0.0); c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0);
+        CHECK(pat(c, 16) == "................", "both off: the trigs from before (none) come back (%s)", pat(c, 16).c_str());
+        {   /* a project from v1.1.1 (no A / B fields on the e line): A on, B off unless it had pulses */
+            AEffect *o = VSTPluginMain(host);
+            void *c0 = 0; o->d(o, 23, 0, 0, &c0, 0); std::string old((char *)c0);
+            const size_t q = old.find("\ne 0 ");
+            if (q != std::string::npos) old.replace(q + 1, old.find('\n', q + 1) - q - 1, "e 0 1 3 0 0 0 0 0 0 8");
+            AEffect *o2 = VSTPluginMain(host); o2->d(o2, 24, 0, (intptr_t)old.size(), (void *)old.c_str(), 0);
+            set_int(o2, "track", 0); set_int(o2, "track_edit", 1); set_int(o2, "euclid_edit", 1); blocks(o2, 1, 0.0);
+            set_int(o2, "eu_pl1", 2); set_int(o2, "eu_pl1", 3);   /* the trigs are saved with the steps; a turn makes the generators write them */
+            CHECK(q != std::string::npos && lit(o2, "eu_enable") && !lit(o2, "eu_ena2") && pat(o2, 8) == "x..x..x.", "an old project: A on, B off, E(3,8) as before (%s)", pat(o2, 8).c_str());
+            o->d(o, 1, 0, 0, 0, 0); o2->d(o2, 1, 0, 0, 0, 0);
+        }
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* v1.2.0: page 2 in STEP EDIT: the selected steps only, trig or not */
