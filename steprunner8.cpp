@@ -264,6 +264,9 @@ struct Plugin {
     int close_frames[NPARAMS] = {0}; /* popup flags: audio frames left before an open list closes after a pick (audio thread + setParameter) */
     bool track_edit = false;         /* TRACK EDIT: the panel shows the track setup */
     int rmode = 2;                   /* v2.1: the right-hand panel EUCLIDIAN leaves as it is: the last of PATTERN EDIT (0), STEP EDIT / TIMING (1), TRACK EDIT (2) */
+    /* v1.2.0: a CC knob turned down to -- stays there (no jump to the base value it rests on otherwise) while the same
+     * steps are selected: bit j = CC j, for the selection cc_rest_key (track, page, selection) */
+    uint8_t cc_rest = 0; uint32_t cc_rest_key = 0;
     bool trk_vals = false;           /* v1.2.0: TRACK EDIT's right panel shows TRACK VALUES (not saved, kept across mode changes) */
     int lpage[3] = {0, 0, 0};        /* v1.2.0: the left section's page in PATTERN EDIT [0], TRACK EDIT [1], STEP EDIT [2]: 0 RND STEPS .. RND CC 5, 1 RND COND / TIMING / RATCHETS (not saved) */
     bool clr_mode = false;           /* CLR LOCKS lit: RND VEL .. RND CC 5 clear that lock (CLR VEL ..), RND STEPS is off */
@@ -391,7 +394,7 @@ static void flush(Plugin *w) {
 static Step &cur_step(Plugin *w) { return w->seq.t[w->track].st[w->page * 16 + w->sel]; }
 static int sel_count(Plugin *w) { int n = 0; for (int k = 0; k < 16; k++) n += (w->selmask >> k) & 1; return n; }
 static bool multi(Plugin *w) { return sel_count(w) > 1; }
-static void select_one(Plugin *w, int k) { w->sel = clampi(k, 0, 15); w->selmask = (uint16_t)(1u << w->sel); }
+static void select_one(Plugin *w, int k) { w->sel = clampi(k, 0, 15); w->selmask = (uint16_t)(1u << w->sel); w->cc_rest = 0; }   /* v1.2.0: a new selection: the CC knobs rest on the base values again */
 /* The lock knobs write to every selected step (STEP EDIT with several selected), or to the one step otherwise.
  * They show the value of the step tapped last. */
 template <class F> static void each_sel(Plugin *w, F fn) {
@@ -841,6 +844,7 @@ static bool lpage2(const Plugin *w) { const int m = lmode(w); return m >= 0 && w
 /* v1.2.0: the PROGRAM tab's Q-Links are on the STEP LOCKS knobs (layout.conf qlinks: the mapping is fixed in the skin).
  * While the track's panel shows (TRACK EDIT, TRACK VALUES, EUCLIDIAN over TRACK EDIT) those knobs stand for the track's
  * own values: a Q-Link turn sets them and the knob reads them. Returns the TRACK VALUES parameter, or -1. */
+static uint32_t sel_key(const Plugin *w) { return (uint32_t)w->track | ((uint32_t)w->page << 3) | ((uint32_t)w->selmask << 5) | (w->step_edit ? 1u << 21 : 0); }
 static int ql_track(const Plugin *w, int i) {
     if (!(w->track_edit || (w->euclid_edit && w->rmode == 2))) return -1;
     if (i == P_ST_VEL) return P_TRK_VEL;
@@ -920,7 +924,11 @@ static int value_of(Plugin *w, int i) {
     }
     if (i >= P_TRKSEL0 && i < P_TRKSEL0 + NTRACKS) return w->track == i - P_TRKSEL0 ? 1 : 0;
     if (i >= P_PGSEL0 && i < P_PGSEL0 + 4) return w->page == i - P_PGSEL0 ? 1 : 0;
-    if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) { const int c = cur_step(w).cc[i - P_ST_CC0]; return c ? c : tr.ccb[i - P_ST_CC0]; }   /* no lock: the knob rests on the CC's base value (shown in brackets); the step is not touched */
+    if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) {
+        const int j = i - P_ST_CC0, c = cur_step(w).cc[j];
+        if (!c && ((w->cc_rest >> j) & 1) && w->cc_rest_key == sel_key(w)) return 0;   /* v1.2.0: just turned to --: it stays there */
+        return c ? c : tr.ccb[j];
+    }   /* no lock: the knob rests on the CC's base value (shown in brackets); the step is not touched */
     switch (i) {
     case P_TRACK: return w->track;
     case P_PAGE: return w->page;
@@ -1045,7 +1053,14 @@ static void set_value_raw(Plugin *w, int i, int v) {
         if (m.mute) { w->seq.note_off(m); flush(w); }
         return;
     }
-    if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) { const int j = i - P_ST_CC0; const uint8_t x = (uint8_t)clampi(v, 0, 128); if (!cur_step(w).cc[j] && x && x == w->seq.t[w->track].ccb[j]) return;   /* the knob only rests on the base value: the host handing that back is not a lock */ each_sel(w, [=](Step &st) { st.cc[j] = x; }); return; }
+    if (i >= P_ST_CC0 && i < P_ST_CC0 + NCC) { const int j = i - P_ST_CC0; const uint8_t x = (uint8_t)clampi(v, 0, 128);
+        if (w->cc_rest_key != sel_key(w)) { w->cc_rest = 0; w->cc_rest_key = sel_key(w); }   /* v1.2.0: -- stays put, see value_of */
+        const bool at_dash = (w->cc_rest >> j) & 1;   /* the knob showed --, not the base value */
+        if (x) w->cc_rest &= (uint8_t)~(1u << j); else w->cc_rest |= (uint8_t)(1u << j);
+        if (!cur_step(w).cc[j] && x && x == w->seq.t[w->track].ccb[j] && !at_dash) return;   /* the knob only rests on the base value: the host handing that back is not a lock */
+        each_sel(w, [=](Step &st) { st.cc[j] = x; });
+        return;
+    }
     if (i >= P_UNUSED0 && i < P_UNUSED0 + NCC) return;
     if (i >= P_PF0 && i < P_PF0 + NPF) { if (w->seq.pf_on) w->seq.pf_off[i - P_PF0] = clampi(v, (int)PARAMS[i].min, (int)PARAMS[i].max); return; }   /* PERFORM ALL off: locked at 0 */
     if (i == P_PFY0) { if (v) w->seq.set_loop(8); else if (w->seq.loopn == 8) w->seq.set_loop(0); return; }   /* LOOP 8: like LOOP 4 / 2 / 1, the last 8 steps */
@@ -1309,7 +1324,9 @@ static void display_of(Plugin *w, int i, char *out, size_t n) {
         const int lockv = cur_step(w).cc[i - P_ST_CC0];
         const char *nm = cc_label(w, w->track, i - P_ST_CC0);   /* "BD Level 94": the name is cut to 9 characters, the text has little room */
         const char *sp = *nm ? " " : "";
-        if (lockv) std::snprintf(out, n, "%.9s%s%d", nm, sp, lockv - 1); else if (v) std::snprintf(out, n, "%.9s%s(%d)", nm, sp, v - 1); else std::snprintf(out, n, "%.9s%s--", nm, sp);
+        const int base = w->seq.t[w->track].ccb[i - P_ST_CC0];   /* v1.2.0: the base, also while the knob stays at -- */
+        if (lockv) std::snprintf(out, n, "%.9s%s%d", nm, sp, lockv - 1); else if (base) std::snprintf(out, n, "%.9s%s(%d)", nm, sp, base - 1); else std::snprintf(out, n, "%.9s%s--", nm, sp);
+        (void)v;
         return;
     }
     if (i >= P_TRK_CC0 && i < P_TRK_CC_END) {   /* v1.2.0 TRACK VALUES: the base value, with the CC's name as on STEP LOCKS */

@@ -309,8 +309,9 @@ STEP EDIT sets the **locks** of individual steps.
 | **Probability** | 0–100 % | 100 % |
 | **CC 1–5** | 0–127 | nothing sent (or the base value, see [12.3](#123-base-values)) |
 
-- If a CC has a base value, a step without a lock shows it in brackets, e.g. *(64)*.
-- Turn a CC knob fully down to `--` to remove its lock.
+- If a CC has a base value, a step without a lock shows it in brackets, e.g. *(64)*, and the knob starts from there.
+- Turn a CC knob fully down to `--` to remove its lock. The knob stays at `--` (it does not jump to the base value)
+  until you select another step.
 
 **▶ / ◀** switch the left section to a second page and back: **RND COND / RND TIMING / RND RATCHETS**, as in
 [TRACK EDIT](#5-track-edit), but on the **selected steps** only, with or without a trig (like the other RND buttons in

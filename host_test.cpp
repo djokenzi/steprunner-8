@@ -2121,7 +2121,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             CHECK(before == after && !strcmp(d1, "BD Level (94)"), "an echo of the resting value leaves the step alone ('%s')", d1);
             set_int(c, "st_cc1", 41); c->d(c, 7, P("st_cc1"), 0, d1, 0); CHECK(!strcmp(d1, "BD Level 40"), "turning it makes a lock: '%s'", d1);
             set_int(c, "st_cc1", 0); blocks(c, 1, 0.0); c->d(c, 7, P("st_cc1"), 0, d1, 0);
-            CHECK(!strcmp(d1, "BD Level (94)") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 95, "all the way down clears the lock and the knob goes back to the base: '%s'", d1);
+            CHECK(!strcmp(d1, "BD Level (94)") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 0, "all the way down clears the lock; the knob stays at -- (v1.2.0: no jump), the text shows the base: '%s'", d1);
         }
         set_int(c, "track", 1); blocks(c, 1, 0.0); c->d(c, 7, P("st_cc1"), 0, t2, 0);
         CHECK(!strcmp(t2, "SN Level (58)"), "T2 (CC 25 = SN Level): '%s'", t2);
@@ -2329,6 +2329,18 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "step_edit", 1); CHECK(panel() == 0, "STEP EDIT: STEP LOCKS");
         set_int(c, "track_edit", 1); CHECK(panel() == 8, "back in TRACK EDIT: still TRACK VALUES");
         pr("trk_back"); CHECK(panel() == 2, "BACK: the track panel again");
+        {   /* v1.2.0: a CC lock turned down to -- stays at -- (no jump to the track's base value) while the same step is selected */
+            auto iv = [&](const char *k) { return (int)lroundf(c->getP(c, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
+            set_int(c, "trk_cc1", 1 + 80); set_int(c, "step_edit", 1); set_int(c, "sel", 4);
+            CHECK(iv("st_cc1") == 81, "no lock: the knob rests on the base value 80 (%d)", iv("st_cc1") - 1);
+            set_int(c, "st_cc1", 1 + 40); set_int(c, "st_cc1", 1 + 1); set_int(c, "st_cc1", 0); blocks(c, 1, 0.0);
+            c->d(c, 7, P("st_cc1"), 0, d, 0);
+            CHECK(iv("st_cc1") == 0 && std::string(d).find("(80)") != std::string::npos, "turned down to --: the knob stays at -- (%d), the text still shows the base ('%s')", iv("st_cc1"), d);
+            set_int(c, "st_cc1", 1 + 0); CHECK(iv("st_cc1") == 1, "and one step up is a lock of 0, no jump (%d)", iv("st_cc1") - 1);
+            set_int(c, "st_cc1", 0); set_int(c, "sel", 5); set_int(c, "sel", 4);
+            CHECK(iv("st_cc1") == 81, "another step and back: the knob rests on the base value again (%d)", iv("st_cc1") - 1);
+            set_int(c, "track_edit", 1);
+        }
         {   /* v1.2.0 Q-Links: the STEP LOCKS knobs stand for the track's values while the track's panel shows */
             auto iv = [&](const char *k) { return (int)lroundf(c->getP(c, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
             set_int(c, "st_vel", 70); set_int(c, "st_cc3", 1 + 33); set_int(c, "st_len", 12);
