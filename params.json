@@ -3398,6 +3398,16 @@
    "max": 128,
    "default": 0,
    "display": "int"
+  },
+  {
+   "key": "shift_left",
+   "name": "Shift Left",
+   "momentary": true
+  },
+  {
+   "key": "shift_right",
+   "name": "Shift Right",
+   "momentary": true
   }
  ]
 }

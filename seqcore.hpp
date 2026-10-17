@@ -808,6 +808,21 @@ struct Seq {
         tr.eu_tro = 0;
         euclid_enable(track, g);
     }
+    /* v1.2.0 SHIFT: steps 1..length of the track one step later (d = +1) or earlier (-1), wrapping around, with all
+     * their locks, conditions and timing. A generated track moves its rhythm by the same step (eu_tro) and its backup with it. */
+    void shift_track(int track, int d) {
+        if (track < 0 || track >= NTRACKS || !d) return;
+        Track &tr = t[track];
+        const int n = eff_len(tr);
+        if (n < 2) return;
+        Step tmp[NSTEPS];
+        for (int k = 0; k < n; k++) tmp[((k + d) % n + n) % n] = tr.st[k];
+        for (int k = 0; k < n; k++) tr.st[k] = tmp[k];
+        uint64_t b = 0;
+        for (int k = 0; k < n; k++) if ((tr.eu_backup >> k) & 1) b |= (uint64_t)1 << (((k + d) % n + n) % n);
+        tr.eu_backup = (tr.eu_backup & (n < 64 ? ~(((uint64_t)1 << n) - 1) : 0)) | b;
+        if (tr.eu_on) { tr.eu_tro = (uint8_t)((tr.eu_tro + d + NSTEPS) % NSTEPS); euclid_apply(track); }
+    }
     void euclid_commit(int track) { t[track].len = (uint8_t)eff_len(t[track]); t[track].eu_on = 0; t[track].eu_a = 0; t[track].eu_b = 0; }   /* a longer rhythm keeps its length as the track's */   /* keep what the generator wrote; it stops following the settings */
 
     void clear_track(int track) {

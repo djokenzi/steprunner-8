@@ -202,6 +202,8 @@ PATTERN EDIT holds the settings of the whole pattern:
 - **SHUFFLE EDIT**: shows the buttons T1–T8 and ALL. Only lit tracks follow the shuffle; all of them do by default.
 - **PATTERN LENGTH 16 / 32 / 48 / 64**: sets the length of all 8 tracks. When tracks get longer, their existing
   pages are copied onto the new, empty pages. Pages that already hold trigs are never overwritten.
+- **SHIFT ◀ / ▶**: moves every track of the pattern one step earlier / later (each round its own length), as SHIFT in
+  TRACK EDIT. UNDO takes it back.
 - **COPY PTN / PASTE PTN**: copy the playing pattern and paste it over the playing pattern. Its eight states go along
   and replace the states of the pattern you paste into.
 - In PATTERN EDIT the random buttons act on **all 8 tracks**. CLR STEPS and CLR LOCKS still clear only the selected
@@ -245,6 +247,7 @@ The settings of the selected track:
 | **TRACK LENGTH 16 / 32 / 48 / 64** | | Quick length buttons (with the same page copying as PATTERN LENGTH) |
 | **Track Length** | 1–64 | Any length, e.g. 13 for a polymetric track |
 | **TRACK VALUES** | | Opens the track's values (below) |
+| **SHIFT ◀ / ▶** | | Moves every step of the track one step earlier / later, with its locks, conditions and timing. Steps wrap round the track's length. On a Euclidean track the rhythm moves too. |
 | **DIRECTION** | FWD, BWD, BOTH | Forwards, backwards, or back and forth |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
 

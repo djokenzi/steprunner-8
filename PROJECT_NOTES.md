@@ -4,7 +4,7 @@
 Step Seq. Developed in `mpc-vst-plugins/poc/steprunner8/` (nothing outside it is changed) and published as its own GitHub
 repo; the build needs an mpc-vst-plugins checkout (`MPC_VST`, default `../..`).
 
-Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B, TRACK VALUES. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
+Status: v1.2.0 (in development, local only, not published): STOP CC pad, RND RATCHETS draws the resolution, PATTERN / TRACK / STEP EDIT page 2 (◀ ▶), EUCLIDIAN generators A and B, TRACK VALUES, SHIFT. v1.1.1 (2026-10-13), tested on MPC Live 3.9.1.2: low-RAM skin (opening the window took 25-30% of the MPC's RAM); not yet tried on the device. v1.1.0: every PATTERN has its own eight STATEs.
 v1.0.0 (2026-10-10) = Trig Seq v2.12.0 renamed: released on GitHub (djokenzi/steprunner-8), tested on the device, in the catalog.
 
 ## What it does
@@ -282,6 +282,9 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   zeroed track means 100 %), rolled after the step's own condition and probability, not under NO LOCKS, saved as a
   `K t %` line when not 100; CC 1-5 (`trk_cc1..5`) are `Track::ccb` (the same base values TRACK SETUP edits). PAN and the
   CCs are sent when turned (STOP CC still holds them back).
+- SHIFT ◀ / ▶ (`shift_left` / `shift_right`) in TRACK EDIT (the track) and PATTERN EDIT (all 8): `Seq::shift_track`
+  rotates steps 1..eff_len by one with everything on them, and the backup bits; a generated track also moves `eu_tro`
+  by one (exact while the rhythm's length divides 64, e.g. 4, 8, 16, 32). Nothing in STEP EDIT.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

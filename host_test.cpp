@@ -2279,6 +2279,19 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         }
         c->d(c, 1, 0, 0, 0, 0);
     }
+    {   /* v1.2.0 SHIFT buttons: the selected track in TRACK EDIT, all tracks in PATTERN EDIT, nothing in STEP EDIT */
+        AEffect *c = VSTPluginMain(host);
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        auto on = [&](int trk, int k) { set_int(c, "track", trk); return c->getP(c, P(("step" + std::to_string(k)).c_str())) > 0.5f; };
+        for (int t = 0; t < 3; t++) { set_int(c, "track", t); c->setP(c, P("step0"), 1.0f); }
+        set_int(c, "track", 1); set_int(c, "track_edit", 1); pr("shift_right");
+        CHECK(on(1, 1) && !on(1, 0) && on(0, 0) && on(2, 0), "TRACK EDIT: SHIFT right moves T2 only");
+        set_int(c, "pattern_edit", 1); pr("shift_left");
+        CHECK(on(1, 0) && on(0, 15) && on(2, 15) && !on(0, 0), "PATTERN EDIT: SHIFT left moves every track (T1 step 1 -> 16)");
+        set_int(c, "step_edit", 1); pr("shift_right"); CHECK(on(1, 0), "STEP EDIT: nothing");
+        set_int(c, "pattern_edit", 1); pr("undo"); CHECK(on(0, 0) && on(1, 1), "UNDO takes a SHIFT back");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     {   /* v1.2.0: TRACK VALUES: VELOCITY, PAN, LENGTH, PROB and the CC base values of the track, BACK; PAN / CC go out at once */
         AEffect *c = VSTPluginMain(host);
         char d[64];
@@ -2304,6 +2317,20 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "track_edit", 1); CHECK(panel() == 8, "back in TRACK EDIT: still TRACK VALUES");
         pr("trk_back"); CHECK(panel() == 2, "BACK: the track panel again");
         c->d(c, 1, 0, 0, 0, 0);
+    }
+    {   /* v1.2.0 SHIFT in the core: steps 1..length wrap round with their locks; past the length untouched; a generated track moves its rhythm */
+        Seq s; Track &t0 = s.t[0];
+        auto pat = [&](int n) { std::string r; for (int k = 0; k < n; k++) r += t0.st[k].on ? 'x' : '.'; return r; };
+        t0.len = 8; t0.st[0].on = 1; t0.st[0].vel = 99; t0.st[0].micro = 5; t0.st[3].on = 1; t0.st[7].on = 1; t0.st[10].on = 1;
+        s.shift_track(0, 1);
+        CHECK(pat(12) == "xx..x.....x." && t0.st[1].vel == 99 && t0.st[1].micro == 5 && t0.st[0].vel == 0, "shift right: x..x...x -> %s (8 long; step 11 stays), the locks go along", pat(12).c_str());
+        s.shift_track(0, -1); s.shift_track(0, -1);
+        CHECK(pat(8) == "..x...xx" && t0.st[7].vel == 99, "two left: %s, step 1's locks now on step 8", pat(8).c_str());
+        Seq e; Track &t1 = e.t[1]; t1.len = 8; t1.eu_pl1 = 2; e.euclid_enable(1);
+        std::string a0; for (int k = 0; k < 8; k++) a0 += t1.st[k].on ? 'x' : '.';
+        e.shift_track(1, 1); std::string a1; for (int k = 0; k < 8; k++) a1 += t1.st[k].on ? 'x' : '.';
+        e.euclid_apply(1); std::string a2; for (int k = 0; k < 8; k++) a2 += t1.st[k].on ? 'x' : '.';
+        CHECK(a0 == "x...x..." && a1 == ".x...x.." && a2 == a1, "a generated track: %s -> %s, and stays so when the generator writes again (%s)", a0.c_str(), a1.c_str(), a2.c_str());
     }
     {   /* v1.2.0: the track's PROB in the core: 0 % silences every trig, 100 % changes nothing, NO LOCKS ignores it */
         Seq s; Track &t0 = s.t[0];

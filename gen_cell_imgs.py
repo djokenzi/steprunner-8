@@ -180,6 +180,12 @@ if os.path.exists(FONT):
     for g in ("A", "B"):
         btn("ENABLE " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_enable%s_on.png" % g.lower())
         btn("RANDOM " + g, GREY, False, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=80, BTN_H=26, size=13).save("images/eu2_rnd%s_on.png" % g.lower())
+    for nm, sgn in (("l", -1), ("r", 1)):   # v1.2.0 SHIFT: grey 78x39, a triangle (as DIRECTION's size)
+        for on in (False, True):
+            im = btn("", GREY, on, BTN_W=78, BTN_H=39).convert("RGBA"); d = ImageDraw.Draw(im)
+            cx, cy, r = 39, 19.5, 9
+            d.polygon([(cx - sgn * r, cy - r), (cx - sgn * r, cy + r), (cx + sgn * r, cy)], fill=(253, 243, 234, 255))
+            im.save("images/shift_%s%s.png" % (nm, "_on" if on else ""))
     btn("TRACK VALUES", TRACKC, False, BTN_W=170).save("images/trk_vals.png"); btn("TRACK VALUES", TRACKC, True, BTN_W=170).save("images/trk_vals_on.png")   # v1.2.0
     btn("BACK", GREY, False).save("images/trk_back.png"); btn("BACK", GREY, True).save("images/trk_back_on.png")
     btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")

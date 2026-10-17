@@ -191,6 +191,7 @@ opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF
 trig("trk_vals", "Track Values"); trig("trk_back", "Back")
 num("trk_pan", "Track Pan", 0, 128, 0); num("trk_prob", "Track Probability", 0, 100, 100)
 for i in range(5): num("trk_cc%d" % (i + 1), "Track CC %d" % (i + 1), 0, 128, 0)
+trig("shift_left", "Shift Left"); trig("shift_right", "Shift Right")   # v1.2.0: every step one step earlier / later: the track (TRACK EDIT) or all 8 (PATTERN EDIT)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")
