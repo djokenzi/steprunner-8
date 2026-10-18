@@ -181,6 +181,7 @@ enum {
     P_PSHIFTV,                                   /* v1.2.0: read-only, PATTERN EDIT's SHIFT: HIDDEN (SHUFFLE EDIT on, or another panel) / ON */
     P_ST_CC8, P_PF_CC8, P_RND_CC8, P_TRK_CC8,    /* v1.2.0: CC 8: its step lock, PERFORM ALL knob, RND button, TRACK VALUES knob */
     P_TRK_BFWD, P_EU_BFWD, P_EU_BFWD2,           /* v1.2.0: BFWD (back and forth from the end): the track, generators A / B */
+    P_CCN6, P_CCN8 = P_CCN6 + 2,                 /* v1.2.0: TRACK SETUP: the numbers of CC 6 / 7 / 8 */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC_V1, NPF = 9 };   /* parameter counts: the RND buttons, the PERFORM knobs P_PF0.. (CC 6 / 7: P_PF_CC6 / 7) */
@@ -197,7 +198,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC_END - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"}, {P_RND_CC6, "rnd_cc6"}, {P_RND_CC7, "rnd_cc7"}, {P_NAVV, "navv"}, {P_PSHIFTV, "pshiftv"}, {P_ST_CC8, "st_cc8"}, {P_PF_CC8, "pf_cc8"}, {P_RND_CC8, "rnd_cc8"}, {P_TRK_CC8, "trk_cc8"}, {P_TRK_BFWD, "trk_bfwd"}, {P_EU_BFWD, "eu_bfwd"}, {P_EU_BFWD2, "eu_bfwd2"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC_END - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"}, {P_RND_CC6, "rnd_cc6"}, {P_RND_CC7, "rnd_cc7"}, {P_NAVV, "navv"}, {P_PSHIFTV, "pshiftv"}, {P_ST_CC8, "st_cc8"}, {P_PF_CC8, "pf_cc8"}, {P_RND_CC8, "rnd_cc8"}, {P_TRK_CC8, "trk_cc8"}, {P_TRK_BFWD, "trk_bfwd"}, {P_EU_BFWD, "eu_bfwd"}, {P_EU_BFWD2, "eu_bfwd2"}, {P_CCN6, "ccn6"}, {P_CCN8, "ccn8"},
 };
 
 static FILE *g_log;
@@ -863,14 +864,16 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
     return n;
 }
 
-/* EDIT CC: is draft number j already used anywhere in StepRunner-8? Pan (CC 10), the PERFORM knob (CC 117), the other
- * four numbers of this draft, and every CC number of every other track, whatever MIDI channel that track is on
- * (v1.36.1; before, only tracks on the same channel counted). It only marks the knob, it does not restrict the choice. */
+/* TRACK SETUP: is the track's number j already used anywhere in StepRunner-8? Pan (CC 10), the pan CCs, the track's
+ * other numbers, and every CC number of every other track, whatever MIDI channel that track is on (v1.36.1; before,
+ * only tracks on the same channel counted). It only marks the knob, it does not restrict the choice. v1.2.0: the
+ * numbers themselves, no draft (the knobs take effect at once). */
 static bool cc_in_use(Plugin *w, int j) {
-    const int v = w->ccdraft[j];
+    const Track &me = w->seq.t[w->track];
+    const int v = Seq::cc_num(me, j);
     if (v == CC_PAN) return true;   /* (CC 117 was the PERFORM knob until v1.71) */
     for (int t = 0; t < NTRACKS; t++) if (v == PAN_CC[t]) return true;   /* the tracks' pan controllers (v1.93) */
-    for (int k = 0; k < NCC; k++) if (k != j && w->ccdraft[k] == v) return true;
+    for (int k = 0; k < NCC; k++) if (k != j && Seq::cc_num(me, k) == v) return true;
     for (int t = 0; t < NTRACKS; t++) {
         if (t == w->track) continue;
         for (int k = 0; k < NCC; k++) if (Seq::cc_num(w->seq.t[t], k) == v) return true;
@@ -953,10 +956,11 @@ static int value_of(Plugin *w, int i) {
     if (i >= P_PAT0 && i < P_PAT_END) return w->pat[i - P_PAT0].full || i - P_PAT0 == w->pat_cur ? 1 : 0;
     if (i == P_PAT_CLEAR) return w->patclear ? 1 : 0;
     if (i == P_PAT_STORE) return w->patstore ? 1 : 0;
-    if (i >= P_CCB0 && i < P_CCB0 + NCC_V1) return w->cc_edit ? w->basedraft[i - P_CCB0] : tr.ccb[i - P_CCB0];
+    if (i >= P_CCB0 && i < P_CCB0 + NCC_V1) return tr.ccb[i - P_CCB0];   /* v1.2.0: no knob on the screen (TRACK VALUES has them); no draft */
     if (i == P_CC_EDIT) return w->cc_edit ? 1 : 0;
     if (i >= P_CCUSE0 && i < P_CCUSE_END) return w->cc_edit && cc_in_use(w, i - P_CCUSE0) ? 1 : 0;
-    if (i >= P_CCN0 && i < P_CCN0 + NCC_V1) return w->cc_edit ? w->ccdraft[i - P_CCN0] : Seq::cc_num(tr, i - P_CCN0);
+    if (i >= P_CCN0 && i < P_CCN0 + NCC_V1) return Seq::cc_num(tr, i - P_CCN0);   /* v1.2.0: the track's own, no draft */
+    if (i >= P_CCN6 && i <= P_CCN8) return Seq::cc_num(tr, NCC_V1 + i - P_CCN6);
     if (i >= P_PGST0 && i < P_PGST_END) { int pg = i - P_PGST0; return (w->page == pg ? 1 : 0) + ((w->seq.playing && tr.cur >= 0 && tr.cur / 16 == pg) ? 2 : 0); }
     if (i == P_PF_CC117) return 0;   /* retired v1.72.0: no knob, nothing sent */
     if (i == P_SHIFT) return w->shift ? 1 : 0;
@@ -1177,8 +1181,12 @@ static void set_value_raw(Plugin *w, int i, int v) {
         if (w->cc_edit) for (int j = 0; j < NCC; j++) { w->ccdraft[j] = Seq::cc_num(tr, j); w->basedraft[j] = tr.ccb[j]; }
         return;
     }
-    if (i >= P_CCB0 && i < P_CCB0 + NCC_V1) { if (w->cc_edit) w->basedraft[i - P_CCB0] = clampi(v, 0, 128); return; }
-    if (i >= P_CCN0 && i < P_CCN0 + NCC_V1) { if (w->cc_edit) w->ccdraft[i - P_CCN0] = clampi(v, 0, 127); return; }
+    if (i >= P_CCB0 && i < P_CCB0 + NCC_V1) { tr.ccb[i - P_CCB0] = (uint8_t)clampi(v, 0, 128); return; }
+    if ((i >= P_CCN0 && i < P_CCN0 + NCC_V1) || (i >= P_CCN6 && i <= P_CCN8)) {   /* v1.2.0: at once (no COMMIT); the track's lock knobs follow */
+        const int j = i >= P_CCN6 ? NCC_V1 + i - P_CCN6 : i - P_CCN0;
+        tr.ccn[j] = (uint8_t)(clampi(v, 0, 127) + 1); w->ccdraft[j] = clampi(v, 0, 127);
+        return;
+    }
     if (i == P_SHIFT) { w->shift = v != 0 && w->step_edit; return; }
     if (i == P_EU_LEN) { tr.eu_len = (uint8_t)clampi(v, 1, NSTEPS); w->seq.euclid_apply(w->track); return; }
     if (i == P_EU_LEN2) { tr.eu_len2 = (uint8_t)clampi(v, 1, NSTEPS); w->seq.euclid_apply(w->track); return; }   /* v1.2.0 */
@@ -1245,7 +1253,7 @@ static void set_value_raw(Plugin *w, int i, int v) {
          * the lit one (the right-hand panel's mode) leaves EUCLIDIAN for that mode. */
         const bool four = i == P_STEP_EDIT || i == P_TRACK_EDIT || i == P_GLOBAL_EDIT || i == P_PATTERN_EDIT;
         if (four && !on) {
-            if (i == P_GLOBAL_EDIT && w->random_edit) on = true;
+            if (i == P_GLOBAL_EDIT && (w->random_edit || w->cc_edit)) on = true;   /* v1.2.0: TRACK SETUP too (no COMMIT / DISCARD any more) */
             else if (w->euclid_edit) on = true;
             else { w->raw[i] = -1.0f; break; }
         }
@@ -1263,6 +1271,7 @@ static void set_value_raw(Plugin *w, int i, int v) {
         if (!w->step_edit) { select_one(w, w->sel); w->shift = false; }
         w->shuf_edit = false;   /* the SHUFFLE EDIT row belongs to the pattern setup */
         if (!w->global_edit) { w->cc_edit = false; w->src_mode = SM_IDLE; w->src_list.clear(); }   /* TRACK SETUP and the map list live in the SETUP panel */
+        if (i == P_GLOBAL_EDIT) w->cc_edit = false;   /* v1.2.0: a tap on SETUP leaves TRACK SETUP */
         rmode_note(w);
         w->src_gen++;
         break;
@@ -1659,7 +1668,9 @@ static void run_job(Plugin *w, Job &j) {
         if (ok) w->src_proj = pn;
         if (j.kind == J_CCREAD) {   /* from the target chosen by CREATE DEFAULT MAP, if one was */
             if (!w->cc_edit) break;
+            for (int k = 0; k < NCC; k++) { w->ccdraft[k] = Seq::cc_num(w->seq.t[w->track], k); w->basedraft[k] = w->seq.t[w->track].ccb[k]; }
             const int got = ok ? xpj_bases(es, w->src, w->seq.t[w->track].ch + 1, w->ccdraft, w->basedraft, w->ccname[w->track], w->ccname_cc[w->track]) : -1;
+            for (int k = 0; k < NCC; k++) w->seq.t[w->track].ccb[k] = (uint8_t)w->basedraft[k];   /* v1.2.0: at once (no COMMIT) */
             w->msg = got < 0 ? fail : 57 + got;
         } else if (!ok) w->msg = fail;
         else {   /* FETCH CC VALUES: base values and names of all eight tracks from the target track (any, if none was chosen) */
@@ -2026,7 +2037,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
                 w->seq.euclid_apply(w->track);
                 w->msg = done ? 16 + done : 0; w->msg_frames = secs2;
             }
-            if (i == P_CC_COMMIT && w->cc_edit) { Track &ct = w->seq.t[w->track]; for (int j = 0; j < NCC; j++) { ct.ccn[j] = (uint8_t)(w->ccdraft[j] + 1); ct.ccb[j] = (uint8_t)w->basedraft[j]; } w->cc_edit = false; }
+            if (i == P_CC_COMMIT && w->cc_edit) w->cc_edit = false;   /* v1.2.0: no button; the knobs take effect at once, so it only closes TRACK SETUP */
             /* the project file work: asked for here, done after the lock is let go (run_job) */
             if (i == P_CC_READ && w->cc_edit) queue_job(w, J_CCREAD);   /* base values from the open project: the MIDI learn entries on this track's channel */
             /* P_READ_ALL (INITIALIZE) is retired; COPY MAPPING, the backup browser and SKIP BACKUP too (v1.64.0): CREATE

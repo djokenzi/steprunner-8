@@ -3558,6 +3558,30 @@
     "ON"
    ],
    "default": 0
+  },
+  {
+   "key": "ccn6",
+   "name": "CC 6 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn7",
+   "name": "CC 7 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "ccn8",
+   "name": "CC 8 Number",
+   "min": 0,
+   "max": 127,
+   "default": 0,
+   "display": "int"
   }
  ]
 }

@@ -129,14 +129,11 @@ The settings of the selected track (the title shows *SETUP TRACK n*):
 |---|---|---|
 | **MIDI CH** | 1–16 | Channel the track sends on |
 | **Note** | 0–127 | Note the track plays |
-| **CC 1–5 Number** | 0–127 | CC number each of the first five CC locks is sent on (CC 6 / 7 / 8: see [12.1](#121-defaults)) |
-| **CC 1–5 Base** | OFF, 0–127 | The value the CC goes back to after a locked step (see [12.3](#123-base-values)) |
+| **CC 1–8 Number** | 0–127 | CC number each CC lock is sent on (defaults: [12.1](#121-defaults)) |
 
-- **MIDI CH** and **Note** take effect immediately.
-- The CC numbers and base values are a draft: **COMMIT** applies them, **DISCARD** throws them away. Selecting another
-  track (T1–T8) drops the draft and starts again from that track.
-- **READ PROJECT** fills the base values from the saved project. Each base becomes the current value of the pad
-  parameter that its CC is mapped to. Press COMMIT afterwards to keep them.
+- Every knob takes effect immediately; there is no COMMIT. Tap **SETUP** to go back to the SETUP panel.
+- The base values (what a CC goes back to after a locked step) are set in TRACK EDIT → **TRACK VALUES**, or read from the
+  project with FETCH CC VALUES.
 
 ### 3.2 RANDOM SETUP
 
@@ -188,7 +185,7 @@ Use this to map the CC locks to the pads of a drum program automatically. The st
 5. The message **n VALUES MAPPED** asks you to **close the project and open it again without saving it first**.
    Saving first would overwrite the new mappings with the MPC's old ones.
 
-The chosen drum track is remembered and used by READ PROJECT, FETCH CC VALUES and FETCH NOTES.
+The chosen drum track is remembered and used by FETCH CC VALUES and FETCH NOTES.
 
 ---
 
@@ -504,7 +501,7 @@ Locks are never changed: they still play on their steps.
 
 All 72 numbers are different, so all eight tracks can share one MIDI channel. None of them is a controller MPC or a
 MIDI device acts on by itself (bank select, modulation, volume, pan, expression, pedals, RPN/NRPN, channel mode).
-CC 6, CC 7 and CC 8 have no number in TRACK SETUP yet. CREATE DEFAULT MAP maps CC 6 and CC 7 to the pad's Send 3 and
+CC 1–8 numbers can be changed in TRACK SETUP. CREATE DEFAULT MAP maps CC 6 and CC 7 to the pad's Send 3 and
 Send 4; CC 8 has no default mapping (map it with MPC's MIDI learn). Every MIDI "undefined" number is used by CC 1–7 and
 pan, so CC 8 uses numbers MPC does not act on by itself: General Purpose 4 (19), the LSBs of the undefined 3, 9, 30, 31
 (35, 41, 62, 63), Effect Control 1 / 2 (12, 13) and Effects 2 Depth (92).
@@ -530,7 +527,7 @@ The MIDI port is **StepRunner-8**. A second StepRunner-8 in the same project use
 
 - **Base OFF** (default): a CC lock stays in effect until another lock of that CC changes it.
 - **Base set:** the step after a locked step sends the base value, so the lock affects only its own step. Use
-  FETCH CC VALUES or READ PROJECT to take the base values from the pads' current settings.
+  FETCH CC VALUES to take the base values from the pads' current settings, or TRACK VALUES to set them by hand.
 
 ---
 

@@ -1435,13 +1435,15 @@ static void vst_tests() {
         set_int(a, "cc_edit", 1);
         CHECK(OPT3("panel") == 2 && a->getP(a, P("cc_edit")) == 1.0f && cc0 == 25, "TRACK SETUP (the CC editor, SETUP tab) opens without changing the PROGRAM tab's panel; T2's first CC is %d", cc0);
         set_int(a, "ccn1", 71); set_int(a, "ccn4", 3);
-        press("cc_discard");
-        CHECK(a->getP(a, P("cc_edit")) == 0.0f && (int)lroundf(a->getP(a, P("ccn1")) * 127) == 25, "DISCARD: the editor closes, numbers unchanged");
-        set_int(a, "cc_edit", 1); set_int(a, "ccn1", 71); set_int(a, "ccn4", 3);
+        CHECK((int)lroundf(a->getP(a, P("ccn1")) * 127) == 71, "v1.2.0: a CC number takes effect at once, no COMMIT");
+        set_int(a, "ccn8", 99); CHECK((int)lroundf(a->getP(a, P("ccn8")) * 127) == 99, "CC 8 has its number knob too (v1.2.0)");
+        set_int(a, "ccn8", 35);   /* back to T2's default CC 8 */
+        set_int(a, "global_edit", 0); CHECK(a->getP(a, P("cc_edit")) == 0.0f && a->getP(a, P("global_edit")) == 1.0f, "a tap on SETUP leaves TRACK SETUP (v1.2.0)");
+        set_int(a, "track_edit", 1); set_int(a, "cc_edit", 1);
         press("cc_commit");
         CHECK(OPT3("panel") == 2 && (int)lroundf(a->getP(a, P("ccn1")) * 127) == 71 && (int)lroundf(a->getP(a, P("ccn4")) * 127) == 3 && (int)lroundf(a->getP(a, P("ccn2")) * 127) == 26,
               "COMMIT: CC 1 = 71, CC 4 = 3, the others as they were");
-        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 27 28 4 30 48 56 36\n") != 0, "the track's own CC numbers are saved"); }
+        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 0 0 4 0 0 0 36\n") != 0, "the track's own CC numbers are saved"); }
         /* numbers already in use are marked, not refused */
         set_int(a, "track", 5); int t6cc = (int)lroundf(a->getP(a, P("ccn1")) * 127);
         set_int(a, "track", 7); int t8cc = (int)lroundf(a->getP(a, P("ccn5")) * 127);
@@ -2100,7 +2102,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
     a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "OFF"), "BASE 1 starts OFF ('%s')", disp);
     set_int(a, "ccb1", 65); blocks(a, 1, ppb); press("cc_discard");
     set_int(a, "cc_edit", 1); blocks(a, 1, ppb);
-    a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "OFF"), "DISCARD drops the base value ('%s')", disp);
+    a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "64"), "v1.2.0: a base value takes effect at once, DISCARD does not undo it ('%s')", disp);
     set_int(a, "ccb1", 65); set_int(a, "ccb3", 1); blocks(a, 1, ppb); press("cc_commit");
     a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "64"), "COMMIT keeps BASE 1 = '%s'", disp);
     a->d(a, 7, P("ccb3"), 0, disp, 0); CHECK(!strcmp(disp, "0"), "and BASE 3 = '%s' (0 is a value, not OFF)", disp);

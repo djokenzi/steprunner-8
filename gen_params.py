@@ -205,6 +205,8 @@ trig("rnd_cc8", "Random CC 8"); num("trk_cc8", "CC 8", 0, 128, 0)
 # v1.2.0: BFWD: back and forth, starting backwards (FBWD, the old BOTH, starts forwards): the track (TRACK EDIT) and
 # generators A / B (EUCLIDIAN); one choice with FWD / BWD / FBWD
 opt("trk_bfwd", "BFWD", onoff); opt("eu_bfwd", "Euclid BFWD", onoff); opt("eu_bfwd2", "Euclid B BFWD", onoff)
+# v1.2.0: TRACK SETUP: the numbers of CC 6 / 7 / 8 (as ccn1-5; every number knob takes effect at once, no COMMIT)
+for i in range(6, 9): num("ccn%d" % i, "CC %d Number" % i, 0, 127, 0)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

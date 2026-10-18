@@ -348,6 +348,10 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   generator B and XOR / OR / AND / SUB; COMMIT on both. Directions as 100x32 text buttons (images eu3_*).
 - TIMING: the knobs are named Ratchets / Resolution; the message box shows "On Grid" (MSG_TIM + MICRO_MAX) after a shift
   or CLR TIMING that lands on the grid (no message before).
+- TRACK SETUP: MIDI CH / NOTE and the numbers of CC 1-8 (new ccn6-8; CC 1-4 top row at the old CC 2-5 places, CC 5-8
+  below at the old BASE 2-5 places). No BASE knobs (TRACK VALUES), no READ PROJECT / DISCARD / COMMIT: every knob takes
+  effect at once (no draft; cc_in_use reads the track's numbers). A tap on SETUP leaves it. The parameters ccb1-5,
+  cc_read, cc_commit, cc_discard stay (append-only) and act at once / just close.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
