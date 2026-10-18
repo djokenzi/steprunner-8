@@ -132,6 +132,8 @@ The settings of the selected track (the title shows *SETUP TRACK n*):
 | **CC 1–8 Number** | 0–127 | CC number each CC lock is sent on (defaults: [12.1](#121-defaults)) |
 
 - Every knob takes effect immediately; there is no COMMIT. Tap **SETUP** to go back to the SETUP panel.
+- A red **IN USE** tag on a CC number knob means that number is already sent elsewhere: by another CC of this track,
+  by another track (on any channel), by a pan CC or CC 10. It is only a warning; the number is kept.
 - The base values (what a CC goes back to after a locked step) are set in TRACK EDIT → **TRACK VALUES**, or read from the
   project with FETCH CC VALUES.
 

@@ -1463,6 +1463,12 @@ static void vst_tests() {
         set_int(a, "ccn3", t8cc); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC %d is T8's last number: marked", t8cc);
         set_int(a, "ccn3", 19); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC 19 is T1's CC 8 (v1.2.0): marked");
         set_int(a, "ccn3", 94); CHECK(a->getP(a, P("ccuse3")) == 0.0f, "CC 94 is used nowhere: free");
+        set_int(a, "ccn6", 20); CHECK(a->getP(a, P("ccuse6")) == 1.0f, "CC 6 on 20 (T1's CC 1): its IN USE tag shows (v1.2.0)");
+        set_int(a, "ccn6", 94); CHECK(a->getP(a, P("ccuse6")) == 1.0f && a->getP(a, P("ccuse3")) == 1.0f, "CC 6 and CC 3 both on 94: both marked");
+        set_int(a, "ccn6", 47); CHECK(a->getP(a, P("ccuse6")) == 0.0f && a->getP(a, P("ccuse3")) == 0.0f, "back to T2's own CC 6 (47): free");
+        set_int(a, "ccn8", 62); CHECK(a->getP(a, P("ccuse8")) == 1.0f, "CC 8 on 62 (T4's CC 8): marked");
+        set_int(a, "ccn8", 35);
+
         set_int(a, "trk_ch", 1);
         press("cc_discard");
         CHECK(a->getP(a, P("ccuse2")) == 0.0f, "no marks while the editor is closed");

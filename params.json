@@ -3582,6 +3582,33 @@
    "max": 127,
    "default": 0,
    "display": "int"
+  },
+  {
+   "key": "ccuse6",
+   "name": "CC 6 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse7",
+   "name": "CC 7 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
+  },
+  {
+   "key": "ccuse8",
+   "name": "CC 8 In Use",
+   "options": [
+    "FREE",
+    "USED"
+   ],
+   "default": 0
   }
  ]
 }

@@ -205,6 +205,7 @@ if os.path.exists(FONT):
     for k in ("fwd", "bwd", "both"):
         arrows(GREY, (253, 243, 234), k).save("images/eu2_%s.png" % k); arrows(EUC, (253, 243, 234), k).save("images/eu2_%s_on.png" % k)
         arrows(DIM, DIM_INK, k).save("images/eu2_%s_d.png" % k)
+    btn("IN USE", CLR_RED, False, BTN_W=64, BTN_H=20, size=11).save("images/cc_inuse.png")   # v1.2.0: TRACK SETUP, a number used elsewhere too
     for k, nm in (("fwd", "FWD"), ("bwd", "BWD"), ("fbwd", "FBWD"), ("bfwd", "BFWD")):   # v1.2.0: a generator's direction, 100x32 text (one generator a page)
         btn(nm, GREY, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s.png" % k); btn(nm, EUC, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_on.png" % k)
         btn(nm, DIM, False, ink=DIM_INK, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_d.png" % k)

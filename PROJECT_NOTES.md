@@ -352,6 +352,8 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   below at the old BASE 2-5 places). No BASE knobs (TRACK VALUES), no READ PROJECT / DISCARD / COMMIT: every knob takes
   effect at once (no draft; cc_in_use reads the track's numbers). A tap on SETUP leaves it. The parameters ccb1-5,
   cc_read, cc_commit, cc_discard stay (append-only) and act at once / just close.
+- TRACK SETUP IN USE tag back (lost before v1.0.0, when its pictures went in the v2.10 cleanup of Trig Seq): a red
+  64x20 tag (images/cc_inuse.png) at the top right of a CC number knob, when=ccuseN:USED; ccuse6-8 appended.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
