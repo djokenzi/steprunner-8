@@ -75,7 +75,7 @@ static inline int cond_pos(int code) {
 
 static const double SPEEDS[] = {0.125, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0};   /* append only */
 enum { NSPEEDS = 7, SPEED_1X = 4, SHUFFLE_MAX = 80 };
-enum { DIR_FWD = 1, DIR_BWD = 2, DIR_PP = 3 };
+enum { DIR_FWD = 1, DIR_BWD = 2, DIR_PP = 3, DIR_BF = 4 };   /* DIR_BF (v1.2.0, with DIR_PP: 7): back and forth starting backwards (BFWD) */
 
 struct Step {
     uint8_t on;     /* trig */
@@ -108,7 +108,7 @@ struct Track {
     uint8_t mute;
     uint8_t rnd_dens, rnd_min, rnd_max;   /* this track's random generator: density %, value range 0..127 */
     uint8_t shuf;     /* 1 = this track follows the global shuffle */
-    uint8_t dir;      /* play direction (v1.76): DIR_FWD 1, DIR_BWD 2, both = back and forth; never 0 */
+    uint8_t dir;      /* play direction (v1.76): DIR_FWD 1, DIR_BWD 2, both = back and forth (FBWD); 7 = BFWD (v1.2.0); never 0 */
     uint8_t panb;     /* the pad's own pan + 1, read from the project (v1.93); 0 = not known (the centre, 64) */
     uint8_t ccbase;   /* first of the five CC numbers this track's CC locks 1-5 are sent on, 0..CC_BASE_MAX */
     uint8_t tix;      /* v1.2.0: the track's own index 0..7 (CC 6 / CC 7 default numbers); never copied to another track */
@@ -126,7 +126,7 @@ struct Track {
      * direction; with both on, eu_op combines them. eu_on = at least one is on (the track's trigs are generated). */
     uint8_t eu_a, eu_b;       /* generator A / B on (only read while eu_on; neither = A, as before v1.2.0) */
     uint8_t eu_len2;          /* length of B's rhythm, 1..64; 0 = as long as A's */
-    uint8_t eu_dir1, eu_dir2; /* how A / B run through their rhythm: EU_FWD, EU_BWD, EU_BOTH (back and forth) */
+    uint8_t eu_dir1, eu_dir2; /* how A / B run through their rhythm: EU_FWD, EU_BWD, EU_BOTH (FBWD), EU_BFWD */
     uint8_t pcut;             /* v1.2.0 TRACK VALUES PROB: 100 - the chance (%) of every trig of the track; 0 = 100 % */
     /* runtime */
     int64_t next_k;   /* next absolute step index to fire */
@@ -465,7 +465,10 @@ struct Seq {
     }
     static int path_step(const Track &tr, int64_t m) {   /* the step at path position m: FWD, BWD, back and forth */
         const int len = eff_len(tr), d = tr.dir & DIR_PP;
-        if (d == DIR_PP && len > 1) return (int)(m < len ? m : 2 * len - 2 - m);
+        if (d == DIR_PP && len > 1) {
+            if (tr.dir & DIR_BF) return (int)(m < len ? len - 1 - m : m - len + 1);   /* v1.2.0 BFWD: last step down to 1, then up */
+            return (int)(m < len ? m : 2 * len - 2 - m);
+        }
         return d == DIR_BWD ? len - 1 - (int)m : (int)m;
     }
     /* the step absolute step k plays (LOOP pads and direction), no random step: for the TIMING of a step not yet fired */
@@ -725,12 +728,12 @@ struct Seq {
      * While eu_on, that result IS the track's trigs for steps 1..len (locks and conditions of the steps are left alone);
      * euclid_apply() must be called again after any of the settings or the length changes. */
     enum { E_OR = 0, E_AND, E_XOR, E_SUB, E_NOPS };
-    enum { EU_FWD = 0, EU_BWD, EU_BOTH };
+    enum { EU_FWD = 0, EU_BWD, EU_BOTH, EU_BFWD };   /* EU_BOTH: back and forth from the start (FBWD); EU_BFWD (v1.2.0): from the end */
     /* is step k of the track a pulse of one generator (rhythm length m, direction dir) */
     static bool eu_gen(int k, int pulses, int rot, int m, int dir, int tro) {
         if (m < 1) return false;
         int j;
-        if (dir == EU_BOTH && m > 1) { const int per = 2 * m - 2, q = ((k - tro) % per + per) % per; j = q < m ? q : per - q; }
+        if ((dir == EU_BOTH || dir == EU_BFWD) && m > 1) { const int per = 2 * m - 2, q = ((k - tro) % per + per) % per; j = dir == EU_BFWD ? (q < m ? m - 1 - q : q - m + 1) : (q < m ? q : per - q); }
         else { j = ((k - tro) % m + m) % m; if (dir == EU_BWD) j = m - 1 - j; }
         return eu_pulse(j, pulses, rot, m);
     }

@@ -1467,7 +1467,8 @@
     "EUCLID",
     "HIDDEN",
     "TIMING",
-    "LOGO"
+    "LOGO",
+    "EUCLID2"
    ],
    "default": 0
   },
@@ -2826,7 +2827,7 @@
   },
   {
    "key": "st_ratch",
-   "name": "Ratchet",
+   "name": "Ratchets",
    "min": 1,
    "max": 8,
    "default": 1,
@@ -2888,7 +2889,7 @@
   },
   {
    "key": "trk_both",
-   "name": "Back and Forth",
+   "name": "FBWD",
    "options": [
     "OFF",
     "ON"
@@ -3028,7 +3029,7 @@
   },
   {
    "key": "eu_both",
-   "name": "Euclid Back and Forth",
+   "name": "Euclid FBWD",
    "options": [
     "OFF",
     "ON"
@@ -3176,7 +3177,7 @@
   },
   {
    "key": "st_rres",
-   "name": "Ratchet Resolution",
+   "name": "Resolution",
    "options": [
     "AUTO",
     "1/16",
@@ -3286,7 +3287,7 @@
   },
   {
    "key": "eu_both2",
-   "name": "Euclid B Back and Forth",
+   "name": "Euclid B FBWD",
    "options": [
     "OFF",
     "ON"
@@ -3377,7 +3378,7 @@
   },
   {
    "key": "trk_cc1",
-   "name": "Track CC 1",
+   "name": "CC 1",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3385,7 +3386,7 @@
   },
   {
    "key": "trk_cc2",
-   "name": "Track CC 2",
+   "name": "CC 2",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3393,7 +3394,7 @@
   },
   {
    "key": "trk_cc3",
-   "name": "Track CC 3",
+   "name": "CC 3",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3401,7 +3402,7 @@
   },
   {
    "key": "trk_cc4",
-   "name": "Track CC 4",
+   "name": "CC 4",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3409,7 +3410,7 @@
   },
   {
    "key": "trk_cc5",
-   "name": "Track CC 5",
+   "name": "CC 5",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3417,7 +3418,7 @@
   },
   {
    "key": "trk_cc6",
-   "name": "Track CC 6",
+   "name": "CC 6",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3425,7 +3426,7 @@
   },
   {
    "key": "trk_cc7",
-   "name": "Track CC 7",
+   "name": "CC 7",
    "min": 0,
    "max": 128,
    "default": 0,
@@ -3525,11 +3526,38 @@
   },
   {
    "key": "trk_cc8",
-   "name": "Track CC 8",
+   "name": "CC 8",
    "min": 0,
    "max": 128,
    "default": 0,
    "display": "int"
+  },
+  {
+   "key": "trk_bfwd",
+   "name": "BFWD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_bfwd",
+   "name": "Euclid BFWD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "eu_bfwd2",
+   "name": "Euclid B BFWD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
   }
  ]
 }

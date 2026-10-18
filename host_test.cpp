@@ -1566,14 +1566,16 @@ static void vst_tests() {
         auto pr = [&](const char *k) { a->setP(a, P(k), 1.0f); blocks(a, 1, ppb); a->setP(a, P(k), 0.0f); blocks(a, 1, ppb); };
         set_int(a, "track", 0); set_int(a, "page", 0); set_int(a, "timing_edit", 1); blocks(a, 1, ppb);
         CHECK(a->getP(a, P("timing_edit")) == 1.0f && a->getP(a, P("step_edit")) == 1.0f, "TIMING on: its button lit, and STEP EDIT's too (v1.0.0)");
-        CHECK(lroundf(a->getP(a, P("lpanel")) * 4) == 3 && lroundf(a->getP(a, P("ptitle")) * 9) == 9, "the TIMING section on the left, its own title");
+        CHECK(lroundf(a->getP(a, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)) == 3 && lroundf(a->getP(a, P("ptitle")) * 9) == 9, "the TIMING section on the left, its own title");
         set_int(a, "sel", 3); pr("tm_right"); pr("tm_right");
         a->d(a, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "Timing: +2"), "two taps on the right arrow: '%s'", m);
         for (int k = 0; k < 30; k++) pr("tm_left");
         a->d(a, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "Timing: -23"), "no further than 23: '%s'", m);
         for (int k = 0; k < 23; k++) pr("tm_right");
-        a->d(a, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, " "), "back on the grid: no message ('%s')", m);
+        a->d(a, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "On Grid"), "back on the grid: 'On Grid' (v1.2.0; '%s')", m);
         set_int(a, "st_ratch", 4); a->d(a, 7, P("st_ratch"), 0, r1, 0); CHECK(!strcmp(r1, "4"), "RATCHET 4 ('%s')", r1);
+        { char nm[64]; a->d(a, 8, P("st_ratch"), 0, nm, 0); char nm2[64]; a->d(a, 8, P("st_rres"), 0, nm2, 0);
+          CHECK(!strcmp(nm, "Ratchets") && !strcmp(nm2, "Resolution"), "the knobs are named '%s' and '%s' (v1.2.0)", nm, nm2); }
         pr("tm_right");
         { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
           CHECK(sv.find("\nM 0 ") != std::string::npos, "saved with the project");
@@ -1598,7 +1600,7 @@ static void vst_tests() {
         }
         set_int(a, "st_ratch", 5); pr("tm_right"); pr("clr_ratch"); pr("clr_timing");
         a->d(a, 7, P("st_ratch"), 0, r1, 0); a->d(a, 7, P("msg"), 0, m, 0);
-        CHECK(!strcmp(r1, "1") && !strcmp(m, " "), "CLR RATCHETS / CLR TIMING: one hit, on the grid ('%s', '%s')", r1, m);
+        CHECK(!strcmp(r1, "1") && !strcmp(m, "On Grid"), "CLR RATCHETS / CLR TIMING: one hit, on the grid ('%s', '%s')", r1, m);
         set_int(a, "step_edit", 0); CHECK(a->getP(a, P("timing_edit")) == 1.0f && a->getP(a, P("step_edit")) == 1.0f, "STEP EDIT tapped in TIMING: nothing changes (v1.0.0)");
         set_int(a, "timing_edit", 0); CHECK(a->getP(a, P("timing_edit")) == 0.0f && a->getP(a, P("step_edit")) == 1.0f, "TIMING off: back to STEP EDIT");
         CHECK(lroundf(a->getP(a, P("slotv")) * 2) == 1, "STEP EDIT: TIMING in the EUCLID place");
@@ -1643,6 +1645,50 @@ static void vst_tests() {
           b->d(b, 1, 0, 0, 0, 0); }
         a->d(a, 24, 0, (intptr_t)keep.size(), (void *)keep.c_str(), 0);
         set_int(a, "track", 2); CHECK(opt("trk_fwd") && !opt("trk_bwd"), "an older project: every track forwards");
+        set_int(a, "track", 0);
+    }
+
+    /* v1.2.0: BFWD (back and forth from the end) for the track and generators A / B; FBWD is the old BOTH */
+    {
+        auto opt = [&](const char *k) { return a->getP(a, P(k)) == 1.0f; };
+        void *c0 = 0; a->d(a, 23, 0, 0, &c0, 0); std::string keep((char *)c0);
+        { Track tr = Seq().t[0]; tr.len = 4; std::string f, b;
+          tr.dir = DIR_PP; for (int m = 0; m < 6; m++) f += (char)('1' + Seq::path_step(tr, m));
+          tr.dir = DIR_PP | DIR_BF; for (int m = 0; m < 6; m++) b += (char)('1' + Seq::path_step(tr, m));
+          CHECK(f == "123432" && b == "432123" && Seq::round_len(tr) == 6, "FBWD plays %s, BFWD %s (a round of 6 steps either way)", f.c_str(), b.c_str()); }
+        { std::string f, b;   /* one pulse on step 1 of a 4-step rhythm */
+          for (int k = 0; k < 6; k++) { f += Seq::eu_gen(k, 1, 0, 4, Seq::EU_BOTH, 0) ? 'x' : '.'; b += Seq::eu_gen(k, 1, 0, 4, Seq::EU_BFWD, 0) ? 'x' : '.'; }
+          CHECK(f == "x....." && b == "...x..", "a generator: FBWD '%s', BFWD '%s' (the rhythm read from its end first)", f.c_str(), b.c_str()); }
+        set_int(a, "track", 2); blocks(a, 1, ppb);
+        set_int(a, "trk_bfwd", 1); CHECK(opt("trk_bfwd") && !opt("trk_both") && !opt("trk_fwd") && !opt("trk_bwd"), "TRACK EDIT BFWD: one of four, FBWD dark");
+        set_int(a, "trk_both", 1); CHECK(opt("trk_both") && !opt("trk_bfwd"), "FBWD: BFWD dark");
+        set_int(a, "trk_bfwd", 1);
+        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+          CHECK(sv.find("\nD 2 7\n") != std::string::npos, "saved as D 2 7 (an older version reads FBWD)");
+          AEffect *b = VSTPluginMain(host); b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+          set_int(b, "track", 2); blocks(b, 1, ppb);
+          CHECK(b->getP(b, P("trk_bfwd")) == 1.0f && b->getP(b, P("trk_both")) == 0.0f, "and loaded");
+          b->d(b, 1, 0, 0, 0, 0); }
+        set_int(a, "euclid_edit", 1);
+        auto lp = [&]() { return (int)lroundf(a->getP(a, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)); };
+        auto look = [&](const char *k) { return (int)lroundf(a->getP(a, P(k)) * (PARAMS[P(k)].nopts - 1)); };
+        CHECK(lp() == 1 && look("navv") == 1 && look("eu_dirv") == 1 && look("eu_dirv2") == 0 && look("eu_opv") == 0,
+              "EUCLIDIAN page 1: generator A only, the right arrow goes on (lpanel %d, navv %d, A %d, B %d, ops %d)", lp(), look("navv"), look("eu_dirv"), look("eu_dirv2"), look("eu_opv"));
+        a->setP(a, P("nav_right"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("nav_right"), 0.0f); blocks(a, 1, ppb);
+        CHECK(lp() == 5 && look("navv") == 2 && look("eu_dirv") == 0 && look("eu_dirv2") == 1 && look("eu_opv") == 1,
+              "the right arrow: page 2, generator B and XOR / OR / AND / SUB (lpanel %d, navv %d, A %d, B %d, ops %d)", lp(), look("navv"), look("eu_dirv"), look("eu_dirv2"), look("eu_opv"));
+        a->setP(a, P("eu_ena2"), 1.0f); blocks(a, 1, ppb); set_int(a, "eu_bfwd2", 1);
+        CHECK(opt("eu_bfwd2") && !opt("eu_both2"), "B's BFWD");
+        a->setP(a, P("nav_left"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("nav_left"), 0.0f); blocks(a, 1, ppb);
+        a->setP(a, P("eu_enable"), 1.0f); blocks(a, 1, ppb); set_int(a, "eu_bfwd", 1);
+        CHECK(lp() == 1 && opt("eu_bfwd") && !opt("eu_both") && !opt("eu_fwd"), "the left arrow: page 1 again; A's BFWD");
+        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+          AEffect *b = VSTPluginMain(host); b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+          set_int(b, "track", 2); blocks(b, 1, ppb);
+          CHECK(b->getP(b, P("eu_bfwd")) == 1.0f && b->getP(b, P("eu_bfwd2")) == 1.0f, "A's and B's BFWD saved and loaded");
+          b->d(b, 1, 0, 0, 0, 0); }
+        set_int(a, "euclid_edit", 0);
+        a->d(a, 24, 0, (intptr_t)keep.size(), (void *)keep.c_str(), 0);
         set_int(a, "track", 0);
     }
 
@@ -2250,6 +2296,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         auto look = [&](AEffect *e, const char *k) { return (int)lroundf(e->getP(e, P(k)) * 2); };
         auto pat = [&](AEffect *e, int n) { std::string r; for (int k = 0; k < n; k++) r += e->getP(e, P(("step" + std::to_string(k)).c_str())) > 0.5f ? 'x' : '.'; return r; };
         set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
+        c->setP(c, P("nav_right"), 1.0f); blocks(c, 1, 0.0); c->setP(c, P("nav_right"), 0.0f); blocks(c, 1, 0.0);   /* v1.2.0: B is on page 2 */
         CHECK(look(c, "eu_dirv2") == 1 && look(c, "eu_opv") == 1 && !lit(c, "eu_ena2"), "EUCLIDIAN: B off, its direction and the boolean buttons dim");
         c->setP(c, P("eu_enable"), 1.0f); blocks(c, 1, 0.0); set_int(c, "eu_pl1", 3); set_int(c, "eu_len", 8);
         c->setP(c, P("eu_ena2"), 1.0f); blocks(c, 1, 0.0);
@@ -2480,7 +2527,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "pattern_edit", 1); CHECK(OPTC("navv") == 1, "page 1: only the right arrow goes somewhere (%d)", OPTC("navv"));
         pr("nav_right"); CHECK(OPTC("navv") == 2, "page 2: only the left one (%d)", OPTC("navv"));
         set_int(c, "global_edit", 1); CHECK(OPTC("navv") == 0, "SETUP: no pages, both dim");
-        set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1); CHECK(OPTC("navv") == 0, "EUCLIDIAN: both dim");
+        set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1); CHECK(OPTC("navv") == 1, "EUCLIDIAN: page 1, the right arrow goes to generator B (v1.2.0)");
         set_int(c, "track_edit", 1); pr("nav_right");
         c->setP(c, P("step0"), 1.0f); c->setP(c, P("step4"), 1.0f);
         set_int(c, "rnd_dens", 100); set_int(c, "rnd_min", 30); set_int(c, "rnd_max", 40); pr("rnd_cc6"); pr("rnd_cc7");
@@ -2832,11 +2879,11 @@ static void preset_tests() {
             CHECK(lit("global_edit") && !lit("random_edit") && one(), "RANDOM SETUP off: back to SETUP");
             {   /* v1.0.1: SETUP (and RANDOM SETUP) show the logo on the left, no RND / CLR buttons */
                 set_int(f, "global_edit", 1);
-                const int lp = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
+                const int lp = (int)lroundf(f->getP(f, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)), lb = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 set_int(f, "random_edit", 1);
-                const int lp2 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb2 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
+                const int lp2 = (int)lroundf(f->getP(f, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)), lb2 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 set_int(f, "pattern_edit", 1);
-                const int lp3 = (int)lroundf(f->getP(f, P("lpanel")) * 4), lb3 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
+                const int lp3 = (int)lroundf(f->getP(f, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)), lb3 = (int)lroundf(f->getP(f, P("lbtn")) * (PARAMS[P("lbtn")].nopts - 1));
                 CHECK(lp == 4 && lb == 4 && lp2 == 4 && lb2 == 4 && lp3 == 0 && lb3 == 0,
                       "SETUP / RANDOM SETUP: logo, no RND buttons (%d %d, %d %d); PATTERN EDIT: RND / CLR again (%d %d)", lp, lb, lp2, lb2, lp3, lb3);
             }

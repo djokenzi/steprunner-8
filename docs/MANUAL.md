@@ -248,7 +248,7 @@ The settings of the selected track:
 | **Track Length** | 1–64 | Any length, e.g. 13 for a polymetric track |
 | **TRACK VALUES** | | Opens the track's values (below) |
 | **SHIFT ◀ / ▶** | | Moves every step of the track one step earlier / later, with its locks, conditions and timing. Steps wrap round the track's length. On a Euclidean track the rhythm moves too. Works in EUCLIDIAN as well. |
-| **DIRECTION** | FWD, BWD, BOTH | Forwards, backwards, or back and forth |
+| **DIRECTION** | FWD, BWD, FBWD, BFWD | Forwards, backwards, or back and forth: FBWD starts forwards, BFWD starts backwards (from the last step) |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
 
 **TRACK VALUES** shows the knobs of STEP LOCKS in the same places, but for the whole track. **BACK** (where CONDITION
@@ -274,7 +274,7 @@ first. The page stays as it is when you switch modes.
 |---|---|
 | **RND COND** | A random condition (any in the list, "--" included) |
 | **RND TIMING** | A random timing offset (up to ±23/24 of a step) |
-| **RND RATCHETS** | A random number of hits (1–8) and Ratchet Resolution (AUTO with one hit) |
+| **RND RATCHETS** | A random number of hits (1–8) and Resolution (AUTO with one hit) |
 
 RND COND / TIMING / RATCHETS ignore *Random Density*: every trig gets a new value. Steps without a trig are not changed. CLR STEPS and
 CLR LOCKS stay on page 2. With CLR LOCKS lit the buttons read **CLR COND / CLR TIMING / CLR RATCHETS** and clear that
@@ -336,10 +336,13 @@ Tap **TIMING** in STEP EDIT. Steps are selected exactly as in STEP EDIT, and the
 | Control | What it does |
 |---|---|
 | **◀ SHIFT LEFT / SHIFT RIGHT ▶** | Moves the selected steps 1/24 of a step earlier or later (up to ±23/24) |
-| **Ratchet** | 1–8 hits on the step |
-| **Ratchet Resolution** | AUTO spreads the hits over the step. 1/16 … 1/80 give a fixed spacing (1–5 hits per step); extra hits continue over the following steps. |
-| **RND TIMING / RND RATCHETS** | Random offset / random number of hits and Ratchet Resolution on the selected steps (one hit: AUTO) |
+| **Ratchets** | 1–8 hits on the step |
+| **Resolution** | AUTO spreads the hits over the step. 1/16 … 1/80 give a fixed spacing (1–5 hits per step); extra hits continue over the following steps. |
+| **RND TIMING / RND RATCHETS** | Random offset / random number of hits and Resolution on the selected steps (one hit: AUTO) |
 | **CLR TIMING / CLR RATCHETS** | Back on the grid / back to one hit |
+
+The message box shows the selected step's offset after each shift (`Timing: +5`), or **On Grid** when it is exactly on
+the grid.
 
 Tap **TIMING** again to go back to STEP EDIT.
 
@@ -350,7 +353,8 @@ Tap **TIMING** again to go back to STEP EDIT.
 ![EUCLIDIAN](manual/euclidian.png)
 
 Tap **EUCLIDIAN** in TRACK EDIT. It generates evenly spread rhythms on the selected track, with two generators:
-**A** (top row) and **B** (bottom row). Each has the same controls:
+**A** on page 1 and **B** on page 2 (the **▶ / ◀** arrows top left switch the pages; the title reads GENERATOR A / B).
+Each has the same controls:
 
 | Control | What it does |
 |---|---|
@@ -359,9 +363,9 @@ Tap **EUCLIDIAN** in TRACK EDIT. It generates evenly spread rhythms on the selec
 | **Rotate A / B** | Shifts that rhythm by steps |
 | **Length A / B** | Length of that rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
 | **RANDOM A / B** | Random length, pulses and rotation for that generator; switches it on. The other generator is left as it is. |
-| **▶ / ◀ / ◀▶** | How that generator runs through its rhythm: forwards, backwards, or back and forth (while it is on). The track itself keeps the direction set in TRACK EDIT. |
+| **FWD / BWD / FBWD / BFWD** | How that generator runs through its rhythm: forwards, backwards, or back and forth starting forwards (FBWD) or backwards (BFWD) (while it is on). The track itself keeps the direction set in TRACK EDIT. |
 
-When both generators are on, the bottom row decides what happens to the steps (dim while only one is on):
+When both generators are on, the buttons at the bottom of page 2 decide what happens to the steps (dim while only one is on):
 
 | Button | A step gets a trig when… |
 |---|---|
@@ -370,7 +374,7 @@ When both generators are on, the bottom row decides what happens to the steps (d
 | **AND** | both have a hit there |
 | **SUB** | A has a hit there and B does not |
 
-**COMMIT** keeps the generated trigs as normal trigs and leaves EUCLIDIAN.
+**COMMIT** (on both pages) keeps the generated trigs as normal trigs and leaves EUCLIDIAN.
 
 Step conditions and locks stay as they are; only the trigs are generated. If you leave EUCLIDIAN without COMMIT, the
 generators keep running on that track (green cells) and is saved with the project. Tap EUCLIDIAN or TRACK EDIT to leave.
@@ -436,11 +440,11 @@ The effect pads act on all 8 tracks and are violet while on.
 | Pad | Effect |
 |---|---|
 | **STOP CC** | No CC messages go out while it is on (CC locks, base values, pan, PERFORM ALL); notes keep playing. Switched off, every track sends its base values and pan again on its next step. |
+| **NO LOCKS** | Plays the trigs without conditions, probability, locks, timing or ratchets |
 | **ECHO** | Every note repeats 3 times, an 8th note apart, getting quieter |
 | **GHOST** | Every empty step plays a quiet ghost note |
 | **FADE OUT** | Fades all tracks to silence over one bar |
 | **RANDOM STEP** | Every track plays random steps |
-| **NO LOCKS** | Plays the trigs without conditions, probability, locks, timing or ratchets |
 | **AUTO FILL** | Adds random extra hits in the last 4 steps of each track |
 | **FILL** | Switches the FILL condition on |
 | **LOOP 8 / 4 / 2 / 1** | Every track repeats the last 8 / 4 / 2 / 1 steps it played. Switching off drops back to where it would have been. |

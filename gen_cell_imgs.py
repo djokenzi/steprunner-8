@@ -205,6 +205,9 @@ if os.path.exists(FONT):
     for k in ("fwd", "bwd", "both"):
         arrows(GREY, (253, 243, 234), k).save("images/eu2_%s.png" % k); arrows(EUC, (253, 243, 234), k).save("images/eu2_%s_on.png" % k)
         arrows(DIM, DIM_INK, k).save("images/eu2_%s_d.png" % k)
+    for k, nm in (("fwd", "FWD"), ("bwd", "BWD"), ("fbwd", "FBWD"), ("bfwd", "BFWD")):   # v1.2.0: a generator's direction, 100x32 text (one generator a page)
+        btn(nm, GREY, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s.png" % k); btn(nm, EUC, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_on.png" % k)
+        btn(nm, DIM, False, ink=DIM_INK, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_d.png" % k)
     for k, nm in (("xor", "XOR"), ("or", "OR"), ("and", "AND"), ("sub", "SUB")):
         btn(nm, GREY, False, BTN_W=74, BTN_H=32).save("images/eu2_%s.png" % k); btn(nm, EUC, False, BTN_W=74, BTN_H=32).save("images/eu2_%s_on.png" % k)
         btn(nm, DIM, False, ink=DIM_INK, BTN_W=74, BTN_H=32).save("images/eu2_%s_d.png" % k); btn(nm, (40, 70, 40), False, ink=(140, 170, 140), BTN_W=74, BTN_H=32).save("images/eu2_%s_dl.png" % k)
@@ -310,7 +313,7 @@ if os.path.exists(FONT):
 # v1.82.0: FWD / BWD / BOTH, narrower: 78 wide (TRACK EDIT violet, pattern setup orange), 100 wide (EUCLIDIAN green);
 # PATTERN cells as pictures: EMPTY, FULL, PLAYING (the play-head step's look), CUED (the play-head bar on a dark cell)
 if os.path.exists(FONT):
-    for nm in ("FWD", "BWD", "BOTH"):
+    for nm in ("FWD", "BWD", "BOTH", "FBWD", "BFWD"):   # v1.2.0: FBWD (the old BOTH) and BFWD
         k = nm.lower()
         btn(nm, GREY, False, BTN_W=78).save("images/dir_%s_s.png" % k)
         btn(nm, TRACKC, False, BTN_W=78).save("images/dir_%s_st.png" % k); btn(nm, TRIG, False, BTN_W=78).save("images/dir_%s_sp.png" % k)

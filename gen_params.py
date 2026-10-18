@@ -71,7 +71,7 @@ opt("random_edit", "Random Edit", onoff)
 num("trk_ccbase", "CC Base", 0, 123, 20)
 # appended v1.12.0: Euclidean generator. EUCLIDIAN is the fourth mode; the eu_* controls belong to the selected track.
 opt("euclid_edit", "Euclidian", onoff)
-opt("lpanel", "Left Panel", ["RANDOM", "EUCLID", "HIDDEN", "TIMING", "LOGO"])          # read-only, for the skin: what the left-hand section shows
+opt("lpanel", "Left Panel", ["RANDOM", "EUCLID", "HIDDEN", "TIMING", "LOGO", "EUCLID2"])   # read-only, for the skin: what the left-hand section shows (v1.2.0: EUCLID2 = EUCLIDIAN page 2, generator B)
 opt("eu_enable", "Euclid Enable", onoff)                    # ON while the selected track's trigs come from the generator
 num("eu_pl1", "Pulse A", 0, 64, 4)   # "Pulse" until v1.1.1
 num("eu_ro1", "Rotate A", 0, 63, 0)
@@ -159,14 +159,14 @@ opt("trk_fwd", "Forward", onoff, 1)   # v1.76.0: the track plays forwards; with 
 opt("trk_bwd", "Backward", onoff)
 opt("timing_edit", "Timing", onoff)   # v1.77.0: TIMING mode
 trig("tm_left", "Timing Earlier"); trig("tm_right", "Timing Later")
-num("st_ratch", "Ratchet", 1, 8, 1)
+num("st_ratch", "Ratchets", 1, 8, 1)
 trig("rnd_timing", "Random Timing"); trig("rnd_ratch", "Random Ratchets")
 trig("clr_timing", "Clear Timing"); trig("clr_ratch", "Clear Ratchets")   # v1.78.0
 opt("pst_act", "Active State", ["NONE"] + ["S%d" % k for k in range(1, 9)])   # read-only: the STATE last saved or recalled
 opt("pat_fwd", "Pattern Forward", onoff, 1); opt("pat_bwd", "Pattern Backward", onoff)   # v1.81.0: every track at once
-opt("trk_both", "Back and Forth", onoff); opt("pat_both", "Pattern Back and Forth", onoff)   # v1.82.0
+opt("trk_both", "FBWD", onoff); opt("pat_both", "Pattern Back and Forth", onoff)   # v1.82.0
 for i in range(1, 9): opt("patv%d" % i, "Pattern %d Look" % i, ["HIDDEN", "EMPTY", "FULL", "PLAYING", "CUED", "BLINK"])   # read-only, v1.82.0; BLINK v1.92.0 (HIDDEN: not the pattern setup)
-opt("eu_fwd", "Euclid Forward", onoff); opt("eu_bwd", "Euclid Backward", onoff); opt("eu_both", "Euclid Back and Forth", onoff)   # v1.83.0
+opt("eu_fwd", "Euclid Forward", onoff); opt("eu_bwd", "Euclid Backward", onoff); opt("eu_both", "Euclid FBWD", onoff)   # v1.83.0
 opt("eu_dirv", "Euclid Direction Look", ["HIDDEN", "OFF", "ON"])   # read-only
 opt("slotv", "Mode Slot Look", ["EUCLID", "TIMING", "HIDDEN"])   # read-only, v1.84.0; HIDDEN: StepRunner-8 v1.0.0 (EUCLIDIAN on TRACK EDIT only)
 opt("rtrk", "Random Track Look", ["HIDDEN"] + ["T%d" % k for k in range(1, 9)])   # read-only, v1.85.0
@@ -174,7 +174,7 @@ opt("pf_hum", "Humanize", onoff); opt("pf_build", "Build", onoff); opt("pf_echo"
 opt("pf_ghost", "Ghost", onoff); opt("pf_poly", "Poly", onoff); opt("pf_down", "Downbeat Only", onoff)   # v1.94.0 PERFORM pads
 trig("pat_copy", "Copy Pattern"); trig("pat_paste", "Paste Pattern"); trig("pat_clrall", "Clear Pattern")   # v2.0.0 PATTERN EDIT
 opt("ttl", "Panel Title Look", ["HIDDEN", "SETUP"] + ["ST%d" % k for k in range(1, 9)] + ["RT%d" % k for k in range(1, 9)])   # read-only, v2.0.0
-opt("st_rres", "Ratchet Resolution", ["AUTO", "1/16", "1/32", "1/48", "1/64", "1/80"])   # v2.1.0: hits per step of the RATCHET
+opt("st_rres", "Resolution", ["AUTO", "1/16", "1/32", "1/48", "1/64", "1/80"])   # v2.1.0: hits per step of the RATCHET
 opt("pf_alt", "Alt Bar", onoff); opt("pf_afill", "Auto Fill", onoff)   # v2.2.0 PERFORM pads
 opt("pst_pat", "States Pattern", ["P%d" % k for k in range(1, 9)])   # read-only, v1.1.0: whose STATEs the PERFORM tab shows (the pattern playing)
 opt("pf_stopcc", "Stop CC", onoff)   # v1.2.0 PERFORM pad STOP CC: lit = no CC goes out (replaces the HUMANIZE pad; pf_hum stays)
@@ -182,7 +182,7 @@ trig("nav_left", "Left"); trig("nav_right", "Right")   # v1.2.0: the arrow butto
 trig("rnd_cond", "Random Conditions")   # v1.2.0: RND COND, page 2 of the left section
 # v1.2.0: EUCLIDIAN generator B (PULSE B / ROTATE B are eu_pl2 / eu_ro2 above) and the boolean buttons
 opt("eu_ena2", "Euclid Enable B", onoff); trig("eu_rnd2", "Euclid Random B"); num("eu_len2", "Length B", 1, 64, 16)
-opt("eu_fwd2", "Euclid B Forward", onoff); opt("eu_bwd2", "Euclid B Backward", onoff); opt("eu_both2", "Euclid B Back and Forth", onoff)
+opt("eu_fwd2", "Euclid B Forward", onoff); opt("eu_bwd2", "Euclid B Backward", onoff); opt("eu_both2", "Euclid B FBWD", onoff)
 opt("eu_dirv2", "Euclid B Direction Look", ["HIDDEN", "OFF", "ON"])   # read-only, as eu_dirv
 opt("eu_opxor", "Euclid XOR", onoff); opt("eu_opor", "Euclid OR", onoff); opt("eu_opand", "Euclid AND", onoff); opt("eu_opsub", "Euclid SUB", onoff)   # lit: the one in use (eu_bool)
 opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF (dim) unless A and B are both on
@@ -190,7 +190,7 @@ opt("eu_opv", "Euclid Boolean Look", ["HIDDEN", "OFF", "ON"])   # read-only: OFF
 # trk_gate; PAN the pad's pan (Track::panb), PROB a chance for every trig of the track, CC 1-5 the base values (ccb)
 trig("trk_vals", "Track Values"); trig("trk_back", "Back")
 num("trk_pan", "Track Pan", 0, 128, 0); num("trk_prob", "Track Probability", 0, 100, 100)
-for i in range(7): num("trk_cc%d" % (i + 1), "Track CC %d" % (i + 1), 0, 128, 0)   # CC 6 / 7 also v1.2.0
+for i in range(7): num("trk_cc%d" % (i + 1), "CC %d" % (i + 1), 0, 128, 0)   # CC 6 / 7 also v1.2.0; named "CC n" (not "Track CC n") since v1.2.0, as on STEP LOCKS
 trig("shift_left", "Shift Left"); trig("shift_right", "Shift Right")   # v1.2.0: every step one step earlier / later: the track (TRACK EDIT) or all 8 (PATTERN EDIT)
 # v1.2.0: CC 6 and CC 7 (default numbers 46 + track / 54 + track): their step locks and PERFORM ALL knobs
 num("st_cc6", "CC 6", 0, 128, 0); num("st_cc7", "CC 7", 0, 128, 0)
@@ -201,7 +201,10 @@ opt("pshiftv", "Pattern Shift Look", ["HIDDEN", "ON"])   # read-only, v1.2.0: PA
 # v1.2.0: CC 8 (default numbers T1-T8 = 19, 35, 41, 62, 63, 12, 13, 92): its step lock, PERFORM ALL knob, RND button and
 # TRACK VALUES knob (after CC 6 / 7, so it comes last)
 num("st_cc8", "CC 8", 0, 128, 0); num("pf_cc8", "CC 8", -127, 127, 0)
-trig("rnd_cc8", "Random CC 8"); num("trk_cc8", "Track CC 8", 0, 128, 0)
+trig("rnd_cc8", "Random CC 8"); num("trk_cc8", "CC 8", 0, 128, 0)
+# v1.2.0: BFWD: back and forth, starting backwards (FBWD, the old BOTH, starts forwards): the track (TRACK EDIT) and
+# generators A / B (EUCLIDIAN); one choice with FWD / BWD / FBWD
+opt("trk_bfwd", "BFWD", onoff); opt("eu_bfwd", "Euclid BFWD", onoff); opt("eu_bfwd2", "Euclid B BFWD", onoff)
 
 json.dump({"name": "StepRunner-8", "params": P}, open("params.json", "w"), indent=1)
 print(len(P), "params")

@@ -12,6 +12,9 @@ the decisions and the version history. `PROJECT_HISTORY.md` holds the history of
 - His working copy is `~/projekti/steprunner-8`, with the tools in `~/projekti/mpc-vst-plugins`.
 - He commits and pushes himself. Hand him changed files as a zip of the repo folder (`steprunner-8/` at the top, no
   `build/` or `dist/`), which he unzips with `unzip -o` in `~/projekti`.
+- After every answer that changes files, end with the full list of commands to run, in order: unzip, check the branch,
+  test, build, local commit, `git status`. Commit messages are in English. While the new features stay private
+  (v1.2.0 on the `dev` branch), never push and never tell him to push.
 
 ## Setup and test
 

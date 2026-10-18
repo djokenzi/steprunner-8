@@ -338,6 +338,16 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
     wrote it), the C / B lines' ninth number, the state P line's last number. No CREATE DEFAULT MAP entry (PAD_PRM id
     0). Layout: CC 8 right of CC 7 on STEP LOCKS / TRACK VALUES (cx=1200) and PERFORM (cx=1028), RND CC 8 right of RND
     CC 7; Q-Links 12.
+- PERFORM: NO LOCKS moved next to STOP CC (row 1: STOP CC, NO LOCKS, ECHO, GHOST, FADE OUT, RANDOM STEP, AUTO FILL,
+  FILL). TRACK VALUES knobs named "CC 1" .. "CC 8" (were "Track CC n"; the name is MPC's, projects keep loading).
+- BFWD: back and forth starting backwards, for the track (TRACK EDIT; dir 7 = DIR_PP | DIR_BF, an older version reads
+  FBWD) and generators A / B (EU_BFWD = 3, the e line's direction fields). BOTH reads FBWD now. New parameters trk_bfwd,
+  eu_bfwd, eu_bfwd2. TRACK EDIT: LENGTH knob and TRACK VALUES swapped (knob cx=605, button cx=805), DIRECTION row FWD /
+  BWD / FBWD / BFWD from cx=949.
+- EUCLIDIAN on two pages (the arrows; Plugin::eupage, not saved; lpanel option EUCLID2): page 1 generator A, page 2
+  generator B and XOR / OR / AND / SUB; COMMIT on both. Directions as 100x32 text buttons (images eu3_*).
+- TIMING: the knobs are named Ratchets / Resolution; the message box shows "On Grid" (MSG_TIM + MICRO_MAX) after a shift
+  or CLR TIMING that lands on the grid (no message before).
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
