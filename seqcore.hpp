@@ -126,7 +126,7 @@ struct Track {
      * direction; with both on, eu_op combines them. eu_on = at least one is on (the track's trigs are generated). */
     uint8_t eu_a, eu_b;       /* generator A / B on (only read while eu_on; neither = A, as before v1.2.0) */
     uint8_t eu_len2;          /* length of B's rhythm, 1..64; 0 = as long as A's */
-    uint8_t eu_dir1, eu_dir2; /* how A / B run through their rhythm: EU_FWD, EU_BWD, EU_BOTH (FBWD), EU_BFWD */
+    uint8_t eu_dir1, eu_dir2; /* kept in projects, not used (v1.2.0 builds before 2026-10-18 read A / B backwards with it) */
     uint8_t pcut;             /* v1.2.0 TRACK VALUES PROB: 100 - the chance (%) of every trig of the track; 0 = 100 % */
     /* runtime */
     int64_t next_k;   /* next absolute step index to fire */
@@ -769,8 +769,8 @@ struct Seq {
         const int n = eff_len(tr), m1 = eu_m1(tr), m2 = eu_m2(tr);
         const bool ga = gen_a(tr), gb = gen_b(tr);
         for (int k = 0; k < n; k++) {
-            const bool a = ga && eu_gen(k, tr.eu_pl1, tr.eu_ro1, m1, tr.eu_dir1, tr.eu_tro);
-            const bool b = gb && eu_gen(k, tr.eu_pl2, tr.eu_ro2, m2, tr.eu_dir2, tr.eu_tro);
+            const bool a = ga && eu_gen(k, tr.eu_pl1, tr.eu_ro1, m1, EU_FWD, tr.eu_tro);   /* v1.2.0: always forwards; the track's direction moves the play head */
+            const bool b = gb && eu_gen(k, tr.eu_pl2, tr.eu_ro2, m2, EU_FWD, tr.eu_tro);
             bool r;
             if (!(ga && gb)) r = a || b;   /* one generator: its rhythm */
             else switch (tr.eu_op) {

@@ -357,6 +357,11 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
 - Layout from Skin Studio (owner, 2026-10-18, 15:00): TRACK EDIT direction buttons 84 wide, EUCLIDIAN ENABLE / RANDOM
   132x39 in one row, direction row under them, PULSE / ROTATE / LENGTH (r=32) below; generator B (page 2) laid out the
   same. Pictures regenerated for the new sizes.
+- EUCLIDIAN direction rows (both pages) are the track's direction again (as v1.83 .. v1.1.1; `eu_dir_code`), never dim:
+  one play head, so one direction (the owner's choice, 2026-10-18). The generators write their rhythms forwards; eu_dir1 /
+  eu_dir2 stay in the e line, unused. PATTERN EDIT's SHIFT label at cx=1062, as TRACK EDIT's.
+- EUCLIDIAN: no direction row on either page (it only repeated TRACK EDIT's DIRECTION); PULSE / ROTATE / LENGTH r=40,
+  cy=285. The parameters eu_fwd .. eu_bfwd2 stay and still set the track's direction (no button).
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

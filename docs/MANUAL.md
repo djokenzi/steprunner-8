@@ -362,7 +362,6 @@ Each has the same controls:
 | **Rotate A / B** | Shifts that rhythm by steps |
 | **Length A / B** | Length of that rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
 | **RANDOM A / B** | Random length, pulses and rotation for that generator; switches it on. The other generator is left as it is. |
-| **FWD / BWD / FBWD / BFWD** | How that generator runs through its rhythm: forwards, backwards, or back and forth starting forwards (FBWD) or backwards (BFWD) (while it is on). The track itself keeps the direction set in TRACK EDIT. |
 
 When both generators are on, the buttons at the bottom of page 2 decide what happens to the steps (dim while only one is on):
 
@@ -374,6 +373,9 @@ When both generators are on, the buttons at the bottom of page 2 decide what hap
 | **SUB** | A has a hit there and B does not |
 
 **COMMIT** (on both pages) keeps the generated trigs as normal trigs and leaves EUCLIDIAN.
+
+The generated steps play in the track's direction (DIRECTION in TRACK EDIT): the steps stay where they are, the play
+head runs forwards, backwards, FBWD or BFWD.
 
 Step conditions and locks stay as they are; only the trigs are generated. If you leave EUCLIDIAN without COMMIT, the
 generators keep running on that track (green cells) and is saved with the project. Tap EUCLIDIAN or TRACK EDIT to leave.

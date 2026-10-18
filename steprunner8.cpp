@@ -900,6 +900,15 @@ enum { NCC_X = NCC_V1 + 2 };   /* v1.2.0: CC 6 / 7 go on the X line; CC 8 (slot 
 /* v1.2.0 TRACK VALUES: a parameter -> the CC slot j of its knob (CC 1-7 P_TRK_CC0.., CC 8 appended), -1; and back */
 static int trk_cc_j(int i) { return i >= P_TRK_CC0 && i < P_TRK_CC_END ? i - P_TRK_CC0 : i == P_TRK_CC8 ? 7 : -1; }
 static int trk_cc_param(int j) { return j < P_TRK_CC_END - P_TRK_CC0 ? P_TRK_CC0 + j : P_TRK_CC8; }
+/* v1.2.0: EUCLIDIAN's FWD / BWD / FBWD / BFWD (a row on each page) -> the track's direction they set, -1 for any other
+ * parameter. One play head, so one direction: they are the track's (TRACK EDIT's), the generators write their rhythms forwards. */
+static int eu_dir_code(int i) {
+    if (i == P_EU_FWD || i == P_EU_FWD2) return DIR_FWD;
+    if (i == P_EU_BWD || i == P_EU_BWD2) return DIR_BWD;
+    if (i == P_EU_BOTH || i == P_EU_BOTH2) return DIR_PP;
+    if (i == P_EU_BFWD || i == P_EU_BFWD2) return DIR_PP | DIR_BF;
+    return -1;
+}
 enum { NPF_ALL = Seq::PF_COUNT };
 enum { REST_VEL = 8, REST_PAN = 9 };   /* v1.2.0: cc_rest bits of the VELOCITY / PAN lock knobs */
 static uint32_t sel_key(const Plugin *w) { return (uint32_t)w->track | ((uint32_t)w->page << 3) | ((uint32_t)w->selmask << 5) | (w->step_edit ? 1u << 21 : 0); }
@@ -974,11 +983,9 @@ static int value_of(Plugin *w, int i) {
     if (trk_cc_j(i) >= 0) return tr.ccb[trk_cc_j(i)];
     if (i == P_EU_LEN2) return Seq::eu_m2(tr);   /* v1.2.0: B's own length, or A's */
     if (i == P_EU_ENA2) return Seq::gen_b(tr) ? 1 : 0;
-    if (i == P_EU_FWD2 || i == P_EU_BWD2 || i == P_EU_BOTH2) return Seq::gen_b(tr) && tr.eu_dir2 == i - P_EU_FWD2 ? 1 : 0;
-    if (i == P_EU_BFWD2) return Seq::gen_b(tr) && tr.eu_dir2 == Seq::EU_BFWD ? 1 : 0;   /* v1.2.0 */
-    if (i == P_EU_BFWD) return Seq::gen_a(tr) && tr.eu_dir1 == Seq::EU_BFWD ? 1 : 0;
+    if (eu_dir_code(i) >= 0) return tr.dir == eu_dir_code(i) ? 1 : 0;   /* v1.2.0: EUCLIDIAN's direction rows are the track's direction */
     if (i == P_TRK_BFWD) return tr.dir == (DIR_PP | DIR_BF) ? 1 : 0;
-    if (i == P_EU_DIRV2) return !w->euclid_edit || !w->eupage ? 0 : Seq::gen_b(tr) ? 2 : 1;   /* page 2 only */
+    if (i == P_EU_DIRV2) return w->euclid_edit && w->eupage ? 2 : 0;   /* page 2 only; the track's direction, so never dim */
     if (i >= P_EU_OP0 && i < P_EU_OP_END) return tr.eu_op == EU_OPS[i - P_EU_OP0] ? 1 : 0;
     if (i == P_EU_OPV) return !w->euclid_edit || !w->eupage ? 0 : Seq::gen_a(tr) && Seq::gen_b(tr) ? 2 : 1;
     if (i >= P_MPAD0 && i < P_MPAD_END) return w->seq.t[i - P_MPAD0].mute ? 2 : 0;   /* retired with the blink (v1.28.0): no widget uses it */
@@ -1025,9 +1032,7 @@ static int value_of(Plugin *w, int i) {
         return 1;
     }
     case P_TRK_BOTH: return tr.dir == DIR_PP ? 1 : 0;   /* FBWD (v1.2.0: BFWD is its own button) */
-    case P_EU_FWD: case P_EU_BWD: case P_EU_BOTH:   /* lit only while the generator is on */
-        return Seq::gen_a(tr) && tr.eu_dir1 == i - P_EU_FWD ? 1 : 0;   /* v1.2.0: A's direction (the track's before) */
-    case P_EU_DIRV: return !w->euclid_edit || w->eupage ? 0 : Seq::gen_a(tr) ? 2 : 1;   /* v1.2.0: page 1 only */
+    case P_EU_DIRV: return w->euclid_edit && !w->eupage ? 2 : 0;   /* v1.2.0: page 1 only; the track's direction, never dim */
     case P_RTRK: return w->random_edit ? 1 + w->track : 0;   /* v1.85: RANDOM SETTINGS names the track */
     case P_TTL: return w->random_edit ? 10 + w->track : !w->global_edit ? 0 : w->cc_edit ? 2 + w->track : w->src_mode ? 0 : 1;   /* v2.0 */
     case P_SLOTV: return w->step_edit ? 1 : (w->track_edit || w->euclid_edit) ? 0 : 2;   /* v1.84: TIMING sits in the EUCLID place in STEP EDIT (and TIMING) only; v1.0.0: EUCLIDIAN on TRACK EDIT only (and while it is on), else nothing */
@@ -1205,8 +1210,7 @@ static void set_value_raw(Plugin *w, int i, int v) {
         if (tr.ccb[j]) { w->seq.emit((uint8_t)(0xB0 | (tr.ch & 15)), (uint8_t)Seq::cc_num(tr, j), (uint8_t)w->seq.base_eff(tr, j)); w->seq.cc_dirty[w->track][j] = false; flush(w); }
         return;
     }
-    if (i == P_EU_FWD2 || i == P_EU_BWD2 || i == P_EU_BOTH2 || i == P_EU_BFWD2) { if (v && Seq::gen_b(tr)) { tr.eu_dir2 = (uint8_t)(i == P_EU_BFWD2 ? (int)Seq::EU_BFWD : i - P_EU_FWD2); w->seq.euclid_apply(w->track); } return; }
-    if (i == P_EU_BFWD) { if (v && Seq::gen_a(tr)) { tr.eu_dir1 = Seq::EU_BFWD; w->seq.euclid_apply(w->track); } return; }   /* v1.2.0 */
+    if (eu_dir_code(i) >= 0) { if (v) tr.dir = (uint8_t)eu_dir_code(i); return; }   /* v1.2.0: the track's direction (as TRACK EDIT; v1.83 .. v1.1.1 too), on either page */
     if (i == P_TRK_BFWD) { if (v) tr.dir = DIR_PP | DIR_BF; return; }   /* v1.2.0: one of four, as FWD / BWD / FBWD */
     if (i >= P_EU_OP0 && i < P_EU_OP_END) { if (v) { tr.eu_op = EU_OPS[i - P_EU_OP0]; w->seq.euclid_apply(w->track); } return; }
     if (i == P_PF_CTRL) { if (v != 0) w->seq.perform_begin(); else w->seq.perform_discard();   /* off without COMMIT: everything back as it was */ for (int k = 0; k < NPF_ALL; k++) w->raw[pf_param(k)] = -1.0f; return; }   /* on: offsets start at 0 over the current state; off by hand: what was set stays (as COMMIT) */
@@ -1236,9 +1240,6 @@ static void set_value_raw(Plugin *w, int i, int v) {
     case P_TRK_GATE: tr.gate = (uint8_t)clampi(v, 1, 64); break;
     case P_PAT_FWD: case P_PAT_BWD: case P_PAT_BOTH:   /* every track that way; a tap on the lit one changes nothing */
         if (v) { const uint8_t d = i == P_PAT_FWD ? DIR_FWD : i == P_PAT_BWD ? DIR_BWD : DIR_PP; for (int k = 0; k < NTRACKS; k++) w->seq.t[k].dir = d; }
-        break;
-    case P_EU_FWD: case P_EU_BWD: case P_EU_BOTH:   /* generator A's direction (v1.2.0; the track's v1.83 .. v1.1.1): nothing while A is off */
-        if (v && Seq::gen_a(tr)) { tr.eu_dir1 = (uint8_t)(i - P_EU_FWD); w->seq.euclid_apply(w->track); }
         break;
     case P_TRK_FWD: case P_TRK_BWD: case P_TRK_BOTH:   /* FWD, BWD or BOTH (v1.82: one of three; a tap on the lit one changes nothing) */
         if (v) tr.dir = i == P_TRK_FWD ? DIR_FWD : i == P_TRK_BWD ? DIR_BWD : DIR_PP;

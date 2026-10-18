@@ -338,9 +338,7 @@ static void core_tests() {
         tr.eu_a = 0; tr.eu_b = 1; s.euclid_apply(2);
         CHECK(pat(8) == "x.x.x.x.", "A off, B on: B alone (%s)", pat(8).c_str());
         tr.eu_a = 1; tr.eu_b = 0; tr.eu_dir1 = Seq::EU_BWD; s.euclid_apply(2);
-        CHECK(pat(8) == ".x..x..x", "A backwards: E(3,8) mirrored (%s)", pat(8).c_str());
-        tr.eu_dir1 = Seq::EU_BOTH; tr.eu_len = 4; tr.eu_pl1 = 1; tr.len = 8; s.euclid_apply(2);   /* 1 pulse in 4, back and forth: 0 1 2 3 2 1 | 0 1 */
-        CHECK(pat(8) == "x.....x.", "A back and forth over 4: the pulse every 6 steps (%s)", pat(8).c_str());
+        CHECK(pat(8) == "x..x..x.", "v1.2.0: a generator always writes its rhythm forwards; the track's direction moves the play head (%s)", pat(8).c_str());
         tr.eu_dir1 = Seq::EU_FWD; tr.eu_len = 0; tr.eu_pl1 = 3; tr.eu_b = 1; tr.eu_op = Seq::E_OR; tr.eu_len2 = 4; tr.eu_pl2 = 1; s.euclid_apply(2);
         CHECK(pat(8) == "x..xx.x.", "B with its own length 4 (1 pulse): OR with E(3,8) = %s", pat(8).c_str());
         tr.eu_len2 = 12; s.euclid_apply(2);
@@ -1635,10 +1633,10 @@ static void vst_tests() {
         set_int(a, "trk_bwd", 1); CHECK(!opt("trk_fwd") && opt("trk_bwd") && !opt("trk_both"), "BWD: one of three");
         set_int(a, "trk_bwd", 0); CHECK(opt("trk_bwd"), "the lit one cannot be switched off");
         set_int(a, "track", 0); CHECK(opt("trk_fwd") && !opt("trk_bwd"), "per track: T1 still forwards");
-        set_int(a, "track", 1); set_int(a, "eu_bwd", 1); CHECK(opt("trk_fwd") && !opt("eu_fwd"), "EUCLIDIAN FWD / BWD / BOTH do nothing while ENABLE is off (v1.83.0)");
-        set_int(a, "euclid_edit", 1); CHECK(lroundf(a->getP(a, P("eu_dirv")) * 2) == 1, "and look dim");
+        set_int(a, "track", 1); set_int(a, "euclid_edit", 1); set_int(a, "eu_bwd", 1);
+        CHECK(opt("trk_bwd") && opt("eu_bwd") && lroundf(a->getP(a, P("eu_dirv")) * 2) == 2, "v1.2.0: EUCLIDIAN's direction is the track's, generators on or off, never dim");
         a->setP(a, P("eu_enable"), 1.0f); blocks(a, 1, ppb); set_int(a, "eu_both", 1);
-        CHECK(!opt("trk_both") && opt("eu_both") && lroundf(a->getP(a, P("eu_dirv")) * 2) == 2, "ENABLE on: they work, on A's rhythm, not the track's direction (v1.2.0)");
+        CHECK(opt("trk_both") && opt("eu_both"), "FBWD there: the track's FBWD");
         a->setP(a, P("eu_enable"), 0.0f); blocks(a, 1, ppb); set_int(a, "euclid_edit", 0); set_int(a, "trk_fwd", 1); set_int(a, "track", 0);
         set_int(a, "global_edit", 1); set_int(a, "random_edit", 1);
         CHECK(opt("global_edit") && opt("random_edit"), "RANDOM SETUP (in SETUP): SETUP stays lit");
@@ -1680,10 +1678,10 @@ static void vst_tests() {
         set_int(a, "euclid_edit", 1);
         auto lp = [&]() { return (int)lroundf(a->getP(a, P("lpanel")) * (PARAMS[P("lpanel")].nopts - 1)); };
         auto look = [&](const char *k) { return (int)lroundf(a->getP(a, P(k)) * (PARAMS[P(k)].nopts - 1)); };
-        CHECK(lp() == 1 && look("navv") == 1 && look("eu_dirv") == 1 && look("eu_dirv2") == 0 && look("eu_opv") == 0,
+        CHECK(lp() == 1 && look("navv") == 1 && look("eu_dirv") == 2 && look("eu_dirv2") == 0 && look("eu_opv") == 0,
               "EUCLIDIAN page 1: generator A only, the right arrow goes on (lpanel %d, navv %d, A %d, B %d, ops %d)", lp(), look("navv"), look("eu_dirv"), look("eu_dirv2"), look("eu_opv"));
         a->setP(a, P("nav_right"), 1.0f); blocks(a, 1, ppb); a->setP(a, P("nav_right"), 0.0f); blocks(a, 1, ppb);
-        CHECK(lp() == 5 && look("navv") == 2 && look("eu_dirv") == 0 && look("eu_dirv2") == 1 && look("eu_opv") == 1,
+        CHECK(lp() == 5 && look("navv") == 2 && look("eu_dirv") == 0 && look("eu_dirv2") == 2 && look("eu_opv") == 1,
               "the right arrow: page 2, generator B and XOR / OR / AND / SUB (lpanel %d, navv %d, A %d, B %d, ops %d)", lp(), look("navv"), look("eu_dirv"), look("eu_dirv2"), look("eu_opv"));
         a->setP(a, P("eu_ena2"), 1.0f); blocks(a, 1, ppb); set_int(a, "eu_bfwd2", 1);
         CHECK(opt("eu_bfwd2") && !opt("eu_both2"), "B's BFWD");
@@ -2305,7 +2303,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         auto pat = [&](AEffect *e, int n) { std::string r; for (int k = 0; k < n; k++) r += e->getP(e, P(("step" + std::to_string(k)).c_str())) > 0.5f ? 'x' : '.'; return r; };
         set_int(c, "track_edit", 1); set_int(c, "euclid_edit", 1);
         c->setP(c, P("nav_right"), 1.0f); blocks(c, 1, 0.0); c->setP(c, P("nav_right"), 0.0f); blocks(c, 1, 0.0);   /* v1.2.0: B is on page 2 */
-        CHECK(look(c, "eu_dirv2") == 1 && look(c, "eu_opv") == 1 && !lit(c, "eu_ena2"), "EUCLIDIAN: B off, its direction and the boolean buttons dim");
+        CHECK(look(c, "eu_dirv2") == 2 && look(c, "eu_opv") == 1 && !lit(c, "eu_ena2"), "EUCLIDIAN: B off, the boolean buttons dim; the direction row (the track's) never dim");
         c->setP(c, P("eu_enable"), 1.0f); blocks(c, 1, 0.0); set_int(c, "eu_pl1", 3); set_int(c, "eu_len", 8);
         c->setP(c, P("eu_ena2"), 1.0f); blocks(c, 1, 0.0);
         CHECK(lit(c, "eu_enable") && lit(c, "eu_ena2") && look(c, "eu_opv") == 2 && look(c, "eu_dirv2") == 2 && lit(c, "eu_opor"), "ENABLE B: both on, OR lit, the boolean buttons work");
@@ -2315,15 +2313,16 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         set_int(c, "eu_opand", 1); CHECK(pat(c, 8) == "x.....x.", "AND: %s", pat(c, 8).c_str());
         set_int(c, "eu_opsub", 1); CHECK(pat(c, 8) == "...x....", "SUB: %s", pat(c, 8).c_str());
         set_int(c, "eu_opor", 1); set_int(c, "eu_bwd2", 1); set_int(c, "eu_pl2", 1);
-        CHECK(lit(c, "eu_bwd2") && !lit(c, "eu_fwd2") && pat(c, 8) == "x..x..xx", "B backwards (1 pulse in 8: step 8): %s", pat(c, 8).c_str());
-        CHECK(!lit(c, "trk_bwd") && lit(c, "eu_fwd"), "the track still plays forwards, A's direction unchanged");
+        CHECK(lit(c, "eu_bwd2") && lit(c, "eu_bwd") && lit(c, "trk_bwd") && !lit(c, "eu_fwd2") && pat(c, 8) == "x..x..x.", "v1.2.0: BWD in EUCLIDIAN is the track's: the steps stay (%s), the play head runs backwards", pat(c, 8).c_str());
+        set_int(c, "eu_bfwd", 1); CHECK(lit(c, "trk_bfwd") && lit(c, "eu_bfwd2") && !lit(c, "eu_bwd"), "BFWD on page 1: the track's, lit on page 2 too");
+        set_int(c, "eu_bwd2", 1);
         void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
         AEffect *e = VSTPluginMain(host); e->d(e, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
         set_int(e, "track_edit", 1); set_int(e, "euclid_edit", 1); blocks(e, 1, 0.0);
-        CHECK(lit(e, "eu_enable") && lit(e, "eu_ena2") && lit(e, "eu_bwd2") && lit(e, "eu_opor") && pat(e, 8) == "x..x..xx", "saved and loaded: both on, B backwards, OR (%s)", pat(e, 8).c_str());
+        CHECK(lit(e, "eu_enable") && lit(e, "eu_ena2") && lit(e, "eu_bwd2") && lit(e, "eu_opor") && pat(e, 8) == "x..x..x.", "saved and loaded: both on, backwards, OR (%s)", pat(e, 8).c_str());
         e->d(e, 1, 0, 0, 0, 0);
         c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0);
-        CHECK(!lit(c, "eu_enable") && lit(c, "eu_ena2") && pat(c, 8) == ".......x" && look(c, "eu_opv") == 1, "A off: B alone (%s), the boolean buttons dim", pat(c, 8).c_str());
+        CHECK(!lit(c, "eu_enable") && lit(c, "eu_ena2") && pat(c, 8) == "x......." && look(c, "eu_opv") == 1, "A off: B alone (%s), the boolean buttons dim", pat(c, 8).c_str());
         pr("eu_rnd2"); CHECK(lit(c, "eu_ena2") && !lit(c, "eu_enable"), "RANDOM B: B only");
         pr("eu_rnd"); CHECK(lit(c, "eu_enable") && lit(c, "eu_ena2"), "RANDOM A: A on again, B stays");
         c->setP(c, P("eu_ena2"), 0.0f); blocks(c, 1, 0.0); c->setP(c, P("eu_enable"), 0.0f); blocks(c, 1, 0.0);
