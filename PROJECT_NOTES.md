@@ -362,6 +362,8 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   eu_dir2 stay in the e line, unused. PATTERN EDIT's SHIFT label at cx=1062, as TRACK EDIT's.
 - EUCLIDIAN: no direction row on either page (it only repeated TRACK EDIT's DIRECTION); PULSE / ROTATE / LENGTH r=40,
   cy=285. The parameters eu_fwd .. eu_bfwd2 stay and still set the track's direction (no button).
+- EUCLIDIAN layout (owner, 16:10): ENABLE / RANDOM at cx 107 / 416, PULSE / ROTATE / LENGTH r=32 cy=299, COMMIT 118x39;
+  page 2 (B) the same. COMMIT picture regenerated.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

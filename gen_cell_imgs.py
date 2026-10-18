@@ -194,7 +194,7 @@ if os.path.exists(FONT):
             im.save("images/shift_%s%s.png" % (nm, "_on" if on else ""))
     btn("TRACK VALUES", GREY, False, BTN_W=120, size=13).save("images/trk_vals.png"); btn("TRACK VALUES", GREY, True, BTN_W=120, size=13).save("images/trk_vals_on.png")   # v1.2.0
     btn("BACK", GREY, False, BTN_W=120).save("images/trk_back.png"); btn("BACK", GREY, True, BTN_W=120).save("images/trk_back_on.png")
-    btn("COMMIT", GREY, False, BTN_W=118, BTN_H=32).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=32).save("images/eu2_commit_on.png")
+    btn("COMMIT", GREY, False, BTN_W=118, BTN_H=39).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=39).save("images/eu2_commit_on.png")   # v1.2.0: 118x39 (the owner's layout)
     def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small
         im = btn("", col, False, BTN_W=30, BTN_H=30).convert("RGBA"); d = ImageDraw.Draw(im)
         tri = lambda cx, sgn, r: d.polygon([(cx - sgn * r, 15 - r), (cx - sgn * r, 15 + r), (cx + sgn * r, 15)], fill=ink + (255,))
