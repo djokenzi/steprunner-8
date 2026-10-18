@@ -1380,11 +1380,17 @@ static const int FX_PADS[] = {P_PFX0 + 0, P_PFX0 + 1, P_PFX0 + 2, P_PFX0 + 3, P_
 enum { NFX_PADS = sizeof FX_PADS / sizeof FX_PADS[0] };
 static int value_of(Plugin *w, int i);
 static void set_value(Plugin *w, int i, int v);
-static uint32_t fx_take(Plugin *w) { uint32_t m = 0; for (int n = 0; n < NFX_PADS; n++) if (value_of(w, FX_PADS[n])) m |= 1u << n; return m; }
+/* v1.2.0: the ones with a pad on the PERFORM tab. The others (REVERSE, HALF / DOUBLE TIME, SCATTER, HUMANIZE (a pad until
+ * v1.1.1), POLY, DOWNBEAT ONLY, ALT BAR) are never saved into a STATE, and a recall switches them off: a state from an
+ * older project must not switch on an effect there is no pad to switch off. */
+static bool fx_shown(int p) {
+    return p != P_PFY0 + 1 && p != P_PFY0 + 2 && p != P_PFY0 + 3 && p != P_PFY0 + 6 && p != P_PF_HUM && p != P_PF_POLY && p != P_PF_DOWN && p != P_PF_ALT;
+}
+static uint32_t fx_take(Plugin *w) { uint32_t m = 0; for (int n = 0; n < NFX_PADS; n++) if (fx_shown(FX_PADS[n]) && value_of(w, FX_PADS[n])) m |= 1u << n; return m; }
 static void fx_put(Plugin *w, uint32_t m) {   /* the ones that differ: off first, then on (one LOOP at a time) */
     for (int on = 0; on < 2; on++)
         for (int n = 0; n < NFX_PADS; n++) {
-            const int want = (m >> n) & 1;
+            const int want = fx_shown(FX_PADS[n]) ? (m >> n) & 1 : 0;
             if (want == on && (value_of(w, FX_PADS[n]) != 0) != (want != 0)) set_value(w, FX_PADS[n], want);
         }
 }

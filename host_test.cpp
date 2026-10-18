@@ -1654,6 +1654,29 @@ static void vst_tests() {
         set_int(a, "track", 0);
     }
 
+    /* v1.2.0: a STATE brings back only the effects that have a pad; HUMANIZE (a pad until v1.1.1) and the other hidden ones stay off */
+    {
+        AEffect *c = VSTPluginMain(host);
+        auto tap = [&](const char *k) { c->setP(c, P(k), c->getP(c, P(k)) > 0.5f ? 0.0f : 1.0f); blocks(c, 1, 0.0); };
+        set_int(c, "pf_hum", 1); set_int(c, "pf_echo", 1); set_int(c, "pfy3", 1); blocks(c, 1, 0.0);
+        CHECK(c->getP(c, P("pf_hum")) == 1.0f && c->getP(c, P("pfy3")) == 1.0f, "HUMANIZE and HALF TIME switched on (automation only, no pad)");
+        tap("pst1");
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+          const size_t q = sv.find("\nV00 E "); const unsigned long fx = q == std::string::npos ? 0 : std::strtoul(sv.c_str() + q + 7, nullptr, 10);
+          CHECK(q != std::string::npos && (fx & (1u << 14)) && !(fx & (1u << 12)) && !(fx & (1u << 8)), "the state keeps ECHO, not HUMANIZE or HALF TIME (E %lu)", fx); }
+        set_int(c, "pf_echo", 0); blocks(c, 1, 0.0);
+        tap("pst1");
+        CHECK(c->getP(c, P("pf_echo")) == 1.0f && c->getP(c, P("pf_hum")) == 0.0f && c->getP(c, P("pfy3")) == 0.0f, "recalled: ECHO back on, HUMANIZE and HALF TIME off");
+        { void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);   /* a state from v1.1.1 with HUMANIZE in it (bit 12) */
+          const size_t q = sv.find("\nV00 E "); const size_t e = sv.find('\n', q + 1);
+          sv.replace(q, e - q, "\nV00 E " + std::to_string((1u << 12) | (1u << 14)));
+          AEffect *o = VSTPluginMain(host); o->d(o, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+          set_int(o, "pf_echo", 0); blocks(o, 1, 0.0);
+          o->setP(o, P("pst1"), o->getP(o, P("pst1")) > 0.5f ? 0.0f : 1.0f); blocks(o, 1, 0.0);
+          CHECK(o->getP(o, P("pf_echo")) == 1.0f && o->getP(o, P("pf_hum")) == 0.0f, "an older state with HUMANIZE: ECHO comes back, HUMANIZE stays off");
+          o->d(o, 1, 0, 0, 0, 0); }
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     /* v1.2.0: BFWD (back and forth from the end) for the track and generators A / B; FBWD is the old BOTH */
     {
         auto opt = [&](const char *k) { return a->getP(a, P(k)) == 1.0f; };

@@ -367,6 +367,9 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
 - Cleanup: READ PROJECT's job and the TRACK SETUP draft (ccdraft / basedraft) removed (cc_read does nothing; FETCH CC
   VALUES reads the base values; the project-finding tests use it now), eu_gen without a direction, 53 pictures no
   layout line used (and their code in gen_cell_imgs.py) deleted.
+- STATEs keep and bring back only the effects with a pad (`fx_shown`): REVERSE, HALF / DOUBLE TIME, SCATTER, HUMANIZE
+  (a pad until v1.1.1), POLY, DOWNBEAT ONLY and ALT BAR are not saved, and a recall switches them off (a 1.1.1 state
+  with HUMANIZE on no longer switches it on with no pad to switch it off).
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
