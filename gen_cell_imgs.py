@@ -184,8 +184,8 @@ if os.path.exists(FONT):
     # boolean ones), _dl = dim but the one in use
     DIM, DIM_INK = (52, 52, 52), (110, 110, 110)
     for g in ("A", "B"):
-        btn("ENABLE " + g, GREY, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_enable%s_on.png" % g.lower())
-        btn("RANDOM " + g, GREY, False, BTN_W=100, BTN_H=30, size=14).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=100, BTN_H=30, size=14).save("images/eu2_rnd%s_on.png" % g.lower())
+        btn("ENABLE " + g, GREY, False, BTN_W=132, BTN_H=39).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=132, BTN_H=39).save("images/eu2_enable%s_on.png" % g.lower())
+        btn("RANDOM " + g, GREY, False, BTN_W=132, BTN_H=39).save("images/eu2_rnd%s.png" % g.lower()); btn("RANDOM " + g, GREY, True, BTN_W=132, BTN_H=39).save("images/eu2_rnd%s_on.png" % g.lower())
     for nm, sgn in (("l", -1), ("r", 1)):   # v1.2.0 SHIFT: grey 78x39, a triangle (as DIRECTION's size)
         for on in (False, True):
             im = btn("", GREY, on, BTN_W=78, BTN_H=39).convert("RGBA"); d = ImageDraw.Draw(im)
@@ -316,8 +316,8 @@ if os.path.exists(FONT):
 if os.path.exists(FONT):
     for nm in ("FWD", "BWD", "BOTH", "FBWD", "BFWD"):   # v1.2.0: FBWD (the old BOTH) and BFWD
         k = nm.lower()
-        btn(nm, GREY, False, BTN_W=78).save("images/dir_%s_s.png" % k)
-        btn(nm, TRACKC, False, BTN_W=78).save("images/dir_%s_st.png" % k); btn(nm, TRIG, False, BTN_W=78).save("images/dir_%s_sp.png" % k)
+        btn(nm, GREY, False, BTN_W=84).save("images/dir_%s_s.png" % k)   # v1.2.0: 84 wide (the owner's layout, 2026-10-18)
+        btn(nm, TRACKC, False, BTN_W=84).save("images/dir_%s_st.png" % k); btn(nm, TRIG, False, BTN_W=84).save("images/dir_%s_sp.png" % k)
         btn(nm, GREY, False, BTN_W=132).save("images/dir_%s_m.png" % k); btn(nm, EUC, False, BTN_W=132).save("images/dir_%s_me.png" % k)   # v1.98.0: 132x39
         btn(nm, (52, 52, 52), False, ink=(110, 110, 110), BTN_W=132).save("images/dir_%s_md.png" % k)   # v1.83.0: ENABLE off: dim
     # v1.83.0: EMPTY dark; FULL the pale play-head colour, no bar; PLAYING the accent orange with the bar at the BOTTOM;

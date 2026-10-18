@@ -354,6 +354,9 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   cc_read, cc_commit, cc_discard stay (append-only) and act at once / just close.
 - TRACK SETUP IN USE tag back (lost before v1.0.0, when its pictures went in the v2.10 cleanup of Trig Seq): a red
   64x20 tag (images/cc_inuse.png) at the top right of a CC number knob, when=ccuseN:USED; ccuse6-8 appended.
+- Layout from Skin Studio (owner, 2026-10-18, 15:00): TRACK EDIT direction buttons 84 wide, EUCLIDIAN ENABLE / RANDOM
+  132x39 in one row, direction row under them, PULSE / ROTATE / LENGTH (r=32) below; generator B (page 2) laid out the
+  same. Pictures regenerated for the new sizes.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)
