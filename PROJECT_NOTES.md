@@ -323,6 +323,21 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
     (newer tools' skin_check reports it); the knobs themselves do not touch. Q-Links: 11 on PROGRAM and PERFORM.
     Button pictures regenerated for the sizes changed there: EUCLIDIAN ENABLE / RANDOM 100x30, arrows 30x30,
     TRACK VALUES and BACK 120x39.
+  - Knob text: the VALUE line under every knob is font 22 instead of the tools' 25.3 (`knob_text.py`, run by build.sh
+    after gen_vst.py: label_scale= would shrink the name too, and at 1.0 the name read too small on the device), and a
+    CC's name in it is made short, at most 6 characters (was cut to 9; `short_name`, the full name is still what is
+    saved): no leading pad number ("1 TUNE" -> "TUNE"), a name of several words keeps its last word, cut, after the
+    first ones made short ("Filter Cutoff" -> "F. Cut", "BD Level" -> "BD Lev", "Delay Send" -> "D Send", "Amp Env Attack"
+    -> "AE Att"), so the value texts of knobs 90 px apart no longer run into each other. PERFORM ALL CC knobs compare
+    the short names ("1 Delay Send" on T1 and "2 Delay Send" on T2 agree), tracks with no name do not count, and
+    differing names show MULTI (before: no name unless all eight had the very same one). Boxes unchanged (130 px wide).
+- CC 8 per track (NCC 8): default numbers T1-T8 = 19, 35, 41, 62, 63, 12, 13, 92 (`CC8_DEFAULT`: General Purpose 4,
+    the LSBs of the undefined 3 / 9 / 30 / 31, Effect Control 1 / 2, Effects 2 Depth; every "undefined" number was
+    taken). New parameters at the end: st_cc8, pf_cc8, rnd_cc8, trk_cc8 (P_TRK_CC_END stays CC 7: `trk_cc_j`). Saved:
+    CC 8 locks on an H line (64 x 1 byte hex; the X line keeps CC 6 / 7, 2 bytes a step, as the earlier v1.2.0 builds
+    wrote it), the C / B lines' ninth number, the state P line's last number. No CREATE DEFAULT MAP entry (PAD_PRM id
+    0). Layout: CC 8 right of CC 7 on STEP LOCKS / TRACK VALUES (cx=1200) and PERFORM (cx=1028), RND CC 8 right of RND
+    CC 7; Q-Links 12.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

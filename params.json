@@ -3501,6 +3501,35 @@
     "ON"
    ],
    "default": 0
+  },
+  {
+   "key": "st_cc8",
+   "name": "CC 8",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "pf_cc8",
+   "name": "CC 8",
+   "min": -127,
+   "max": 127,
+   "default": 0,
+   "display": "int"
+  },
+  {
+   "key": "rnd_cc8",
+   "name": "Random CC 8",
+   "momentary": true
+  },
+  {
+   "key": "trk_cc8",
+   "name": "Track CC 8",
+   "min": 0,
+   "max": 128,
+   "default": 0,
+   "display": "int"
   }
  ]
 }

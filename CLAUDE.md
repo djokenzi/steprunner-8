@@ -47,7 +47,8 @@ cd steprunner-8 && MPC_VST=../mpc-vst-plugins ./test.sh                    # off
 - **Saved projects must keep loading.** The chunk format is text lines, and new lines must be ignorable by older
   versions. Add a host test for every new behaviour in `host_test.cpp`.
 - **Skin preview without a device.**
-  1. Run `python3 ../mpc-vst-plugins/tools/gen_vst.py vst.json`.
+  1. Run `python3 ../mpc-vst-plugins/tools/gen_vst.py vst.json`, then `python3 knob_text.py build/skin/*/"Plugin Skins"`
+     (smaller knob value text, as `build.sh` does).
   2. Run the `preview` command of `tools/studio.py` on `build/skin/.../Plugin Skins`.
 - **Skin RAM.** MPC decodes every skin picture when the window opens. Avoid many full-screen pictures (one per
   `when=` option adds up fast); share a background and put small pictures on top. `build.sh` runs `skin_dedupe.py`.

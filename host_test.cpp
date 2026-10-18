@@ -99,15 +99,16 @@ static void core_tests() {
         bool used[128] = {false}, clash = false, reserved = false;
         for (int i = 0; i < 8; i++) {
             ok &= s.t[i].ccbase == bases[i];
-            for (int j = 0; j <= NCC; j++) {   /* v1.2.0: CC 1-7 and the pan CC */
+            for (int j = 0; j <= NCC; j++) {   /* v1.2.0: CC 1-8 and the pan CC */
                 int n = j < NCC ? Seq::cc_num(s.t[i], j) : PAN_CC[i];
                 clash |= used[n]; used[n] = true;
                 reserved |= n == 0 || n == 1 || n == 7 || n == 10 || n == 11 || n == 32 || (n >= 64 && n <= 69) || (n >= 96 && n <= 101) || n >= 120;
             }
         }
-        CHECK(!clash && !reserved, "default CC numbers: 64 different (CC 1-7 and pan of 8 tracks, one channel), none of them bank select / mod / volume / pan / expression / pedals / RPN / channel mode");
-        { bool c67 = true; for (int i = 0; i < 8; i++) c67 &= Seq::cc_num(s.t[i], 5) == 46 + i && Seq::cc_num(s.t[i], 6) == 54 + i;
-          CHECK(ok && c67 && NTRACKS == 8 && NCC == 7, "8 tracks on notes 36..43 (pads A01..A08), CC bases 20 25 85 102 107 112 14 80, CC 6 46-53, CC 7 54-61"); }
+        CHECK(!clash && !reserved, "default CC numbers: 72 different (CC 1-8 and pan of 8 tracks, one channel), none of them bank select / mod / volume / pan / expression / pedals / RPN / channel mode");
+        { static const int c8[8] = {19, 35, 41, 62, 63, 12, 13, 92};
+          bool c67 = true; for (int i = 0; i < 8; i++) c67 &= Seq::cc_num(s.t[i], 5) == 46 + i && Seq::cc_num(s.t[i], 6) == 54 + i && Seq::cc_num(s.t[i], 7) == c8[i];
+          CHECK(ok && c67 && NTRACKS == 8 && NCC == 8, "8 tracks on notes 36..43 (pads A01..A08), CC bases 20 25 85 102 107 112 14 80, CC 6 46-53, CC 7 54-61, CC 8 19 35 41 62 63 12 13 92"); }
         CHECK(NCOND == 44, "44 trig conditions");
         int a, b;
         CHECK(cond_ab(C_AB0, &a, &b) && a == 1 && b == 2 && cond_ab(NCOND - 1, &a, &b) && a == 8 && b == 8, "A:B runs 1:2 .. 8:8");
@@ -1440,7 +1441,7 @@ static void vst_tests() {
         press("cc_commit");
         CHECK(OPT3("panel") == 2 && (int)lroundf(a->getP(a, P("ccn1")) * 127) == 71 && (int)lroundf(a->getP(a, P("ccn4")) * 127) == 3 && (int)lroundf(a->getP(a, P("ccn2")) * 127) == 26,
               "COMMIT: CC 1 = 71, CC 4 = 3, the others as they were");
-        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 27 28 4 30 48 56\n") != 0, "the track's own CC numbers are saved"); }
+        { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); CHECK(strstr((char *)cx, "\nC 1 72 27 28 4 30 48 56 36\n") != 0, "the track's own CC numbers are saved"); }
         /* numbers already in use are marked, not refused */
         set_int(a, "track", 5); int t6cc = (int)lroundf(a->getP(a, P("ccn1")) * 127);
         set_int(a, "track", 7); int t8cc = (int)lroundf(a->getP(a, P("ccn5")) * 127);
@@ -1451,14 +1452,15 @@ static void vst_tests() {
         CHECK(a->getP(a, P("ccuse2")) == 1.0f && (int)lroundf(a->getP(a, P("ccn2")) * 127) == 20, "CC 20 is T1's on the same channel: marked, and still chosen");
         set_int(a, "ccn2", 10); CHECK(a->getP(a, P("ccuse2")) == 1.0f, "CC 10 is pan");
         set_int(a, "ccn2", 117); CHECK(a->getP(a, P("ccuse2")) == 1.0f, "CC 117 is T4's pan (v1.93.0)");
-        set_int(a, "ccn2", 62); CHECK(a->getP(a, P("ccuse2")) == 0.0f, "CC 62 is free (50 is T5's CC 6 since v1.2.0)");
+        set_int(a, "ccn2", 95); CHECK(a->getP(a, P("ccuse2")) == 0.0f, "CC 95 is free (50 is T5's CC 6, 62 T4's CC 8 since v1.2.0)");
         set_int(a, "ccn2", 71); CHECK(a->getP(a, P("ccuse2")) == 1.0f && a->getP(a, P("ccuse1")) == 1.0f, "the same number twice on one track marks both");
-        set_int(a, "ccn2", 62); CHECK(a->getP(a, P("ccuse2")) == 0.0f && a->getP(a, P("ccuse1")) == 0.0f, "CC 62 is free");
+        set_int(a, "ccn2", 95); CHECK(a->getP(a, P("ccuse2")) == 0.0f && a->getP(a, P("ccuse1")) == 0.0f, "CC 95 is free");
         set_int(a, "ccn2", 20); set_int(a, "trk_ch", 5);
         CHECK(a->getP(a, P("ccuse2")) == 1.0f, "T1's CC 20 is marked on another MIDI channel too");
         set_int(a, "ccn3", t6cc); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC %d is T6's first number: marked from T2", t6cc);
         set_int(a, "ccn3", t8cc); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC %d is T8's last number: marked", t8cc);
-        set_int(a, "ccn3", 19); CHECK(a->getP(a, P("ccuse3")) == 0.0f, "CC 19 is used nowhere: free");
+        set_int(a, "ccn3", 19); CHECK(a->getP(a, P("ccuse3")) == 1.0f, "CC 19 is T1's CC 8 (v1.2.0): marked");
+        set_int(a, "ccn3", 94); CHECK(a->getP(a, P("ccuse3")) == 0.0f, "CC 94 is used nowhere: free");
         set_int(a, "trk_ch", 1);
         press("cc_discard");
         CHECK(a->getP(a, P("ccuse2")) == 0.0f, "no marks while the editor is closed");
@@ -1671,7 +1673,7 @@ static void vst_tests() {
         CHECK(a->getP(a, P("pf_ctrl")) == 1.0f && !strcmp(d1, "+20") && !strcmp(d2, "-15") && !strcmp(d3, "+0%") && !strcmp(d4, "-20"), "a state saved with PERFORM ALL on brings it back: %s %s %s, pan %s", d1, d2, d3, d4);
         tap("pst1"); CHECK(a->getP(a, P("pf_ctrl")) == 0.0f, "one saved with it off switches it off");
         { void *cx = 0; a->d(a, 23, 0, 0, &cx, 0); const char *c = (const char *)cx;
-          CHECK(strstr(c, "\nV00 t 0 ") && strstr(c, "\nV00 s 0 ") && strstr(c, "\nV01 P 1 0 20 0 -20 0 -15 0 0 0 0 0 0\n") && strstr(c, "\nV07 G ") && !strstr(c, "\nV02 "), "states are saved with the project");
+          CHECK(strstr(c, "\nV00 t 0 ") && strstr(c, "\nV00 s 0 ") && strstr(c, "\nV01 P 1 0 20 0 -20 0 -15 0 0 0 0 0 0 0\n") && strstr(c, "\nV07 G ") && !strstr(c, "\nV02 "), "states are saved with the project");
           std::string sv(c);
           AEffect *b = VSTPluginMain(host);
           b->d(b, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
@@ -2059,7 +2061,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
     {
         static char *chunk; int n = (int)a->d(a, 23, 0, 0, &chunk, 0);
         std::string saved(chunk, n);
-        CHECK(saved.find("\nB 0 65 0 1 0 0 0 0\n") != std::string::npos, "the chunk has the base line for T1");
+        CHECK(saved.find("\nB 0 65 0 1 0 0 0 0 0\n") != std::string::npos, "the chunk has the base line for T1");
         AEffect *b = VSTPluginMain(host);
         b->d(b, 24, 0, n, (void *)saved.c_str(), 0);
         b->d(b, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "64"), "reloaded: BASE 1 = '%s'", disp);
@@ -2113,22 +2115,22 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         c->d(c, 7, P("msg"), 0, m, 0); c->d(c, 7, P("st_cc1"), 0, d1, 0); c->d(c, 7, P("st_cc5"), 0, d5, 0);
         c->d(c, 7, P("srcproj"), 0, r1, 0);
         CHECK(!strncmp(m, "Read ", 5) && strstr(m, " CC values") && atoi(m + 5) >= 8 && !strcmp(r1, "9w9") && display_updates > 0, "FETCH CC VALUES with no target track: '%s' (from any mapping); project '%s'", m, r1);
-        CHECK(!strcmp(d1, "BD Level (94)") && !strcmp(d5, "--") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 95 && c->getP(c, P("st_cc5")) == 0.0f, "T1 lock knobs: CC 1 '%s' and the knob is on it, CC 5 '%s'", d1, d5);
+        CHECK(!strcmp(d1, "BD Lev (94)") && !strcmp(d5, "--") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 95 && c->getP(c, P("st_cc5")) == 0.0f, "T1 lock knobs: CC 1 '%s' and the knob is on it, CC 5 '%s'", d1, d5);
         {   /* the knob resting on the base is not a lock: nothing in the chunk, and the host echoing the value back makes none */
             static char *ch0; int n0 = (int)c->d(c, 23, 0, 0, &ch0, 0); std::string before(ch0, n0);
             c->setP(c, P("st_cc1"), c->getP(c, P("st_cc1"))); blocks(c, 1, 0.0);
             int n1 = (int)c->d(c, 23, 0, 0, &ch0, 0); std::string after(ch0, n1);
             c->d(c, 7, P("st_cc1"), 0, d1, 0);
-            CHECK(before == after && !strcmp(d1, "BD Level (94)"), "an echo of the resting value leaves the step alone ('%s')", d1);
-            set_int(c, "st_cc1", 41); c->d(c, 7, P("st_cc1"), 0, d1, 0); CHECK(!strcmp(d1, "BD Level 40"), "turning it makes a lock: '%s'", d1);
+            CHECK(before == after && !strcmp(d1, "BD Lev (94)"), "an echo of the resting value leaves the step alone ('%s')", d1);
+            set_int(c, "st_cc1", 41); c->d(c, 7, P("st_cc1"), 0, d1, 0); CHECK(!strcmp(d1, "BD Lev 40"), "turning it makes a lock: '%s'", d1);
             set_int(c, "st_cc1", 0); blocks(c, 1, 0.0); c->d(c, 7, P("st_cc1"), 0, d1, 0);
-            CHECK(!strcmp(d1, "BD Level (94)") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 0, "all the way down clears the lock; the knob stays at -- (v1.2.0: no jump), the text shows the base: '%s'", d1);
+            CHECK(!strcmp(d1, "BD Lev (94)") && (int)lroundf(c->getP(c, P("st_cc1")) * 128) == 0, "all the way down clears the lock; the knob stays at -- (v1.2.0: no jump), the text shows the base: '%s'", d1);
         }
         set_int(c, "track", 1); blocks(c, 1, 0.0); c->d(c, 7, P("st_cc1"), 0, t2, 0);
-        CHECK(!strcmp(t2, "SN Level (58)"), "T2 (CC 25 = SN Level): '%s'", t2);
-        c->d(c, 7, P("st_cc4"), 0, t2, 0); CHECK(!strcmp(t2, "SN Distor (0)"), "a long name is cut to 9 characters: '%s'", t2);
-        c->d(c, 7, P("pf_cc1"), 0, t2, 0); CHECK(!strcmp(t2, "OFF"), "PERFORM CC 1: the tracks do not agree on a name ('%s')", t2);
-        set_int(c, "st_cc1", 11); c->d(c, 7, P("st_cc1"), 0, t2, 0); CHECK(!strcmp(t2, "SN Level 10"), "a lock shows its own value: '%s'", t2);
+        CHECK(!strcmp(t2, "SN Lev (58)"), "T2 (CC 25 = SN Level): '%s'", t2);
+        c->d(c, 7, P("st_cc4"), 0, t2, 0); CHECK(!strcmp(t2, "SN Dis (0)"), "a long name is cut to 6 characters (v1.2.0, was 9): '%s'", t2);
+        c->d(c, 7, P("pf_cc1"), 0, t2, 0); CHECK(!strcmp(t2, "MULTI OFF"), "PERFORM CC 1: the tracks do not agree on a name (v1.2.0: MULTI) ('%s')", t2);
+        set_int(c, "st_cc1", 11); c->d(c, 7, P("st_cc1"), 0, t2, 0); CHECK(!strcmp(t2, "SN Lev 10"), "a lock shows its own value: '%s'", t2);
         pr("read_all");
 
         {   /* the target is saved; EDIT CC's READ PROJECT keeps to it */
@@ -2139,7 +2141,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             {   /* names come back with the project; a CC number changed since no longer carries the old name */
                 AEffect *f = VSTPluginMain(host);
                 f->d(f, 24, 0, n, (void *)saved.c_str(), 0); set_int(f, "track", 0); blocks(f, 1, 0.0);
-                char nm[64]; f->d(f, 7, P("st_cc1"), 0, nm, 0); CHECK(!strcmp(nm, "BD Level (94)"), "reloaded: '%s'", nm);
+                char nm[64]; f->d(f, 7, P("st_cc1"), 0, nm, 0); CHECK(!strcmp(nm, "BD Lev (94)"), "reloaded: '%s'", nm);
                 set_int(f, "track_edit", 1); blocks(f, 1, 0.0); set_int(f, "cc_edit", 1); blocks(f, 1, 0.0); set_int(f, "ccn1", 71);
                 f->setP(f, P("cc_commit"), 1.0f); blocks(f, 1, 0.0); f->setP(f, P("cc_commit"), 0.0f); blocks(f, 1, 0.0);
                 set_int(f, "pattern_edit", 1); blocks(f, 1, 0.0);
@@ -2348,6 +2350,52 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         CHECK(!strcmp(d, "+10") || strstr(d, "+10"), "PERFORM ALL: CC 6 knob '%s'", d);
         c->d(c, 1, 0, 0, 0, 0);
     }
+    {   /* v1.2.0 CC 8: T1-T8 on 19 35 41 62 63 12 13 92; a lock is saved on an H line (the X line stays CC 6 / 7), base, PERFORM, RND */
+        AEffect *c = VSTPluginMain(host);
+        char d[64];
+        const double ppb = (120.0 / 60.0) * (128.0 / 44100.0);
+        auto iv = [&](AEffect *x, const char *k) { return (int)lroundf(x->getP(x, P(k)) * (PARAMS[P(k)].max - PARAMS[P(k)].min) + PARAMS[P(k)].min); };
+        auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 2, 0.0); };
+        set_int(c, "track", 3); c->setP(c, P("step0"), 1.0f);
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); set_int(c, "st_cc8", 1 + 77);
+        c->d(c, 7, P("st_cc8"), 0, d, 0); CHECK(!strcmp(d, "77"), "CC 8 lock on T4 step 1: '%s'", d);
+        int before = steprunner_test_count();
+        g_ti.flags = kPlaying | kTempo | kPpq; g_ti.ppqPos = 0.0; blocks(c, 60, ppb); g_ti.flags = kTempo | kPpq; blocks(c, 2, ppb);
+        unsigned char m[3]; int v62 = -1;
+        for (int k = before; k < steprunner_test_count(); k++) { steprunner_test_get(k, m); if ((m[0] & 0xF0) == 0xB0 && m[1] == 62) v62 = m[2]; }
+        CHECK(v62 == 77, "T4: CC 8 goes out on CC 62 (%d)", v62);
+        void *cx = 0; c->d(c, 23, 0, 0, &cx, 0); std::string sv((char *)cx);
+        CHECK(sv.find("\nH 3 ") != std::string::npos && sv.find("\nX 3 ") == std::string::npos, "saved on an H line, no X line (no CC 6 / 7 lock)");
+        AEffect *e = VSTPluginMain(host); e->d(e, 24, 0, (intptr_t)sv.size(), (void *)sv.c_str(), 0);
+        set_int(e, "track", 3); set_int(e, "step_edit", 1); set_int(e, "sel", 1);
+        CHECK(iv(e, "st_cc8") == 78, "and loaded (%d)", iv(e, "st_cc8") - 1);
+        e->d(e, 1, 0, 0, 0, 0);
+        {   /* an X line as the earlier v1.2.0 builds wrote it (2 bytes a step) still gives CC 6 / 7, and CC 8 stays empty */
+            std::string old = sv; const size_t q = old.find("\nH 3 "); old.erase(q + 1, old.find('\n', q + 1) - q);
+            std::string x = "X 3 "; for (int k = 0; k < 64; k++) x += k == 0 ? "1f2a" : "0000";
+            old += x + "\n";
+            AEffect *o = VSTPluginMain(host); o->d(o, 24, 0, (intptr_t)old.size(), (void *)old.c_str(), 0);
+            set_int(o, "track", 3); set_int(o, "step_edit", 1); set_int(o, "sel", 1);
+            CHECK(iv(o, "st_cc6") == 0x1f && iv(o, "st_cc7") == 0x2a && iv(o, "st_cc8") == 0, "an X line of 2 bytes a step: CC 6 %d, CC 7 %d, CC 8 none (%d)", iv(o, "st_cc6") - 1, iv(o, "st_cc7") - 1, iv(o, "st_cc8"));
+            o->d(o, 1, 0, 0, 0, 0);
+        }
+        set_int(c, "step_edit", 0); set_int(c, "track_edit", 1); set_int(c, "st_cc8", 1 + 50);   /* a Q-Link in TRACK EDIT: the track's CC 8 base */
+        CHECK(iv(c, "trk_cc8") == 51, "TRACK EDIT: the CC 8 Q-Link sets the track's CC 8 base (%d)", iv(c, "trk_cc8") - 1);
+        before = steprunner_test_count(); set_int(c, "trk_cc8", 1 + 60); blocks(c, 1, 0.0);
+        int b62 = -1; for (int k = before; k < steprunner_test_count(); k++) { steprunner_test_get(k, m); if ((m[0] & 0xF0) == 0xB0 && m[1] == 62) b62 = m[2]; }
+        CHECK(b62 == 60, "TRACK VALUES CC 8: the base goes out at once on CC 62 (%d)", b62);
+        { void *bx = 0; c->d(c, 23, 0, 0, &bx, 0); CHECK(strstr((char *)bx, "\nB 3 0 0 0 0 0 0 0 61\n") != 0, "the base is the B line's ninth number"); }
+        set_int(c, "pf_ctrl", 1); set_int(c, "pf_cc8", 10); c->d(c, 7, P("pf_cc8"), 0, d, 0);
+        CHECK(!strcmp(d, "+10"), "PERFORM ALL: CC 8 knob '%s'", d);
+        set_int(c, "pf_ctrl", 0);
+        set_int(c, "rnd_dens", 100); set_int(c, "rnd_min", 30); set_int(c, "rnd_max", 40); pr("rnd_cc8");
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); c->d(c, 7, P("st_cc8"), 0, d, 0);
+        CHECK(atoi(d) >= 30 && atoi(d) <= 40, "TRACK EDIT: RND CC 8 wrote a lock in 30..40 ('%s')", d);
+        set_int(c, "track_edit", 1); set_int(c, "clr_mode", 1); pr("rnd_cc8"); set_int(c, "clr_mode", 0);
+        set_int(c, "step_edit", 1); set_int(c, "sel", 1); c->d(c, 7, P("st_cc8"), 0, d, 0);
+        CHECK(strstr(d, "(60)") != 0, "CLR CC 8: the lock goes, the knob shows the base ('%s')", d);
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     {   /* v1.2.0: TRACK VALUES: VELOCITY, PAN, LENGTH, PROB and the CC base values of the track, BACK; PAN / CC go out at once */
         AEffect *c = VSTPluginMain(host);
         char d[64];
@@ -2490,6 +2538,25 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         c->d(c, 1, 0, 0, 0, 0);
         unsetenv("STEPRUNNER_XPJ_ROOT");
     }
+    {   /* v1.2.0: a CC's name made short under the knob: no pad number, first words to initials, the last one cut */
+        AEffect *c = VSTPluginMain(host);
+        static char *ch0; int n0 = (int)c->d(c, 23, 0, 0, &ch0, 0); std::string ck(ch0, n0); while (!ck.empty() && ck.back() == 0) ck.pop_back();
+        const char *full[8] = {"1 TUNE", "12 NOISE", "Filter Cutoff", "BD Level", "Amp Env Attack", "Resonance", "2 Delay Send", "Filter Env"};
+        const char *want[8] = {"TUNE --", "NOISE --", "F. Cut --", "BD Lev --", "AE Att --", "Resona --", "D Send --", "F. Env --"};
+        for (int ti = 0; ti < 8; ti++) ck += "N " + std::to_string(ti) + " 5 " + std::to_string(46 + ti) + " " + full[ti] + "\n";   /* CC 6 of track ti: 46 + ti */
+        for (int ti = 0; ti < 7; ti++) ck += "N " + std::to_string(ti) + " 6 " + std::to_string(54 + ti) + " " + std::to_string(ti + 1) + " Delay Send\n";   /* CC 7: the same on 7 tracks, T8 none */
+        c->d(c, 24, 0, (int)ck.size(), (void *)ck.c_str(), 0);
+        for (int ti = 0; ti < 8; ti++) {
+            set_int(c, "track", ti); blocks(c, 1, 0.0);
+            char a[64], b[64]; c->d(c, 7, P("st_cc6"), 0, a, 0); c->d(c, 7, P("trk_cc6"), 0, b, 0);
+            CHECK(!strcmp(a, want[ti]) && !strcmp(b, want[ti]), "short CC name: '%s' -> STEP LOCKS '%s', TRACK VALUES '%s'", full[ti], a, b);
+        }
+        char p6[64], p7[64]; c->d(c, 7, P("pf_cc6"), 0, p6, 0); c->d(c, 7, P("pf_cc7"), 0, p7, 0);
+        CHECK(!strcmp(p6, "MULTI OFF") && !strcmp(p7, "D Send OFF"), "PERFORM: different names MULTI ('%s'), the same name without its pad number ('%s'; a track with no name does not count)", p6, p7);
+        static char *ch1; int n1 = (int)c->d(c, 23, 0, 0, &ch1, 0); std::string saved(ch1, n1);
+        CHECK(saved.find("N 2 5 48 Filter Cutoff\n") != std::string::npos, "the full name is what is saved");
+        c->d(c, 1, 0, 0, 0, 0);
+    }
     {   /* PERFORM ALL CC knobs move the base values, at once: every track's own value by the same amount */
         AEffect *c = VSTPluginMain(host);
         static char *ch0; int n0 = (int)c->d(c, 23, 0, 0, &ch0, 0); std::string ck(ch0, n0); while (!ck.empty() && ck.back() == 0) ck.pop_back();
@@ -2530,10 +2597,10 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         c->d(c, 24, 0, (int)ck.size(), (void *)ck.c_str(), 0);
         char p1[64], p2[64];
         c->d(c, 7, P("pf_cc1"), 0, p1, 0); c->d(c, 7, P("pf_cc2"), 0, p2, 0);
-        CHECK(!strcmp(p1, "Cutoff OFF") && !strcmp(p2, "OFF"), "PERFORM ALL off: CC 1 '%s' (all agree), CC 2 '%s' (T8 has no name)", p1, p2);
+        CHECK(!strcmp(p1, "Cutoff OFF") && !strcmp(p2, "Resona OFF"), "PERFORM ALL off: CC 1 '%s' (all agree), CC 2 '%s' (T8 has no name: v1.2.0, it does not count)", p1, p2);
         set_int(c, "pf_ctrl", 1); blocks(c, 1, 0.0);
         c->d(c, 7, P("pf_cc1"), 0, p1, 0); c->d(c, 7, P("pf_cc2"), 0, p2, 0);
-        CHECK(!strcmp(p1, "Cutoff +0") && !strcmp(p2, "+0"), "PERFORM ALL on: '%s' / '%s'", p1, p2);
+        CHECK(!strcmp(p1, "Cutoff +0") && !strcmp(p2, "Resona +0"), "PERFORM ALL on: '%s' / '%s'", p1, p2);
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* CREATE DEFAULT MAP (v1.64.0, SETUP panel): a list of the open project's drum tracks; a tap on one copies the project
@@ -2569,7 +2636,7 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         }
         pr("src_fetch");
         c->d(c, 7, P("msg"), 0, r1, 0); c->d(c, 7, P("st_cc1"), 0, m, 0); c->d(c, 7, P("st_cc3"), 0, r2, 0);
-        CHECK(!strcmp(r1, "Read 56 CC values") && !strcmp(m, "Tuning (64)") && !strcmp(r2, "Filter Re (0)"), "FETCH CC VALUES from the target track: '%s'; T1 '%s', '%s'", r1, m, r2);
+        CHECK(!strcmp(r1, "Read 56 CC values") && !strcmp(m, "Tuning (64)") && !strcmp(r2, "F. Res (0)"), "FETCH CC VALUES from the target track: '%s'; T1 '%s', '%s'", r1, m, r2);
         { char c6[64], pn[64]; set_int(c, "step_edit", 1); set_int(c, "sel", 2); c->d(c, 7, P("st_cc6"), 0, c6, 0); c->d(c, 7, P("st_pan"), 0, pn, 0);
           CHECK(strstr(c6, "(") && pn[0] == '(', "STEP LOCKS after FETCH: CC 6 '%s' (Send 3), pan '%s' (the pad's), in brackets: no lock", c6, pn);
           set_int(c, "global_edit", 1); }

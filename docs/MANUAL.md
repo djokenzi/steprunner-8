@@ -129,7 +129,7 @@ The settings of the selected track (the title shows *SETUP TRACK n*):
 |---|---|---|
 | **MIDI CH** | 1–16 | Channel the track sends on |
 | **Note** | 0–127 | Note the track plays |
-| **CC 1–5 Number** | 0–127 | CC number each of the first five CC locks is sent on (CC 6 / 7: see [12.1](#121-defaults)) |
+| **CC 1–5 Number** | 0–127 | CC number each of the first five CC locks is sent on (CC 6 / 7 / 8: see [12.1](#121-defaults)) |
 | **CC 1–5 Base** | OFF, 0–127 | The value the CC goes back to after a locked step (see [12.3](#123-base-values)) |
 
 - **MIDI CH** and **Note** take effect immediately.
@@ -255,7 +255,7 @@ The settings of the selected track:
 is on STEP LOCKS) returns to TRACK EDIT. The panel stays open when you switch modes and come back, and it opens from
 EUCLIDIAN too.
 
-**Q-Links:** on the PROGRAM tab the Q-Links turn the STEP LOCKS knobs (Velocity, Pan, Length, Prob, CC 1–7). In TRACK
+**Q-Links:** on the PROGRAM tab the Q-Links turn the STEP LOCKS knobs (Velocity, Pan, Length, Prob, CC 1–8). In TRACK
 EDIT, and in EUCLIDIAN opened from TRACK EDIT, the same Q-Links turn the track's values instead; in STEP EDIT and the
 other modes they are the step's locks again.
 
@@ -265,7 +265,7 @@ other modes they are the step's locks again.
 | **Pan** | L64 … C … R63 | The pad's pan (sent at once); trigs without a pan lock return to it. `--` = not known yet (see FETCH CC VALUES) |
 | **Length** | 0.25–16 steps | Note length of trigs without a length lock |
 | **Prob** | 0–100 % | Chance of every trig of the track, on top of each step's own probability. NO LOCKS ignores it. |
-| **CC 1–7** | 0–127 | The CC's base value (sent at once); a CC lock returns to it, as in [12.3](#123-base-values). `--` = none |
+| **CC 1–8** | 0–127 | The CC's base value (sent at once); a CC lock returns to it, as in [12.3](#123-base-values). `--` = none |
 
 The random buttons act on the selected track. **▶** shows a second page of random buttons, **◀** goes back to the
 first. The page stays as it is when you switch modes.
@@ -307,7 +307,7 @@ STEP EDIT sets the **locks** of individual steps.
 | **Pan** | L64 … C … R63 | the track's pan (shown in brackets once known, e.g. *(L20)*) |
 | **Length** | 0.25–16 steps | track gate |
 | **Probability** | 0–100 % | 100 % |
-| **CC 1–7** | 0–127 | nothing sent (or the base value, see [12.3](#123-base-values)) |
+| **CC 1–8** | 0–127 | nothing sent (or the base value, see [12.3](#123-base-values)) |
 
 - If a CC has a base value, a step without a lock shows it in brackets, e.g. *(64)*, and the knob starts from there.
   VELOCITY and PAN do the same with the track's values (TRACK VALUES; pan from FETCH CC VALUES).
@@ -387,7 +387,7 @@ The left section on the PROGRAM tab holds the random and clear buttons:
 | **RND VEL** | Velocity locks |
 | **RND LEN** | Length locks |
 | **RND PAN** | Pan locks |
-| **RND CC 1–7** | Locks of that CC (CC 6 / CC 7 in their own row) |
+| **RND CC 1–8** | Locks of that CC (CC 6 / CC 7 / CC 8 in their own row) |
 
 The values come from *Random Min … Max* in RANDOM SETUP. What the buttons act on depends on the mode:
 
@@ -400,7 +400,7 @@ The values come from *Random Min … Max* in RANDOM SETUP. What the buttons act 
 In PATTERN EDIT and TRACK EDIT the lock buttons change only *Random Density* % of the steps that have a trig.
 
 - **CLR STEPS**: empties the selected track (trigs, conditions, locks, timing). Its settings stay.
-- **CLR LOCKS**: a switch. While it is lit (red), the buttons turn into CLR VEL, CLR LEN, CLR PAN and CLR CC 1–7.
+- **CLR LOCKS**: a switch. While it is lit (red), the buttons turn into CLR VEL, CLR LEN, CLR PAN and CLR CC 1–8.
   Each removes that lock from the selected steps (STEP EDIT) or from the whole selected track (other modes). Tap
   CLR LOCKS again to switch it off.
 
@@ -462,7 +462,7 @@ The effect pads act on all 8 tracks and are violet while on.
 | **Pan** | Pan of steps without a pan lock |
 | **Length** | Each track's gate |
 | **Probability** | Lowers the probability of plain steps (100 %, no condition) |
-| **CC 1–7** | Moves each track's base value of that CC (only tracks with a base value) |
+| **CC 1–8** | Moves each track's base value of that CC (only tracks with a base value) |
 
 Locks are never changed: they still play on their steps.
 
@@ -487,20 +487,23 @@ Locks are never changed: they still play on their steps.
 
 ### 12.1 Defaults
 
-| Track | Note (pad) | CC 1–5 | CC 6 | CC 7 | Pan CC |
-|---|---|---|---|---|---|
-| T1 | 36 (A01) | 20–24 | 46 | 54 | 30 |
-| T2 | 37 (A02) | 25–29 | 47 | 55 | 31 |
-| T3 | 38 (A03) | 85–89 | 48 | 56 | 90 |
-| T4 | 39 (A04) | 102–106 | 49 | 57 | 117 |
-| T5 | 40 (A05) | 107–111 | 50 | 58 | 118 |
-| T6 | 41 (A06) | 112–116 | 51 | 59 | 119 |
-| T7 | 42 (A07) | 14–18 | 52 | 60 | 3 |
-| T8 | 43 (A08) | 80–84 | 53 | 61 | 9 |
+| Track | Note (pad) | CC 1–5 | CC 6 | CC 7 | CC 8 | Pan CC |
+|---|---|---|---|---|---|---|
+| T1 | 36 (A01) | 20–24 | 46 | 54 | 19 | 30 |
+| T2 | 37 (A02) | 25–29 | 47 | 55 | 35 | 31 |
+| T3 | 38 (A03) | 85–89 | 48 | 56 | 41 | 90 |
+| T4 | 39 (A04) | 102–106 | 49 | 57 | 62 | 117 |
+| T5 | 40 (A05) | 107–111 | 50 | 58 | 63 | 118 |
+| T6 | 41 (A06) | 112–116 | 51 | 59 | 12 | 119 |
+| T7 | 42 (A07) | 14–18 | 52 | 60 | 13 | 3 |
+| T8 | 43 (A08) | 80–84 | 53 | 61 | 92 | 9 |
 
-All 64 numbers are different, so all eight tracks can share one MIDI channel. None of them is a controller MPC or a
+All 72 numbers are different, so all eight tracks can share one MIDI channel. None of them is a controller MPC or a
 MIDI device acts on by itself (bank select, modulation, volume, pan, expression, pedals, RPN/NRPN, channel mode).
-CC 6 and CC 7 have no number in TRACK SETUP yet. CREATE DEFAULT MAP maps them to the pad's Send 3 and Send 4.
+CC 6, CC 7 and CC 8 have no number in TRACK SETUP yet. CREATE DEFAULT MAP maps CC 6 and CC 7 to the pad's Send 3 and
+Send 4; CC 8 has no default mapping (map it with MPC's MIDI learn). Every MIDI "undefined" number is used by CC 1–7 and
+pan, so CC 8 uses numbers MPC does not act on by itself: General Purpose 4 (19), the LSBs of the undefined 3, 9, 30, 31
+(35, 41, 62, 63), Effect Control 1 / 2 (12, 13) and Effects 2 Depth (92).
 
 FETCH CC VALUES reads the **saved** project: after changing a pad on the MPC (pan, cutoff, sends …), save the project,
 then tap FETCH CC VALUES. For the pad parameters CREATE DEFAULT MAP maps, it reads the pad's own value.

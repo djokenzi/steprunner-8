@@ -173,12 +173,13 @@ enum {
     P_EU_OPV = P_EU_OP_END,                      /* v1.2.0: read-only, how they look: HIDDEN / OFF (dim, not both on) / ON */
     P_TRK_VALS, P_TRK_BACK,                      /* v1.2.0: TRACK VALUES (TRACK EDIT's right panel) and its BACK button */
     P_TRK_PAN, P_TRK_PROB,                       /* v1.2.0: the track's pan (panb) and PROB (100 - pcut) */
-    P_TRK_CC0, P_TRK_CC_END = P_TRK_CC0 + NCC,   /* v1.2.0: the track's CC base values (ccb, 0 = none) */
+    P_TRK_CC0, P_TRK_CC_END = P_TRK_CC0 + 7,     /* v1.2.0: the track's CC 1-7 base values (ccb, 0 = none); CC 8: P_TRK_CC8 */
     P_SHIFT_L = P_TRK_CC_END, P_SHIFT_R,         /* v1.2.0: SHIFT: the track (TRACK EDIT) or the pattern (PATTERN EDIT) one step earlier / later */
     P_ST_CC6, P_ST_CC7, P_PF_CC6, P_PF_CC7,      /* v1.2.0: CC 6 / CC 7: their step locks and PERFORM ALL knobs */
     P_RND_CC6, P_RND_CC7,                        /* v1.2.0: RND CC 6 / 7 (page 2 of the left section) */
     P_NAVV,                                      /* v1.2.0: read-only, which arrow has a page: NONE / RIGHT / LEFT */
     P_PSHIFTV,                                   /* v1.2.0: read-only, PATTERN EDIT's SHIFT: HIDDEN (SHUFFLE EDIT on, or another panel) / ON */
+    P_ST_CC8, P_PF_CC8, P_RND_CC8, P_TRK_CC8,    /* v1.2.0: CC 8: its step lock, PERFORM ALL knob, RND button, TRACK VALUES knob */
     P_OWN_COUNT
 };
 enum { NRND = 3 + NCC_V1, NPF = 9 };   /* parameter counts: the RND buttons, the PERFORM knobs P_PF0.. (CC 6 / 7: P_PF_CC6 / 7) */
@@ -195,7 +196,7 @@ static const struct { int idx; const char *key; } KEYCHECK[] = {
     {P_TRACK_EDIT, "track_edit"}, {P_PANEL, "panel"}, {P_PTITLE, "ptitle"}, {P_LEN16, "len16"}, {P_LEN64, "len64"},
     {P_TRKSEL0, "trk1"}, {P_TRKSEL0 + NTRACKS - 1, "trk8"}, {P_PGSEL0, "pg1"}, {P_PGSEL0 + 3, "pg4"}, {P_RANDOM_EDIT, "random_edit"}, {P_TRK_CCBASE, "trk_ccbase"},
     {P_EUCLID_EDIT, "euclid_edit"}, {P_LPANEL, "lpanel"}, {P_EU_ENABLE, "eu_enable"}, {P_EU_PL1, "eu_pl1"}, {P_EU_BOOL, "eu_bool"}, {P_EU_COMMIT, "eu_commit"},
-    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC0 + NCC - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"}, {P_RND_CC6, "rnd_cc6"}, {P_RND_CC7, "rnd_cc7"}, {P_NAVV, "navv"}, {P_PSHIFTV, "pshiftv"},
+    {P_PF0, "pf_prob"}, {P_PF0 + NPF - 1, "pf_cc5"}, {P_PF_CTRL, "pf_ctrl"}, {P_PF_DISCARD, "pf_discard"}, {P_PFX0, "pfx1"}, {P_PFX0 + 7, "pfx8"}, {P_PFY0, "pfy1"}, {P_PFY0 + 7, "pfy8"}, {P_MSTATE, "mstate"}, {P_GLOBAL_EDIT, "global_edit"}, {P_SHUFFLE, "shuffle"}, {P_SHUF0, "shuf1"}, {P_SHUF0 + NTRACKS - 1, "shuf8"}, {P_GLOB_CH, "glob_ch"}, {P_SHUF_ALL, "shuf_all"}, {P_PATTERN_EDIT, "pattern_edit"}, {P_PLEN0, "plen16"}, {P_PLEN0 + 3, "plen64"}, {P_UNDO, "undo"}, {P_REDO, "redo"}, {P_COPY, "copy"}, {P_PASTE, "paste"}, {P_MSG, "msg"}, {P_MPAD0, "mpad1"}, {P_MPAD0 + NTRACKS - 1, "mpad8"}, {P_PF_CC117, "pf_cc117"}, {P_PCOPY, "pcopy"}, {P_PPASTE, "ppaste"}, {P_SHIFT, "shift"}, {P_EU_LEN, "eu_len"}, {P_EU_RND, "eu_rnd"}, {P_PGST0, "pgst1"}, {P_PGST0 + 3, "pgst4"}, {P_CC_EDIT, "cc_edit"}, {P_CCN0, "ccn1"}, {P_CCN0 + NCC_V1 - 1, "ccn5"}, {P_CC_COMMIT, "cc_commit"}, {P_CC_DISCARD, "cc_discard"}, {P_CCUSE0, "ccuse1"}, {P_CCUSE0 + NCC_V1 - 1, "ccuse5"}, {P_PST0, "pst1"}, {P_PST0 + 3, "pst4"}, {P_PCLEAR, "pclear"}, {P_CCB0, "ccb1"}, {P_CCB0 + NCC_V1 - 1, "ccb5"}, {P_CC_READ, "cc_read"}, {P_READ_ALL, "read_all"}, {P_SRCPROJ, "srcproj"}, {P_SRCROW0, "srcrow1"}, {P_SRCROW0 + 5, "srcrow6"}, {P_SRCSEL0, "srcsel1"}, {P_SRCSEL0 + 5, "srcsel6"}, {P_SRC_PREV, "src_prev"}, {P_SRC_NEXT, "src_next"}, {P_SRC_CANCEL, "src_cancel"}, {P_SCR, "scr"}, {P_SRC_COMMIT, "src_commit"}, {P_SRCHL0, "srchl1"}, {P_SRCHL0 + 5, "srchl6"}, {P_SRC_MAP, "src_map"}, {P_SRC_FETCH, "src_fetch"}, {P_SRC_NOTES, "src_notes"}, {P_SHUF_EDIT, "shuf_edit"}, {P_CLR_MODE, "clr_mode"}, {P_LBTN, "lbtn"}, {P_SRC_COPY, "src_copy"}, {P_SRC_SKIP, "src_skip"}, {P_BKSTEP, "bkstep"}, {P_BIGMSG, "bigmsg"}, {P_BIGDONE, "bigdone"}, {P_MSG_OK, "msg_ok"}, {P_BKNAME, "bkname"}, {P_PST5, "pst5"}, {P_PST5 + 3, "pst8"}, {P_PAT0, "pat1"}, {P_PAT0 + 7, "pat8"}, {P_PAT_CLEAR, "pat_clear"}, {P_PAT_STORE, "pat_store"}, {P_TRK_FWD, "trk_fwd"}, {P_TRK_BWD, "trk_bwd"}, {P_TIMING_EDIT, "timing_edit"}, {P_TM_LEFT, "tm_left"}, {P_TM_RIGHT, "tm_right"}, {P_ST_RATCH, "st_ratch"}, {P_RND_TIMING, "rnd_timing"}, {P_RND_RATCH, "rnd_ratch"}, {P_CLR_TIMING, "clr_timing"}, {P_CLR_RATCH, "clr_ratch"}, {P_PST_ACT, "pst_act"}, {P_PAT_FWD, "pat_fwd"}, {P_PAT_BWD, "pat_bwd"}, {P_TRK_BOTH, "trk_both"}, {P_PAT_BOTH, "pat_both"}, {P_PATV0, "patv1"}, {P_PATV0 + 7, "patv8"}, {P_EU_FWD, "eu_fwd"}, {P_EU_BWD, "eu_bwd"}, {P_EU_BOTH, "eu_both"}, {P_EU_DIRV, "eu_dirv"}, {P_SLOTV, "slotv"}, {P_RTRK, "rtrk"}, {P_PF_HUM, "pf_hum"}, {P_PF_BUILD, "pf_build"}, {P_PF_ECHO, "pf_echo"}, {P_PF_FADE, "pf_fade"}, {P_PF_GHOST, "pf_ghost"}, {P_PF_POLY, "pf_poly"}, {P_PF_DOWN, "pf_down"}, {P_PAT_COPY, "pat_copy"}, {P_PAT_PASTE, "pat_paste"}, {P_PAT_CLRALL, "pat_clrall"}, {P_TTL, "ttl"}, {P_ST_RRES, "st_rres"}, {P_PF_ALT, "pf_alt"}, {P_PF_AFILL, "pf_afill"}, {P_PST_PAT, "pst_pat"}, {P_PF_STOPCC, "pf_stopcc"}, {P_NAV_LEFT, "nav_left"}, {P_NAV_RIGHT, "nav_right"}, {P_RND_COND, "rnd_cond"}, {P_EU_ENA2, "eu_ena2"}, {P_EU_RND2, "eu_rnd2"}, {P_EU_LEN2, "eu_len2"}, {P_EU_FWD2, "eu_fwd2"}, {P_EU_BOTH2, "eu_both2"}, {P_EU_DIRV2, "eu_dirv2"}, {P_EU_OP0, "eu_opxor"}, {P_EU_OP0 + 3, "eu_opsub"}, {P_EU_OPV, "eu_opv"}, {P_TRK_VALS, "trk_vals"}, {P_TRK_BACK, "trk_back"}, {P_TRK_PAN, "trk_pan"}, {P_TRK_PROB, "trk_prob"}, {P_TRK_CC0, "trk_cc1"}, {P_TRK_CC_END - 1, "trk_cc7"}, {P_SHIFT_L, "shift_left"}, {P_SHIFT_R, "shift_right"}, {P_ST_CC6, "st_cc6"}, {P_ST_CC7, "st_cc7"}, {P_PF_CC6, "pf_cc6"}, {P_PF_CC7, "pf_cc7"}, {P_RND_CC6, "rnd_cc6"}, {P_RND_CC7, "rnd_cc7"}, {P_NAVV, "navv"}, {P_PSHIFTV, "pshiftv"}, {P_ST_CC8, "st_cc8"}, {P_PF_CC8, "pf_cc8"}, {P_RND_CC8, "rnd_cc8"}, {P_TRK_CC8, "trk_cc8"},
 };
 
 static FILE *g_log;
@@ -770,7 +771,7 @@ static int xpj_pad_note(const std::string &js, const std::vector<XTrack> &tracks
  * for them under the copy's name) or needed the whole data folder copied, so the user chose this.
  * xpj_map_text only adds them to the text `js`: the number added, -2 if there is no such drum track. */
 /* CREATE DEFAULT MAP's pad parameters, in CC order (CC 1-7, then pan): MPC's MIDI learn ids. v1.2.0: CC 6 / 7 = Send 3 / 4 */
-static const struct { int id; const char *name; } PAD_PRM[NCC + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {524, "Send 3"}, {525, "Send 4"}, {517, "Pan"}};
+static const struct { int id; const char *name; } PAD_PRM[NCC + 1] = {{513, "Tuning"}, {514, "Filter Cutoff"}, {515, "Filter Resonance"}, {522, "Send 1"}, {523, "Send 2"}, {524, "Send 3"}, {525, "Send 4"}, {0, "CC 8"}, {517, "Pan"}};   /* v1.2.0: CC 8 has no default mapping (id 0) */
 /* the pad object js[at..e]: its values 0..1 in PAD_PRM order */
 static void xpj_pad_read(const std::string &js, size_t at, size_t e, double *val) {
     double c = 1.0, r = 0.0, ct = 0.0, ft = 0.0;
@@ -778,7 +779,7 @@ static void xpj_pad_read(const std::string &js, size_t at, size_t e, double *val
     xpj_num(js, at, e, "\"coarseTune\"", ct); xpj_num(js, at, e, "\"fineTune\"", ft);   /* the pad's own (first in its object) */
     /* Tuning as 0..1: -36..+36 semitones (an assumption: 0 = the middle, 0.5; not checked against MPC's own value) */
     double tn = (ct + ft / 100.0 + 36.0) / 72.0; tn = tn < 0.0 ? 0.0 : tn > 1.0 ? 1.0 : tn;
-    val[0] = tn; val[1] = c; val[2] = r; val[3] = val[4] = val[5] = val[6] = 0.0; val[NCC] = 0.5;
+    val[0] = tn; val[1] = c; val[2] = r; val[3] = val[4] = val[5] = val[6] = val[7] = 0.0; val[NCC] = 0.5;
     { size_t mx = js.find("\"mixable\"", at); double pv = 0.5;   /* the pad's pan, 0..1 (0.5 = the centre) */
       if (mx != std::string::npos && mx < e && xpj_num(js, mx, e, "\"pan\"", pv) && pv >= 0.0 && pv <= 1.0) val[NCC] = pv; }
     size_t sd = js.find("\"sends\"", at), sb = sd == std::string::npos || sd > e ? std::string::npos : js.find('[', sd);
@@ -793,7 +794,7 @@ static void xpj_pad_values(const std::string &js, std::vector<XEntry> &es) {
     std::vector<std::pair<std::string, std::vector<std::pair<size_t, size_t>>>> pads;   /* drum track -> its pad objects */
     for (XEntry &e : es) {
         int k = -1;
-        for (int j = 0; j <= NCC; j++) if (PAD_PRM[j].id == e.param) k = j;
+        for (int j = 0; j <= NCC; j++) if (PAD_PRM[j].id && PAD_PRM[j].id == e.param) k = j;
         if (k < 0 || e.inst < 0) continue;
         const std::vector<std::pair<size_t, size_t>> *list = nullptr;
         for (auto &pt : pads) if (pt.first == e.tgt) list = &pt.second;
@@ -839,6 +840,7 @@ static int xpj_map_text(const Seq &seq, const std::string &track, std::string &j
     bool empty = js.find('{', ca) > ce;
     std::string add; int n = 0; char b[1600];
     for (int ti = 0; ti < NTRACKS; ti++) if (pad[ti]) for (int j = 0; j < NCC + 1; j++) {
+        if (!PRM[j].id) continue;   /* CC 8: no default mapping */
         const int ch = seq.t[ti].ch + 1, cc = j < NCC ? Seq::cc_num(seq.t[ti], j) : PAN_CC[ti];
         bool dup = false;
         for (const XEntry &e : have) if ((e.ch == ch && e.cc == cc) || (e.tgt == track && e.inst == ti && e.param == PRM[j].id)) dup = true;   /* the CC is taken, or the pad's parameter has a mapping already */
@@ -885,9 +887,13 @@ static bool lpage2(const Plugin *w) { const int m = lmode(w); return m >= 0 && w
  * own values: a Q-Link turn sets them and the knob reads them. Returns the TRACK VALUES parameter, or -1. */
 /* v1.2.0: CC 1-5 are P_ST_CC0.. / P_PF0 + PF_CC0.., CC 6 / 7 were appended (P_ST_CC6.., P_PF_CC6..): a parameter -> the
  * CC slot j (0..6) of a step lock knob, -1; a PERFORM knob <-> its Seq::pf_off index (0..PF_COUNT-1) */
-static int st_cc_j(int i) { return i >= P_ST_CC0 && i < P_ST_CC0 + NCC_V1 ? i - P_ST_CC0 : i == P_ST_CC6 ? 5 : i == P_ST_CC7 ? 6 : -1; }
-static int pf_k(int i) { return i >= P_PF0 && i < P_PF0 + NPF ? i - P_PF0 : i == P_PF_CC6 ? Seq::PF_CC0 + 5 : i == P_PF_CC7 ? Seq::PF_CC0 + 6 : -1; }
-static int pf_param(int k) { return k < NPF ? P_PF0 + k : k == Seq::PF_CC0 + 5 ? P_PF_CC6 : P_PF_CC7; }
+static int st_cc_j(int i) { return i >= P_ST_CC0 && i < P_ST_CC0 + NCC_V1 ? i - P_ST_CC0 : i == P_ST_CC6 ? 5 : i == P_ST_CC7 ? 6 : i == P_ST_CC8 ? 7 : -1; }
+static int pf_k(int i) { return i >= P_PF0 && i < P_PF0 + NPF ? i - P_PF0 : i == P_PF_CC6 ? Seq::PF_CC0 + 5 : i == P_PF_CC7 ? Seq::PF_CC0 + 6 : i == P_PF_CC8 ? Seq::PF_CC0 + 7 : -1; }
+static int pf_param(int k) { return k < NPF ? P_PF0 + k : k == Seq::PF_CC0 + 5 ? P_PF_CC6 : k == Seq::PF_CC0 + 6 ? P_PF_CC7 : P_PF_CC8; }
+enum { NCC_X = NCC_V1 + 2 };   /* v1.2.0: CC 6 / 7 go on the X line; CC 8 (slot NCC_X) on an H line of its own */
+/* v1.2.0 TRACK VALUES: a parameter -> the CC slot j of its knob (CC 1-7 P_TRK_CC0.., CC 8 appended), -1; and back */
+static int trk_cc_j(int i) { return i >= P_TRK_CC0 && i < P_TRK_CC_END ? i - P_TRK_CC0 : i == P_TRK_CC8 ? 7 : -1; }
+static int trk_cc_param(int j) { return j < P_TRK_CC_END - P_TRK_CC0 ? P_TRK_CC0 + j : P_TRK_CC8; }
 enum { NPF_ALL = Seq::PF_COUNT };
 enum { REST_VEL = 8, REST_PAN = 9 };   /* v1.2.0: cc_rest bits of the VELOCITY / PAN lock knobs */
 static uint32_t sel_key(const Plugin *w) { return (uint32_t)w->track | ((uint32_t)w->page << 3) | ((uint32_t)w->selmask << 5) | (w->step_edit ? 1u << 21 : 0); }
@@ -906,7 +912,7 @@ static int ql_track(const Plugin *w, int i) {
     if (i == P_ST_PAN) return P_TRK_PAN;
     if (i == P_ST_LEN) return P_TRK_GATE;
     if (i == P_ST_PROB) return P_TRK_PROB;
-    if (st_cc_j(i) >= 0) return P_TRK_CC0 + st_cc_j(i);
+    if (st_cc_j(i) >= 0) return trk_cc_param(st_cc_j(i));
     return -1;
 }
 static int value_of(Plugin *w, int i) {
@@ -957,7 +963,7 @@ static int value_of(Plugin *w, int i) {
     if (i == P_NAVV) return lmode(w) < 0 ? 0 : w->lpage[lmode(w)] ? 2 : 1;   /* v1.2.0 */
     if (i == P_TRK_PAN) return tr.panb;   /* v1.2.0 TRACK VALUES */
     if (i == P_TRK_PROB) return 100 - tr.pcut;
-    if (i >= P_TRK_CC0 && i < P_TRK_CC_END) return tr.ccb[i - P_TRK_CC0];
+    if (trk_cc_j(i) >= 0) return tr.ccb[trk_cc_j(i)];
     if (i == P_EU_LEN2) return Seq::eu_m2(tr);   /* v1.2.0: B's own length, or A's */
     if (i == P_EU_ENA2) return Seq::gen_b(tr) ? 1 : 0;
     if (i == P_EU_FWD2 || i == P_EU_BWD2 || i == P_EU_BOTH2) return Seq::gen_b(tr) && tr.eu_dir2 == i - P_EU_FWD2 ? 1 : 0;
@@ -1178,8 +1184,8 @@ static void set_value_raw(Plugin *w, int i, int v) {
         return;
     }
     if (i == P_TRK_PROB) { tr.pcut = (uint8_t)(100 - clampi(v, 0, 100)); return; }
-    if (i >= P_TRK_CC0 && i < P_TRK_CC_END) {
-        const int j = i - P_TRK_CC0;
+    if (trk_cc_j(i) >= 0) {
+        const int j = trk_cc_j(i);
         tr.ccb[j] = (uint8_t)clampi(v, 0, 128);
         if (tr.ccb[j]) { w->seq.emit((uint8_t)(0xB0 | (tr.ch & 15)), (uint8_t)Seq::cc_num(tr, j), (uint8_t)w->seq.base_eff(tr, j)); w->seq.cc_dirty[w->track][j] = false; flush(w); }
         return;
@@ -1287,11 +1293,47 @@ static float shown_norm(Plugin *w, int i) {
 static const char *cc_label(const Plugin *w, int ti, int j) {
     return (!w->ccname[ti][j].empty() && w->ccname_cc[ti][j] == Seq::cc_num(w->seq.t[ti], j)) ? w->ccname[ti][j].c_str() : "";
 }
-/* PERFORM ALL moves slot j of every track: it has a name only if all eight agree */
-static const char *cc_label_all(const Plugin *w, int j) {
-    const char *first = cc_label(w, 0, j);
-    for (int ti = 1; ti < NTRACKS; ti++) if (std::strcmp(first, cc_label(w, ti, j))) return "";
-    return first;
+/* v1.2.0: a CC's name made short for the value text under a knob (at most SHORT_NAME characters, the knobs sit close):
+ * a leading pad number goes ("1 TUNE" -> "TUNE"); a longer name of several words keeps its last word, cut, after the
+ * first words made short: one word to its initial and a dot unless it has 2 letters ("Filter Cutoff" -> "F. Cut",
+ * "BD Level" -> "BD Lev"; no dot when that keeps a short last word whole: "Delay Send" -> "D Send"), several words to
+ * their initials ("Amp Env Attack" -> "AE Att"); else it is cut. */
+enum { SHORT_NAME = 6 };
+static std::string short_name(const char *in) {
+    const char *s = in, *q = in;
+    while (*q >= '0' && *q <= '9') q++;
+    if (q > s && *q == ' ') { while (*q == ' ') q++; if (*q) s = q; }
+    std::vector<std::string> wd;
+    for (const char *p = s; *p;) {
+        while (*p == ' ') p++;
+        const char *b = p; while (*p && *p != ' ') p++;
+        if (p > b) wd.emplace_back(b, p - b);
+    }
+    std::string all;
+    for (const auto &x : wd) { if (!all.empty()) all += ' '; all += x; }
+    if ((int)all.size() <= SHORT_NAME || wd.size() < 2) return all.substr(0, SHORT_NAME);
+    std::string pre;
+    if (wd.size() == 2) {
+        pre = wd[0].size() <= 2 ? wd[0] : wd[0].substr(0, 1) + ".";
+        if (pre.size() + 1 + wd[1].size() > (size_t)SHORT_NAME && pre.size() == 2 && pre[1] == '.' && 2 + wd[1].size() <= (size_t)SHORT_NAME)
+            pre = wd[0].substr(0, 1);   /* v1.2.0: "D Send", not "D. Sen" */
+    }
+    else for (size_t k = 0; k + 1 < wd.size(); k++) pre += wd[k][0];
+    const int rem = SHORT_NAME - (int)pre.size() - 1;
+    if (rem < 2) return all.substr(0, SHORT_NAME);
+    return pre + " " + wd.back().substr(0, rem);
+}
+/* PERFORM ALL moves slot j of every track (v1.2.0): the short name if every track that has a name for it has the same
+ * one ("1 Delay Send" on T1 and "2 Delay Send" on T2 are both "D Send"), MULTI if they differ, "" if none has one */
+static std::string cc_label_all(const Plugin *w, int j) {
+    std::string got;
+    for (int ti = 0; ti < NTRACKS; ti++) {
+        const char *nm = cc_label(w, ti, j);
+        if (!*nm) continue;
+        const std::string sn = short_name(nm);
+        if (got.empty()) got = sn; else if (got != sn) return "MULTI";
+    }
+    return got;
 }
 /* the open project's name for the SETUP tab, when MPC says which one it is (no search of the drives here) */
 static void proj_name(Plugin *w, const std::string &pp) {   /* the SETUP panel's project line: a checked file's name, or "Project not saved" */
@@ -1381,23 +1423,24 @@ static void display_of(Plugin *w, int i, char *out, size_t n) {
     int v = value_of(w, i);
     if (st_cc_j(i) >= 0) {   /* no lock: the CC's base value in brackets, if it has one, so the user sees where the CC rests */
         const int lockv = cur_step(w).cc[st_cc_j(i)];
-        const char *nm = cc_label(w, w->track, st_cc_j(i));   /* "BD Level 94": the name is cut to 9 characters, the text has little room */
-        const char *sp = *nm ? " " : "";
+        const std::string sn = short_name(cc_label(w, w->track, st_cc_j(i)));   /* "BD Lev 94": short (v1.2.0, was cut to 9), the text has little room */
+        const char *nm = sn.c_str(), *sp = *nm ? " " : "";
         const int base = w->seq.t[w->track].ccb[st_cc_j(i)];   /* v1.2.0: the base, also while the knob stays at -- */
-        if (lockv) std::snprintf(out, n, "%.9s%s%d", nm, sp, lockv - 1); else if (base) std::snprintf(out, n, "%.9s%s(%d)", nm, sp, base - 1); else std::snprintf(out, n, "%.9s%s--", nm, sp);
+        if (lockv) std::snprintf(out, n, "%s%s%d", nm, sp, lockv - 1); else if (base) std::snprintf(out, n, "%s%s(%d)", nm, sp, base - 1); else std::snprintf(out, n, "%s%s--", nm, sp);
         (void)v;
         return;
     }
-    if (i >= P_TRK_CC0 && i < P_TRK_CC_END) {   /* v1.2.0 TRACK VALUES: the base value, with the CC's name as on STEP LOCKS */
-        const char *nm = cc_label(w, w->track, i - P_TRK_CC0);
-        const char *sp = *nm ? " " : "";
-        if (v) std::snprintf(out, n, "%.9s%s%d", nm, sp, v - 1); else std::snprintf(out, n, "%.9s%s--", nm, sp);
+    if (trk_cc_j(i) >= 0) {   /* v1.2.0 TRACK VALUES: the base value, with the CC's name as on STEP LOCKS */
+        const std::string sn = short_name(cc_label(w, w->track, trk_cc_j(i)));
+        const char *nm = sn.c_str(), *sp = *nm ? " " : "";
+        if (v) std::snprintf(out, n, "%s%s%d", nm, sp, v - 1); else std::snprintf(out, n, "%s%s--", nm, sp);
         return;
     }
     if (pf_k(i) >= 0) {   /* PERFORM knobs: an offset around 0; OFF while PERFORM ALL is off */
         const int cj = pf_k(i) - Seq::PF_CC0;   /* a CC knob carries the parameter's name if all eight tracks agree on it */
-        const char *nm = cj >= 0 && cj < NCC ? cc_label_all(w, cj) : "";
-        if (*nm) std::snprintf(out, n, w->seq.pf_on ? "%.9s %+d" : "%.9s OFF", nm, v);
+        const std::string sn = cj >= 0 && cj < NCC ? cc_label_all(w, cj) : std::string();
+        const char *nm = sn.c_str();
+        if (*nm) std::snprintf(out, n, w->seq.pf_on ? "%s %+d" : "%s OFF", nm, v);
         else if (!w->seq.pf_on) std::snprintf(out, n, "OFF");
         else if (pf_k(i) == Seq::PF_PROB) std::snprintf(out, n, "%+d%%", v);
         else if (pf_k(i) == Seq::PF_LEN) std::snprintf(out, n, "%+.2f", v / 4.0);
@@ -2055,8 +2098,8 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
             if (i == P_PF_COMMIT || i == P_PF_DISCARD) for (int k = 0; k < NPF_ALL; k++) w->raw[pf_param(k)] = -1.0f;   /* knobs back to the middle */
             if (i == P_CLR_STEP) for (int k = 0; k < 16; k++) if ((w->selmask >> k) & 1) w->seq.clear_locks(w->track, w->page * 16 + k);
             /* every press stirs the clock into the generators' RNG, so two sessions never give the same series */
-            if (i == P_RND_PAN || i == P_RND_CC6 || i == P_RND_CC7 || (i >= P_RND0 && i < P_RND0 + NRND)) w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
-            int what = i == P_RND_PAN ? (int)Seq::R_PAN : i == P_RND_CC6 ? Seq::R_CC0 + 5 : i == P_RND_CC7 ? Seq::R_CC0 + 6 : (i >= P_RND0 && i < P_RND0 + NRND) ? i - P_RND0 : -1;
+            if (i == P_RND_PAN || i == P_RND_CC6 || i == P_RND_CC7 || i == P_RND_CC8 || (i >= P_RND0 && i < P_RND0 + NRND)) w->seq.reseed((uint32_t)std::chrono::steady_clock::now().time_since_epoch().count());
+            int what = i == P_RND_PAN ? (int)Seq::R_PAN : i == P_RND_CC6 ? Seq::R_CC0 + 5 : i == P_RND_CC7 ? Seq::R_CC0 + 6 : i == P_RND_CC8 ? Seq::R_CC0 + 7 : (i >= P_RND0 && i < P_RND0 + NRND) ? i - P_RND0 : -1;
             if (what >= 0 && w->clr_mode) {   /* CLR LOCKS lit: the button takes its lock out instead (the selected steps in STEP EDIT, else the whole track) */
                 Track &ct = w->seq.t[w->track];
                 if (what != Seq::R_TRIG) for (int k = 0; k < NSTEPS; k++) {
@@ -2132,7 +2175,7 @@ static float getParameter(AEffect *e, int32_t i) {
  *   G shuffle, follow mask, CC 117   I instance id   N CC names   S READ PROJECT target   W pattern playing
  *   per track: t (setup), C (CC numbers), B (base values), R (random settings), s (64 steps x 11 bytes as hex:
  *     on cond prob vel len cc1..cc5 pan), e (Euclidean generator), D (direction), M (timing, ratchets), Y (ratchet
- *     resolution), A (the pad's pan)
+ *     resolution), A (the pad's pan); v1.2.0: X (CC 6 / 7 locks), H (CC 8 locks), K (track prob)
  *   Q<k> ... STATE k (with G / P / U / E sub-lines), Z<k> ... PATTERN k (the same track lines)
  *   old lines still read: r (v1.1 random settings), P (v1.36-1.67 PERFORM states, dropped)
  * Unknown lines are skipped, so later versions can add lines without breaking older projects.
@@ -2231,11 +2274,11 @@ static void write_tracks(const Track *T, std::string &s, const std::string &pre)
         bool own = false, bas = false; for (int j = 0; j < NCC; j++) { own |= tr.ccn[j] != 0; bas |= tr.ccb[j] != 0; }
         if (own) {   /* own CC numbers (EDIT CC, v1.34.0): number + 1, 0 = from the block; v1.2.0: CC 6 / 7 at the end (older versions read five) */
             s += pre; s += b;
-            std::snprintf(b, sizeof b, "C %d %d %d %d %d %d %d %d\n", i, tr.ccn[0], tr.ccn[1], tr.ccn[2], tr.ccn[3], tr.ccn[4], tr.ccn[5], tr.ccn[6]);
+            std::snprintf(b, sizeof b, "C %d %d %d %d %d %d %d %d %d\n", i, tr.ccn[0], tr.ccn[1], tr.ccn[2], tr.ccn[3], tr.ccn[4], tr.ccn[5], tr.ccn[6], tr.ccn[7]);   /* CC 8 last (v1.2.0) */
         }
         if (bas) {   /* base values (v1.37.0); CC 6 / 7 at the end (v1.2.0) */
             s += pre; s += b;
-            std::snprintf(b, sizeof b, "B %d %d %d %d %d %d %d %d\n", i, tr.ccb[0], tr.ccb[1], tr.ccb[2], tr.ccb[3], tr.ccb[4], tr.ccb[5], tr.ccb[6]);
+            std::snprintf(b, sizeof b, "B %d %d %d %d %d %d %d %d %d\n", i, tr.ccb[0], tr.ccb[1], tr.ccb[2], tr.ccb[3], tr.ccb[4], tr.ccb[5], tr.ccb[6], tr.ccb[7]);
         }
         s += pre; s += b;
         std::snprintf(b, sizeof b, "s %d ", i);
@@ -2255,11 +2298,18 @@ static void write_tracks(const Track *T, std::string &s, const std::string &pre)
         if (tr.dir != DIR_FWD) { std::snprintf(b, sizeof b, "D %d %d\n", i, tr.dir); s += pre; s += b; }   /* direction (v1.76.0), when not forwards */
         if (tr.panb) { std::snprintf(b, sizeof b, "A %d %d\n", i, tr.panb); s += pre; s += b; }
         if (tr.pcut) { std::snprintf(b, sizeof b, "K %d %d\n", i, 100 - tr.pcut); s += pre; s += b; }   /* TRACK VALUES PROB (v1.2.0), when not 100 % */   /* the pad's own pan + 1 (v1.93.0), when known */
-        bool x67 = false; for (int k = 0; k < NSTEPS; k++) x67 |= tr.st[k].cc[5] || tr.st[k].cc[6];
+        bool x67 = false; for (int k = 0; k < NSTEPS; k++) x67 |= tr.st[k].cc[5] || tr.st[k].cc[6];   /* CC 8 goes on its own H line */
         if (x67) {   /* CC 6 / CC 7 locks (v1.2.0): 64 steps x 2 bytes as hex */
             std::snprintf(b, sizeof b, "X %d ", i); s += pre; s += b;
             static const char hx[] = "0123456789abcdef";
-            for (int k = 0; k < NSTEPS; k++) for (int j = NCC_V1; j < NCC; j++) { const uint8_t c = tr.st[k].cc[j]; s += hx[c >> 4]; s += hx[c & 15]; }
+            for (int k = 0; k < NSTEPS; k++) for (int j = NCC_V1; j < NCC_X; j++) { const uint8_t c = tr.st[k].cc[j]; s += hx[c >> 4]; s += hx[c & 15]; }
+            s += '\n';
+        }
+        bool x8 = false; for (int k = 0; k < NSTEPS; k++) x8 |= tr.st[k].cc[NCC_X] != 0;
+        if (x8) {   /* CC 8 locks (v1.2.0): 64 steps x 1 byte as hex; an H line, so the X line stays as it was */
+            std::snprintf(b, sizeof b, "H %d ", i); s += pre; s += b;
+            static const char hx[] = "0123456789abcdef";
+            for (int k = 0; k < NSTEPS; k++) { const uint8_t c = tr.st[k].cc[NCC_X]; s += hx[c >> 4]; s += hx[c & 15]; }
             s += '\n';
         }
         bool mt = false; for (int k = 0; k < NSTEPS; k++) mt |= tr.st[k].micro || tr.st[k].ratch;
@@ -2303,11 +2353,11 @@ static bool track_line(Seq &q, const std::string &line, int sb) {
                 }
             }
         } else if (line.size() > 2 && line[0] == 'B') {   /* base values of the track's CCs (value + 1, 0 = off) */
-            int x[8] = {0}; const int got = std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d", &x[0], &x[1], &x[2], &x[3], &x[4], &x[5], &x[6], &x[7]);
+            int x[9] = {0}; const int got = std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d %d", &x[0], &x[1], &x[2], &x[3], &x[4], &x[5], &x[6], &x[7], &x[8]);
             if (got >= 6 && x[0] >= 0 && x[0] < NTRACKS)
                 for (int j = 0; j < NCC && j + 1 < got; j++) q.t[x[0]].ccb[j] = (uint8_t)clampi(x[1 + j], 0, 128);   /* CC 6 / 7 since v1.2.0 */
         } else if (line.size() > 2 && line[0] == 'C') {
-            int x[8] = {0}; const int got = std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d", &x[0], &x[1], &x[2], &x[3], &x[4], &x[5], &x[6], &x[7]);
+            int x[9] = {0}; const int got = std::sscanf(line.c_str() + 1, "%d %d %d %d %d %d %d %d %d", &x[0], &x[1], &x[2], &x[3], &x[4], &x[5], &x[6], &x[7], &x[8]);
             if (got >= 6 && x[0] >= 0 && x[0] < NTRACKS)
                 for (int j = 0; j < NCC && j + 1 < got; j++) q.t[x[0]].ccn[j] = (uint8_t)clampi(x[1 + j], 0, 128);   /* CC 6 / 7 since v1.2.0 */
         } else if (line.size() > 2 && line[0] == 'R') {
@@ -2357,12 +2407,22 @@ static bool track_line(Seq &q, const std::string &line, int sb) {
             int ti = -1, used = 0;
             if (std::sscanf(line.c_str() + 1, "%d %n", &ti, &used) < 1 || ti < 0 || ti >= NTRACKS) return true;
             const char *h = line.c_str() + 1 + used;
-            for (int k = 0; k < NSTEPS; k++) for (int j = NCC_V1; j < NCC; j++) {
-                const int p = (k * (NCC - NCC_V1) + (j - NCC_V1)) * 2;
+            for (int k = 0; k < NSTEPS; k++) for (int j = NCC_V1; j < NCC_X; j++) {
+                const int p = (k * (NCC_X - NCC_V1) + (j - NCC_V1)) * 2;
                 if (!h[p] || !h[p + 1]) return true;
                 const int hi = hexval(h[p]), lo = hexval(h[p + 1]);
                 if (hi < 0 || lo < 0) return true;
                 q.t[ti].st[k].cc[j] = (uint8_t)clampi(hi * 16 + lo, 0, 128);
+            }
+        } else if (line.size() > 2 && line[0] == 'H' && line[1] == ' ') {   /* CC 8 locks (v1.2.0) */
+            int ti = -1, used = 0;
+            if (std::sscanf(line.c_str() + 1, "%d %n", &ti, &used) < 1 || ti < 0 || ti >= NTRACKS) return true;
+            const char *h = line.c_str() + 1 + used;
+            for (int k = 0; k < NSTEPS; k++) {
+                if (!h[2 * k] || !h[2 * k + 1]) return true;
+                const int hi = hexval(h[2 * k]), lo = hexval(h[2 * k + 1]);
+                if (hi < 0 || lo < 0) return true;
+                q.t[ti].st[k].cc[NCC_X] = (uint8_t)clampi(hi * 16 + lo, 0, 128);
             }
         } else if (line.size() > 2 && line[0] == 'K' && line[1] == ' ') {   /* TRACK VALUES PROB (v1.2.0) */
             if (std::sscanf(line.c_str() + 1, "%d %d", &a[0], &a[1]) == 2 && a[0] >= 0 && a[0] < NTRACKS) q.t[a[0]].pcut = (uint8_t)(100 - clampi(a[1], 0, 100));
@@ -2419,7 +2479,7 @@ static bool chunk_read(Plugin *w, const std::string &s) {
         } else if (rest.size() > 2 && rest[0] == 'E') { unsigned long m = 0; if (std::sscanf(rest.c_str() + 1, "%lu", &m) == 1) { ps.fx = (uint32_t)m; ps.fx_ok = true; }   /* v2.5 */
         } else if (rest.size() > 2 && rest[0] == 'P') {
             int o[NPF_ALL] = {0}, on = 0, cc = 0;
-            if (std::sscanf(rest.c_str() + 1, "%d %d %d %d %d %d %d %d %d %d %d %d %d", &on, &o[0], &o[1], &o[2], &o[3], &o[4], &o[5], &o[6], &o[7], &o[8], &cc, &o[9], &o[10]) >= 11) {
+            if (std::sscanf(rest.c_str() + 1, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d", &on, &o[0], &o[1], &o[2], &o[3], &o[4], &o[5], &o[6], &o[7], &o[8], &cc, &o[9], &o[10], &o[11]) >= 11) {   /* CC 8 last (v1.2.0) */
                 ps.pf_on = on != 0; ps.cc117 = clampi(cc, 0, 127);
                 for (int j = 0; j < NPF_ALL; j++) ps.off[j] = clampi(o[j], (int)PARAMS[pf_param(j)].min, (int)PARAMS[pf_param(j)].max);
             }

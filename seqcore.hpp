@@ -22,9 +22,12 @@
 
 namespace seqcore {
 
-enum { NTRACKS = 8, NSTEPS = 64, NCC = 7 };   /* v1.2.0: 7 CCs per track (5 until v1.1.1) */
+enum { NTRACKS = 8, NSTEPS = 64, NCC = 8 };   /* v1.2.0: 8 CCs per track (5 until v1.1.1) */
 enum { NCC_V1 = 5 };   /* the first five: the CC BASE block (ccbase .. ccbase + 4), the five in a saved step, the CC 1-5 parameters */
 static const uint8_t CC67_DEFAULT[2] = {46, 54};   /* v1.2.0: CC 6 / CC 7 of track i: 46 + i / 54 + i (unused LSB numbers of 14..29) */
+/* v1.2.0: CC 8 of track i. Every MIDI "undefined" number is taken by then, so: General Purpose 4 (19), the LSBs of the
+ * undefined 3, 9, 30, 31 (35, 41, 62, 63), Effect Control 1 / 2 (12, 13) and Effects 2 Depth (92) */
+static const uint8_t CC8_DEFAULT[8] = {19, 35, 41, 62, 63, 12, 13, 92};
 /* Each track sends its five CC locks on its own block of five consecutive controller numbers, ccbase .. ccbase + 4, so
  * all tracks can share one MIDI channel. Defaults: T1-T6 sit in ranges the MIDI spec leaves undefined (20-31, 85-90,
  * 102-119), T7 and T8 in the general purpose ones; none touches bank select, mod wheel, volume, pan, pedals or the
@@ -323,6 +326,7 @@ struct Seq {
     /* The controller number of a track's CC lock j: its own (EDIT CC), or the old block ccbase + j. */
     static int cc_num(const Track &tr, int j) {
         if (tr.ccn[j]) return (tr.ccn[j] - 1) & 127;
+        if (j == NCC_V1 + 2) return CC8_DEFAULT[tr.tix & 7];   /* v1.2.0: CC 8 */
         if (j >= NCC_V1) return CC67_DEFAULT[j - NCC_V1] + (tr.tix & 7);   /* v1.2.0: CC 6 / CC 7 */
         return (tr.ccbase > CC_BASE_MAX ? (int)CC_BASE_MAX : (int)tr.ccbase) + j;
     }
