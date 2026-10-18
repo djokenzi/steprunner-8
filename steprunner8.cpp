@@ -246,7 +246,7 @@ struct XEntry { std::string tgt, name; int ch, cc, val, param = -1, inst = -1; }
  * so the sequencer never waits for the drives (the SETUP button made the sound stutter: it searched them under the lock).
  * Who: what the check (xpj_ours) needs of an instance, copied; Job: one piece of such work. */
 struct Who { std::vector<uint32_t> given; std::string our_path; time_t born = 0; };
-enum { J_NONE = 0, J_CCREAD, J_FETCH, J_NOTES, J_MAPOPEN, J_MAPPICK, J_MAPWRITE };
+enum { J_NONE = 0, J_FETCH, J_NOTES, J_MAPOPEN, J_MAPPICK, J_MAPWRITE };
 struct Job { int kind = J_NONE; Who who; Seq seq; std::string path, to; };
 /* the undo / redo history (v2.11): a ring of HIST_MAX snapshots, allocated once when the plugin is made. When full, a
  * new step drops the oldest one without moving the others (a vector erase moved ~830 KB on the audio thread). */
@@ -306,7 +306,6 @@ struct Plugin {
     int pst_act[NPATS] = {-1, -1, -1, -1, -1, -1, -1, -1};   /* per pattern (v1.1.0): the STATE last saved or recalled, -1: none */
     int pat_cue = -1, pat_cur = 0;   /* the pattern that comes in at the end of the one playing (-1: none); the one playing: always one of the eight (v1.75: the sequencer IS that pattern) */
     bool pclear = false;
-    int basedraft[NCC] = {0};                          /* EDIT CC: the base values being edited (value + 1, 0 = off) */
     std::string ccname[NTRACKS][NCC]; int ccname_cc[NTRACKS][NCC] = {};   /* what each CC controls, read from the project ("BD Level"), and the CC number it was read for: shown only while the track still uses that number */
     std::string src;                                   /* READ PROJECT: the chosen target ("" = any); saved */
     int big = 0;                       /* the big message (BIG_*) */
@@ -320,7 +319,7 @@ struct Plugin {
     std::vector<uint32_t> given;       /* hashes of the chunks handed to MPC (save) or taken from it (load): see xpj_ours */
     std::string src_proj;              /* the SETUP panel's project line */
     std::vector<std::pair<std::string, int>> src_list;   /* rows of the SETUP list: (name, kind 2 = project file, 3 = drum track) */
-    bool cc_edit = false; int ccdraft[NCC] = {0};      /* EDIT CC: open, and the numbers being edited */
+    bool cc_edit = false;                              /* TRACK SETUP open (v1.2.0: its knobs act at once, no draft) */
     bool shift = false;                                /* STEP EDIT: SHIFT is lit */
     int msg = 0, msg_frames = 0;                       /* P_MSG and how long it stays */
     HistStack undo_st, redo_st;
@@ -1183,15 +1182,11 @@ static void set_value_raw(Plugin *w, int i, int v) {
     if (i == P_PAT_STORE) { w->patstore = v != 0; if (w->patstore) w->patclear = false; return; }
     if (i == P_SHUF_EDIT) { w->shuf_edit = v != 0; return; }
     if (i == P_CLR_MODE) { w->clr_mode = v != 0; return; }
-    if (i == P_CC_EDIT) {   /* open: the draft starts from the track's numbers; closing it by hand = DISCARD */
-        w->cc_edit = v != 0;   /* TRACK SETUP on the SETUP tab (v1.58.0; before: EDIT CC inside TRACK EDIT) */
-        if (w->cc_edit) for (int j = 0; j < NCC; j++) { w->ccdraft[j] = Seq::cc_num(tr, j); w->basedraft[j] = tr.ccb[j]; }
-        return;
-    }
+    if (i == P_CC_EDIT) { w->cc_edit = v != 0; return; }   /* TRACK SETUP on the SETUP tab (v1.58.0; before: EDIT CC inside TRACK EDIT) */
     if (i >= P_CCB0 && i < P_CCB0 + NCC_V1) { tr.ccb[i - P_CCB0] = (uint8_t)clampi(v, 0, 128); return; }
     if ((i >= P_CCN0 && i < P_CCN0 + NCC_V1) || (i >= P_CCN6 && i <= P_CCN8)) {   /* v1.2.0: at once (no COMMIT); the track's lock knobs follow */
         const int j = i >= P_CCN6 ? NCC_V1 + i - P_CCN6 : i - P_CCN0;
-        tr.ccn[j] = (uint8_t)(clampi(v, 0, 127) + 1); w->ccdraft[j] = clampi(v, 0, 127);
+        tr.ccn[j] = (uint8_t)(clampi(v, 0, 127) + 1);
         return;
     }
     if (i == P_SHIFT) { w->shift = v != 0 && w->step_edit; return; }
@@ -1217,7 +1212,6 @@ static void set_value_raw(Plugin *w, int i, int v) {
     switch (i) {
     /* a selection of several steps does not carry over to another track or page */
     case P_TRACK: w->track = clampi(v, 0, NTRACKS - 1); select_one(w, w->sel);
-        if (w->cc_edit) { Track &nt = w->seq.t[w->track]; for (int j = 0; j < NCC; j++) { w->ccdraft[j] = Seq::cc_num(nt, j); w->basedraft[j] = nt.ccb[j]; } }   /* TRACK SETUP stays open: the draft is dropped and starts again from the new track */
         break;
     case P_PAGE: w->page = clampi(v, 0, 3); select_one(w, w->sel); break;
     case P_SEL: select_one(w, v - 1); break;
@@ -1662,20 +1656,14 @@ static void run_job(Plugin *w, Job &j) {
     Who &h = j.who;
     const int secs3 = (int)(3.0f * w->sample_rate);
     switch (j.kind) {
-    case J_CCREAD: case J_FETCH: {
+    case J_FETCH: {
         std::string pn; std::vector<XEntry> es;
         const bool ok = xpj_scan(h, pn, es);
         const int fail = ok ? 0 : no_proj_msg();
         std::lock_guard<std::mutex> lk(w->lock);
         w->our_path = h.our_path;
         if (ok) w->src_proj = pn;
-        if (j.kind == J_CCREAD) {   /* from the target chosen by CREATE DEFAULT MAP, if one was */
-            if (!w->cc_edit) break;
-            for (int k = 0; k < NCC; k++) { w->ccdraft[k] = Seq::cc_num(w->seq.t[w->track], k); w->basedraft[k] = w->seq.t[w->track].ccb[k]; }
-            const int got = ok ? xpj_bases(es, w->src, w->seq.t[w->track].ch + 1, w->ccdraft, w->basedraft, w->ccname[w->track], w->ccname_cc[w->track]) : -1;
-            for (int k = 0; k < NCC; k++) w->seq.t[w->track].ccb[k] = (uint8_t)w->basedraft[k];   /* v1.2.0: at once (no COMMIT) */
-            w->msg = got < 0 ? fail : 57 + got;
-        } else if (!ok) w->msg = fail;
+        if (!ok) w->msg = fail;
         else {   /* FETCH CC VALUES: base values and names of all eight tracks from the target track (any, if none was chosen) */
             int total = 0;
             for (int ti = 0; ti < NTRACKS; ti++) {
@@ -1684,9 +1672,9 @@ static void run_job(Plugin *w, Job &j) {
                 for (int k = 0; k < NCC; k++) { nums[k] = Seq::cc_num(rt, k); bases[k] = rt.ccb[k]; }
                 total += xpj_bases(es, w->src, rt.ch + 1, nums, bases, w->ccname[ti], w->ccname_cc[ti]);
                 for (int k = 0; k < NCC; k++) rt.ccb[k] = (uint8_t)bases[k];
-                int pn[NCC], pb[NCC]; for (int k = 0; k < NCC; k++) { pn[k] = -1; pb[k] = 0; } pn[0] = PAN_CC[ti]; pb[0] = rt.panb;   /* v1.93: the pad's pan too */
-                xpj_bases(es, w->src, rt.ch + 1, pn, pb);   /* not counted: the message reads the CC values */
-                rt.panb = (uint8_t)pb[0];
+                int pcc[NCC], pval[NCC]; for (int k = 0; k < NCC; k++) { pcc[k] = -1; pval[k] = 0; } pcc[0] = PAN_CC[ti]; pval[0] = rt.panb;   /* v1.93: the pad's pan too */
+                xpj_bases(es, w->src, rt.ch + 1, pcc, pval);   /* not counted: the message reads the CC values */
+                rt.panb = (uint8_t)pval[0];
             }
             w->msg = 64 + total;
         }
@@ -2042,7 +2030,7 @@ static void setParameter_locked_parts(AEffect *e, int32_t i, float n) {
             }
             if (i == P_CC_COMMIT && w->cc_edit) w->cc_edit = false;   /* v1.2.0: no button; the knobs take effect at once, so it only closes TRACK SETUP */
             /* the project file work: asked for here, done after the lock is let go (run_job) */
-            if (i == P_CC_READ && w->cc_edit) queue_job(w, J_CCREAD);   /* base values from the open project: the MIDI learn entries on this track's channel */
+            /* P_CC_READ (READ PROJECT): no button and no action since v1.2.0 (FETCH CC VALUES reads the base values) */
             /* P_READ_ALL (INITIALIZE) is retired; COPY MAPPING, the backup browser and SKIP BACKUP too (v1.64.0): CREATE
              * DEFAULT MAP, FETCH NOTES, FETCH CC VALUES and TRACK SETUP are in the SETUP panel (the old GLOBAL) */
             if (i == P_SRC_CANCEL) { w->src_mode = SM_IDLE; w->src_list.clear(); w->src_gen++; }   /* CANCEL: the list goes, nothing is written */

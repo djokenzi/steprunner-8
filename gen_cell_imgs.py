@@ -142,8 +142,6 @@ if os.path.exists(FONT):
     for n in (16, 32, 48, 64):   # track length shortcuts in TRACK SETUP: grey, in the TRACK EDIT colour only while the track has that length
         btn(str(n), GREY, False, BTN_W=84).save("images/btn_len%d.png" % n); btn(str(n), TRACKC, False, BTN_W=84).save("images/btn_len%d_on.png" % n); btn(str(n), TRIG, False, BTN_W=84).save("images/btn_plen%d_on.png" % n)
     # Euclidean section: ENABLE sits in the title row (grey, green while the track is generated), COMMIT at the bottom
-    btn("ENABLE", GREY, False).save("images/eu_enable_off.png"); btn("ENABLE", BTN_GREEN, False).save("images/eu_enable_on.png")   # the size of COMMIT
-    btn("COMMIT", GREY, False).save("images/eu_commit.png"); btn("COMMIT", BTN_GREEN, False).save("images/eu_commit_on.png")   # grey; green only while pressed
     # PERFORM tab: MUTE pads (red when muted), performance pads (violet when on)
     PH = 64   # pad height on the PERFORM tab
     def pad(text, fill_on, on, name, size=22):   # "\n" in text: two lines
@@ -167,7 +165,7 @@ if os.path.exists(FONT):
             pad(text, TRACKC, on, "pfx%d_%s" % (n + 1, "on" if on else "off"), 22 if "\n" not in text else 19)
         pad("MUTE\nALL", TRACKC, on, "pfx7m_%s" % ("on" if on else "off"), 19)   # pad 7 while nothing is muted
         pad("LOOP 8", TRACKC, on, "pfy1_%s" % ("on" if on else "off")); pad("ROLL", TRACKC, on, "pfy5_%s" % ("on" if on else "off"))   # v1.79.0 / v1.80.0 (the other pfy pads have no pad any more)
-        for key, text in (("pf_stopcc", "STOP CC"), ("pf_hum", "HUMANIZE"), ("pf_build", "BUILD"), ("pf_echo", "ECHO"), ("pf_fade", "FADE\nOUT"),
+        for key, text in (("pf_stopcc", "STOP CC"), ("pf_build", "BUILD"), ("pf_echo", "ECHO"), ("pf_fade", "FADE\nOUT"),
                           ("pf_ghost", "GHOST"), ("pf_afill", "AUTO\nFILL")):   # v1.91.0; v1.94.0
             pad(text, TRACKC, on, "%s_%s" % (key, "on" if on else "off"), 22 if "\n" not in text else 19)
     btn("PERFORM ALL", GREY, False, BTN_W=190, BTN_H=64).save("images/pf_ctrl_off.png"); btn("PERFORM ALL", TRIG, False, BTN_W=190, BTN_H=64).save("images/pf_ctrl_on.png")
@@ -178,10 +176,8 @@ if os.path.exists(FONT):
     for on in (False, True):   # SHIFT: wider than its neighbours and with a grey outline (v1.59.0)
         sh = seg(on, "SHIFT", 120); ImageDraw.Draw(sh).rectangle([0, 0, sh.size[0] - 1, sh.size[1] - 1], outline=(150, 150, 150, 255), width=2)
         sh.save("images/shift_%s.png" % ("on" if on else "off"))
-    btn("RANDOM", GREY, False).save("images/eu_rnd.png"); btn("RANDOM", GREY, True).save("images/eu_rnd_on.png")
-    # v1.2.0: EUCLIDIAN with two generators, one row each: ENABLE / RANDOM 100x30 (14 px text), the direction as three
-    # 30x30 arrows (sizes from the owner's layout, 2026-10-18) (FWD, BWD, BOTH), boolean 74x32, COMMIT 118x32; _d = dim (that generator off, or not both on for the
-    # boolean ones), _dl = dim but the one in use
+    # v1.2.0: EUCLIDIAN, one generator a page: ENABLE / RANDOM 132x39, XOR / OR / AND / SUB 74x32, COMMIT 118x39; _d = dim
+    # (not both on), _dl = dim but the one in use
     DIM, DIM_INK = (52, 52, 52), (110, 110, 110)
     for g in ("A", "B"):
         btn("ENABLE " + g, GREY, False, BTN_W=132, BTN_H=39).save("images/eu2_enable%s_off.png" % g.lower()); btn("ENABLE " + g, BTN_GREEN, False, BTN_W=132, BTN_H=39).save("images/eu2_enable%s_on.png" % g.lower())
@@ -195,20 +191,7 @@ if os.path.exists(FONT):
     btn("TRACK VALUES", GREY, False, BTN_W=120, size=13).save("images/trk_vals.png"); btn("TRACK VALUES", GREY, True, BTN_W=120, size=13).save("images/trk_vals_on.png")   # v1.2.0
     btn("BACK", GREY, False, BTN_W=120).save("images/trk_back.png"); btn("BACK", GREY, True, BTN_W=120).save("images/trk_back_on.png")
     btn("COMMIT", GREY, False, BTN_W=118, BTN_H=39).save("images/eu2_commit.png"); btn("COMMIT", BTN_GREEN, False, BTN_W=118, BTN_H=39).save("images/eu2_commit_on.png")   # v1.2.0: 118x39 (the owner's layout)
-    def arrows(col, ink, kind):   # FWD: one triangle right, BWD: left, BOTH: both, small
-        im = btn("", col, False, BTN_W=30, BTN_H=30).convert("RGBA"); d = ImageDraw.Draw(im)
-        tri = lambda cx, sgn, r: d.polygon([(cx - sgn * r, 15 - r), (cx - sgn * r, 15 + r), (cx + sgn * r, 15)], fill=ink + (255,))
-        if kind == "fwd": tri(15.5, 1, 7)
-        elif kind == "bwd": tri(14.5, -1, 7)
-        else: tri(9.5, -1, 5); tri(20.5, 1, 5)
-        return im
-    for k in ("fwd", "bwd", "both"):
-        arrows(GREY, (253, 243, 234), k).save("images/eu2_%s.png" % k); arrows(EUC, (253, 243, 234), k).save("images/eu2_%s_on.png" % k)
-        arrows(DIM, DIM_INK, k).save("images/eu2_%s_d.png" % k)
     btn("IN USE", CLR_RED, False, BTN_W=64, BTN_H=20, size=11).save("images/cc_inuse.png")   # v1.2.0: TRACK SETUP, a number used elsewhere too
-    for k, nm in (("fwd", "FWD"), ("bwd", "BWD"), ("fbwd", "FBWD"), ("bfwd", "BFWD")):   # v1.2.0: a generator's direction, 100x32 text (one generator a page)
-        btn(nm, GREY, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s.png" % k); btn(nm, EUC, False, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_on.png" % k)
-        btn(nm, DIM, False, ink=DIM_INK, BTN_W=100, BTN_H=32, size=14).save("images/eu3_%s_d.png" % k)
     for k, nm in (("xor", "XOR"), ("or", "OR"), ("and", "AND"), ("sub", "SUB")):
         btn(nm, GREY, False, BTN_W=74, BTN_H=32).save("images/eu2_%s.png" % k); btn(nm, EUC, False, BTN_W=74, BTN_H=32).save("images/eu2_%s_on.png" % k)
         btn(nm, DIM, False, ink=DIM_INK, BTN_W=74, BTN_H=32).save("images/eu2_%s_d.png" % k); btn(nm, (40, 70, 40), False, ink=(140, 170, 140), BTN_W=74, BTN_H=32).save("images/eu2_%s_dl.png" % k)
@@ -220,8 +203,6 @@ if os.path.exists(FONT):
     for kind in ("STEP", "PAGE", "TRK"):   # COPY / PASTE read differently per mode (PTN: PATTERN EDIT, v1.85)
         for verb in ("COPY", "PASTE"):
             seg(False, "%s %s" % (verb, kind), 90).save("images/%s_%s.png" % (verb.lower(), kind.lower())); seg(True, "%s %s" % (verb, kind), 90).save("images/%s_%s_on.png" % (verb.lower(), kind.lower()))
-    for nm, key, col in (("READ PROJECT", "cc_read", GREY), ("DISCARD", "cc_discard_s", GREY), ("COMMIT", "cc_commit_s", BTN_GREEN)):   # small, for the title row of the CC editor
-        btn(nm, col, False, BTN_W=128, BTN_H=28).save("images/%s.png" % key); btn(nm, col, True, BTN_W=128, BTN_H=28).save("images/%s_on.png" % key)
     for nm, key, col in (("PREV", "src_prev", GREY), ("NEXT", "src_next", GREY)):   # the READ PROJECT target list
         btn(nm, col, False, BTN_W=96, BTN_H=28).save("images/%s.png" % key); btn(nm, col, True, BTN_W=96, BTN_H=28).save("images/%s_on.png" % key)
     # SETUP panel (v1.64.0): 250 x 44, all grey (v1.66.0)
@@ -314,12 +295,11 @@ if os.path.exists(FONT):
 # v1.82.0: FWD / BWD / BOTH, narrower: 78 wide (TRACK EDIT violet, pattern setup orange), 100 wide (EUCLIDIAN green);
 # PATTERN cells as pictures: EMPTY, FULL, PLAYING (the play-head step's look), CUED (the play-head bar on a dark cell)
 if os.path.exists(FONT):
-    for nm in ("FWD", "BWD", "BOTH", "FBWD", "BFWD"):   # v1.2.0: FBWD (the old BOTH) and BFWD
-        k = nm.lower()
-        btn(nm, GREY, False, BTN_W=84).save("images/dir_%s_s.png" % k)   # v1.2.0: 84 wide (the owner's layout, 2026-10-18)
-        btn(nm, TRACKC, False, BTN_W=84).save("images/dir_%s_st.png" % k); btn(nm, TRIG, False, BTN_W=84).save("images/dir_%s_sp.png" % k)
-        btn(nm, GREY, False, BTN_W=132).save("images/dir_%s_m.png" % k); btn(nm, EUC, False, BTN_W=132).save("images/dir_%s_me.png" % k)   # v1.98.0: 132x39
-        btn(nm, (52, 52, 52), False, ink=(110, 110, 110), BTN_W=132).save("images/dir_%s_md.png" % k)   # v1.83.0: ENABLE off: dim
+    for nm in ("FWD", "BWD", "BOTH", "FBWD", "BFWD"):   # v1.2.0: 84 wide (the owner's layout, 2026-10-18); TRACK EDIT: FWD BWD FBWD BFWD
+        k = nm.lower()                                   # (_s, _st); the hidden PATTERN direction: FWD BWD BOTH (_s, _sp)
+        btn(nm, GREY, False, BTN_W=84).save("images/dir_%s_s.png" % k)
+        if nm != "BOTH": btn(nm, TRACKC, False, BTN_W=84).save("images/dir_%s_st.png" % k)
+        if nm in ("FWD", "BWD", "BOTH"): btn(nm, TRIG, False, BTN_W=84).save("images/dir_%s_sp.png" % k)
     # v1.83.0: EMPTY dark; FULL the pale play-head colour, no bar; PLAYING the accent orange with the bar at the BOTTOM;
     # CUED pale with a grey bar at the bottom
     def patcell(fill, bar, k, ink):

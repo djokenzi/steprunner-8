@@ -1662,9 +1662,8 @@ static void vst_tests() {
           tr.dir = DIR_PP; for (int m = 0; m < 6; m++) f += (char)('1' + Seq::path_step(tr, m));
           tr.dir = DIR_PP | DIR_BF; for (int m = 0; m < 6; m++) b += (char)('1' + Seq::path_step(tr, m));
           CHECK(f == "123432" && b == "432123" && Seq::round_len(tr) == 6, "FBWD plays %s, BFWD %s (a round of 6 steps either way)", f.c_str(), b.c_str()); }
-        { std::string f, b;   /* one pulse on step 1 of a 4-step rhythm */
-          for (int k = 0; k < 6; k++) { f += Seq::eu_gen(k, 1, 0, 4, Seq::EU_BOTH, 0) ? 'x' : '.'; b += Seq::eu_gen(k, 1, 0, 4, Seq::EU_BFWD, 0) ? 'x' : '.'; }
-          CHECK(f == "x....." && b == "...x..", "a generator: FBWD '%s', BFWD '%s' (the rhythm read from its end first)", f.c_str(), b.c_str()); }
+        { std::string f; for (int k = 0; k < 6; k++) f += Seq::eu_gen(k, 1, 0, 4, 0) ? 'x' : '.';
+          CHECK(f == "x...x.", "a generator reads its rhythm forwards (v1.2.0: the track's direction moves the play head): '%s'", f.c_str()); }
         set_int(a, "track", 2); blocks(a, 1, ppb);
         set_int(a, "trk_bfwd", 1); CHECK(opt("trk_bfwd") && !opt("trk_both") && !opt("trk_fwd") && !opt("trk_bwd"), "TRACK EDIT BFWD: one of four, FBWD dark");
         set_int(a, "trk_both", 1); CHECK(opt("trk_both") && !opt("trk_bfwd"), "FBWD: BFWD dark");
@@ -2120,20 +2119,11 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         b->d(b, 7, P("ccb2"), 0, disp, 0); CHECK(!strcmp(disp, "OFF"), "reloaded: BASE 2 = '%s'", disp);
         b->d(b, 1, 0, 0, 0, 0);
     }
-    /* READ PROJECT: cctest2.xpj has CC 20 on channel 1 at 37 and CC 19 on channel 16 at 21 */
-    set_int(a, "cc_edit", 1); set_int(a, "ccn1", 20); set_int(a, "ccn2", 19); blocks(a, 1, ppb);
-    press("cc_read");
-    a->d(a, 7, P("msg"), 0, disp, 0); CHECK(!strcmp(disp, "Read 1 project value"), "READ PROJECT on channel 1: '%s'", disp);
-    a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(!strcmp(disp, "37"), "CC 20 on channel 1: base '%s'", disp);
-    char d2[64]; a->d(a, 7, P("ccb2"), 0, d2, 0); CHECK(!strcmp(d2, "OFF"), "CC 19 is learned on channel 16, not this one: '%s'", d2);
-    press("cc_commit");
-    set_int(a, "trk_ch", 16); blocks(a, 1, ppb);
-    set_int(a, "cc_edit", 1); blocks(a, 1, ppb); press("cc_read");
-    a->d(a, 7, P("ccb2"), 0, d2, 0); a->d(a, 7, P("ccb1"), 0, disp, 0);
-    CHECK(!strcmp(d2, "21") && !strcmp(disp, "37"), "on channel 16: CC 19 base '%s'; the CC not found keeps what it had ('%s')", d2, disp);
-    press("cc_discard");
+    /* v1.2.0: READ PROJECT is gone (FETCH CC VALUES reads the base values); its parameter does nothing */
     setenv("STEPRUNNER_XPJ_ROOT", "testdata/none", 1);
-    set_int(a, "cc_edit", 1); blocks(a, 1, ppb); press("cc_read");
+    set_int(a, "cc_edit", 1); blocks(a, 1, ppb); a->d(a, 7, P("ccb1"), 0, disp, 0); { std::string b0(disp);
+    press("cc_read"); a->d(a, 7, P("ccb1"), 0, disp, 0); CHECK(b0 == disp, "cc_read changes nothing (v1.2.0)"); }
+    press("src_fetch");
     a->d(a, 7, P("msg"), 0, disp, 0); CHECK(!strcmp(disp, "No saved project found"), "no project: '%s'", disp);
     a->d(a, 1, 0, 0, 0, 0);
     {   /* a real project with 38 plugin mappings on channel 1: CC 20..23 are there, CC 24 is not */
@@ -2141,10 +2131,10 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         AEffect *c = VSTPluginMain(host);
         auto pr = [&](const char *k) { c->setP(c, P(k), 1.0f); blocks(c, 1, 0.0); c->setP(c, P(k), 0.0f); blocks(c, 1, 0.0); };
         set_int(c, "track_edit", 1); blocks(c, 1, 0.0); set_int(c, "cc_edit", 1); blocks(c, 1, 0.0);
-        pr("cc_read");
+        pr("src_fetch");
         char m[64], b1[64], b2[64], b5[64];
         c->d(c, 7, P("msg"), 0, m, 0); c->d(c, 7, P("ccb1"), 0, b1, 0); c->d(c, 7, P("ccb2"), 0, b2, 0); c->d(c, 7, P("ccb5"), 0, b5, 0);
-        CHECK(!strcmp(m, "Read 4 project values") && !strcmp(b1, "94") && !strcmp(b2, "34") && !strcmp(b5, "OFF"), "9w9: '%s', BASE 1 %s, BASE 2 %s, BASE 5 %s", m, b1, b2, b5);
+        CHECK(!strcmp(m, "Read 38 CC values") && !strcmp(b1, "94") && !strcmp(b2, "34") && !strcmp(b5, "OFF"), "9w9: '%s', BASE 1 %s, BASE 2 %s, BASE 5 %s", m, b1, b2, b5);
         c->d(c, 1, 0, 0, 0, 0);
     }
     {   /* INITIALIZE: its section opens on the left; FETCH CC VALUES reads base values and names of all eight tracks */
@@ -2204,8 +2194,8 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
             AEffect *e = VSTPluginMain(host);
             e->d(e, 24, 0, (int)saved.size(), (void *)saved.c_str(), 0);
             set_int(e, "track_edit", 1); blocks(e, 1, 0.0); set_int(e, "cc_edit", 1); blocks(e, 1, 0.0);
-            e->setP(e, P("cc_read"), 1.0f); blocks(e, 1, 0.0); e->setP(e, P("cc_read"), 0.0f); blocks(e, 1, 0.0);
-            e->d(e, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "Read 0 project values"), "a target track with no mappings in this project (EDIT CC keeps to it): '%s'", m);
+            e->setP(e, P("src_fetch"), 1.0f); blocks(e, 1, 0.0); e->setP(e, P("src_fetch"), 0.0f); blocks(e, 1, 0.0);
+            e->d(e, 7, P("msg"), 0, m, 0); CHECK(!strcmp(m, "Read 0 CC values"), "a target track with no mappings in this project (EDIT CC keeps to it): '%s'", m);
             e->d(e, 1, 0, 0, 0, 0);
         }
         c->d(c, 1, 0, 0, 0, 0);
@@ -2778,9 +2768,9 @@ static void ccbase_tests() {   /* a CC with a base value goes back to it on the 
         setenv("STEPRUNNER_XPJ_ROOT", "build/big", 1);
         AEffect *c = VSTPluginMain(host);
         set_int(c, "track_edit", 1); blocks(c, 1, 0.0); set_int(c, "cc_edit", 1); blocks(c, 1, 0.0);
-        c->setP(c, P("cc_read"), 1.0f); blocks(c, 1, 0.0); c->setP(c, P("cc_read"), 0.0f); blocks(c, 1, 0.0);
+        c->setP(c, P("src_fetch"), 1.0f); blocks(c, 1, 0.0); c->setP(c, P("src_fetch"), 0.0f); blocks(c, 1, 0.0);
         char m[64]; c->d(c, 7, P("msg"), 0, m, 0);
-        CHECK(rc == 0 && !strcmp(m, "Read 4 project values"), "project found behind 21000 files: '%s'", m);
+        CHECK(rc == 0 && !strcmp(m, "Read 38 CC values"), "project found behind 21000 files: '%s'", m);
         c->d(c, 1, 0, 0, 0, 0);
         rc = system("rm -rf build/big"); (void)rc;
     }
@@ -2796,7 +2786,7 @@ static void verify_tests() {
     AEffect *c = VSTPluginMain(host);
     char m[64];
     auto rd = [&](AEffect *e) { set_int(e, "track_edit", 1); blocks(e, 1, 0.0); set_int(e, "cc_edit", 1); blocks(e, 1, 0.0);
-        e->setP(e, P("cc_read"), 1.0f); blocks(e, 1, 0.0); e->setP(e, P("cc_read"), 0.0f); blocks(e, 1, 0.0);
+        e->setP(e, P("src_fetch"), 1.0f); blocks(e, 1, 0.0); e->setP(e, P("src_fetch"), 0.0f); blocks(e, 1, 0.0);
         e->d(e, 7, P("msg"), 0, m, 0); e->setP(e, P("cc_discard"), 1.0f); blocks(e, 1, 0.0); e->setP(e, P("cc_discard"), 0.0f); blocks(e, 1, 0.0); };
     rd(c);
     CHECK(rc == 0 && !strcmp(m, "Save the project first"), "new project, not saved: the newest file is another project's, not read ('%s')", m);
@@ -2808,12 +2798,12 @@ static void verify_tests() {
     if (FILE *f = fopen("build/vfy/chunk", "wb")) { fwrite(chunk, 1, (size_t)n, f); fclose(f); }
     rc = system("python3 test_mkxpj.py testdata9/9w9.xpj build/vfy/chunk build/vfy/mine.xpj");
     rd(c);
-    CHECK(rc == 0 && !strcmp(m, "Read 4 project values"), "saved: the file with its chunk is read ('%s')", m);
+    CHECK(rc == 0 && !strcmp(m, "Read 38 CC values"), "saved: the file with its chunk is read ('%s')", m);
     { AEffect *d = VSTPluginMain(host); rd(d);
       CHECK(!strcmp(m, "Save the project first"), "another StepRunner-8 (another new project) does not take it for its own ('%s')", m);
       d->d(d, 1, 0, 0, 0, 0); }
     { AEffect *e = VSTPluginMain(host); std::string s(chunk, (size_t)n); e->d(e, 24, 0, n, (void *)s.c_str(), 0);   /* the project reopened */
-      rd(e); CHECK(!strcmp(m, "Read 4 project values"), "loaded from that project: it is its own ('%s')", m);
+      rd(e); CHECK(!strcmp(m, "Read 38 CC values"), "loaded from that project: it is its own ('%s')", m);
       e->d(e, 1, 0, 0, 0, 0); }
     {   /* two files hold this StepRunner-8 (a Save As over another project left untitled.xpj next to it, same chunk): CREATE
          * DEFAULT MAP asks which one is open; our own backups do not count */
@@ -2839,11 +2829,11 @@ static void verify_tests() {
     }
     rc = system("touch -d '2036-01-01' build/vfy/other.xpj");   /* another project saved later (a Save As elsewhere) */
     rd(c);
-    CHECK(!strcmp(m, "Read 4 project values"), "a newer file of another project: the one found before is still read ('%s')", m);
+    CHECK(!strcmp(m, "Read 38 CC values"), "a newer file of another project: the one found before is still read ('%s')", m);
     setenv("STEPRUNNER_CURRENT", "build/vfy/cur", 1);
     rc = system("printf '<PROPERTIES><VALUE name=\"lastProjectPath\" val=\"build/vfy/other.xpj\"/></PROPERTIES>' > build/vfy/cur");
     rd(c);
-    CHECK(rc == 0 && !strcmp(m, "Read 4 project values"), "CurrentProject names another project: not trusted ('%s')", m);
+    CHECK(rc == 0 && !strcmp(m, "Read 38 CC values"), "CurrentProject names another project: not trusted ('%s')", m);
     unsetenv("STEPRUNNER_CURRENT");
     c->d(c, 1, 0, 0, 0, 0);
     unsetenv("STEPRUNNER_XPJ_ROOT");

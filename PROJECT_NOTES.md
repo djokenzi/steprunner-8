@@ -364,6 +364,9 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
   cy=285. The parameters eu_fwd .. eu_bfwd2 stay and still set the track's direction (no button).
 - EUCLIDIAN layout (owner, 16:10): ENABLE / RANDOM at cx 107 / 416, PULSE / ROTATE / LENGTH r=32 cy=299, COMMIT 118x39;
   page 2 (B) the same. COMMIT picture regenerated.
+- Cleanup: READ PROJECT's job and the TRACK SETUP draft (ccdraft / basedraft) removed (cc_read does nothing; FETCH CC
+  VALUES reads the base values; the project-finding tests use it now), eu_gen without a direction, 53 pictures no
+  layout line used (and their code in gen_cell_imgs.py) deleted.
 - vst.json 10200, release.sh 1.2.0.
 
 ### v1.1.1 (2026-10-13)

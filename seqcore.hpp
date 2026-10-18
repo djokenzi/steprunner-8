@@ -729,13 +729,11 @@ struct Seq {
      * euclid_apply() must be called again after any of the settings or the length changes. */
     enum { E_OR = 0, E_AND, E_XOR, E_SUB, E_NOPS };
     enum { EU_FWD = 0, EU_BWD, EU_BOTH, EU_BFWD };   /* EU_BOTH: back and forth from the start (FBWD); EU_BFWD (v1.2.0): from the end */
-    /* is step k of the track a pulse of one generator (rhythm length m, direction dir) */
-    static bool eu_gen(int k, int pulses, int rot, int m, int dir, int tro) {
+    /* is step k of the track a pulse of one generator (rhythm length m), read forwards (v1.2.0: the track's direction
+     * moves the play head; eu_dir1 / eu_dir2 are kept in projects only) */
+    static bool eu_gen(int k, int pulses, int rot, int m, int tro) {
         if (m < 1) return false;
-        int j;
-        if ((dir == EU_BOTH || dir == EU_BFWD) && m > 1) { const int per = 2 * m - 2, q = ((k - tro) % per + per) % per; j = dir == EU_BFWD ? (q < m ? m - 1 - q : q - m + 1) : (q < m ? q : per - q); }
-        else { j = ((k - tro) % m + m) % m; if (dir == EU_BWD) j = m - 1 - j; }
-        return eu_pulse(j, pulses, rot, m);
+        return eu_pulse(((k - tro) % m + m) % m, pulses, rot, m);
     }
     static bool eu_pulse(int k, int pulses, int rot, int n) {
         if (pulses <= 0 || n <= 0) return false;
@@ -769,8 +767,8 @@ struct Seq {
         const int n = eff_len(tr), m1 = eu_m1(tr), m2 = eu_m2(tr);
         const bool ga = gen_a(tr), gb = gen_b(tr);
         for (int k = 0; k < n; k++) {
-            const bool a = ga && eu_gen(k, tr.eu_pl1, tr.eu_ro1, m1, EU_FWD, tr.eu_tro);   /* v1.2.0: always forwards; the track's direction moves the play head */
-            const bool b = gb && eu_gen(k, tr.eu_pl2, tr.eu_ro2, m2, EU_FWD, tr.eu_tro);
+            const bool a = ga && eu_gen(k, tr.eu_pl1, tr.eu_ro1, m1, tr.eu_tro);
+            const bool b = gb && eu_gen(k, tr.eu_pl2, tr.eu_ro2, m2, tr.eu_tro);
             bool r;
             if (!(ga && gb)) r = a || b;   /* one generator: its rhythm */
             else switch (tr.eu_op) {
