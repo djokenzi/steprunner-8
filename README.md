@@ -34,6 +34,7 @@ The full user manual with screenshots is in [docs/MANUAL.md](docs/MANUAL.md).
 ## StepRunner-8 MPC Mapper
 
 Map StepRunner-8's CC locks to any drum pad or plugin parameter in your browser, no MIDI Learn needed. 
+It recognises the StepRunner-8 version in your project: all 8 CC knobs and the pan knob from version 1.2, the first 5 CC knobs and the pan knob for 1.1 and earlier.
 
   - [Open the Mapper](https://djokenzi.github.io/steprunner-8/mpcmap.html)
   - [User guide](docs/MAPPER.md)
