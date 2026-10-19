@@ -69,14 +69,26 @@ At the top of section **2 · StepRunner-8 knobs**:
 - **MIDI channel:** the channel StepRunner-8 sends on, for all eight tracks at once. It shows *mixed* when the tracks
   use different channels; you can set each track separately in [CC setup](#6-cc-setup).
 - **Program:** the target track. Drum programs are marked *drum*; plugin tracks show the plugin's name
-  (for example *Plugin 004 · 9W9*). StepRunner-8 tracks themselves are not listed.
+  (for example *Plugin 004 · 9W9*). StepRunner-8 tracks themselves are not listed. If a track already receives MIDI
+  from the chosen StepRunner-8 (its MIDI input is that StepRunner-8's port), it is selected for you.
+
+The line under the instance shows which **StepRunner-8 version** the Mapper found in the project, and so how many
+CC knobs it offers:
+
+| StepRunner-8 | CC knobs |
+|---|---|
+| 1.2 or later | **8** (CC 1–8) and the pan knob |
+| 1.1 or earlier | **5** (CC 1–5) and the pan knob |
+
+The version is recognised from the plugin's saved state; nothing has to be set. If the project has no StepRunner-8,
+the Mapper offers 8 knobs with StepRunner-8's default CC numbers.
 
 The rest of the section changes with the kind of target track you pick.
 
 ## 4. Mapping a drum program
 
-StepRunner-8 track **T1** plays pad **A01**, T2 plays A02, and so on up to T8 and A08. Each track has five CC knobs
-and a pan knob, and each knob sends its own CC number.
+StepRunner-8 track **T1** plays pad **A01**, T2 plays A02, and so on up to T8 and A08. Each track has eight CC knobs
+(five before StepRunner-8 1.2) and a pan knob, and each knob sends its own CC number.
 
 When the target is a drum program, you get a table with one row per StepRunner-8 track and its pad (T1 · A01 …
 T8 · A08) and one column per knob. Pick a pad parameter in each cell. Under each menu is the CC number that knob sends.
@@ -109,6 +121,10 @@ Under each menu is the CC number that knob sends.
 Parameter lists are built in for these plugins: **DrumSynth**, **6W6**, **8W8**, **9W9**, **Iona**, **CW-78** and
 **TR-MPC**. For any other plugin, the page says there is no parameter list for it yet.
 
+Some plugins name a parameter after what is loaded in that slot: in DrumSynth, *6 Noise* becomes *6 Spike* when the
+slot uses another model. It is the same parameter either way. Where the project already has a mapping, the Mapper
+shows the name the MPC wrote for it.
+
 ### Auto-fill
 
 Auto-fill works for drum programs and plugin instruments. **Auto-fill the column from the first chosen parameter**
@@ -134,14 +150,26 @@ already have a first value at once.
 
 Section **3 · CC setup** holds the MIDI channel and the CC numbers of every StepRunner-8 track. Click
 **Show CC numbers and channels** to open the table: tracks in columns, the MIDI channel in the first row, then
-CC knobs 1–5 and the pan knob.
+CC knobs 1–8 (1–5 for StepRunner-8 1.1 and earlier) and the pan knob.
 
 ![CC setup](mapper/06-cc-setup.png)
 
 - The numbers are **read from the chosen StepRunner-8 instance** in the project, including CC numbers you changed
   with EDIT CC. The green line above the table tells you where they came from.
 - **Read CCs and channels from project** goes back to what the project has.
-- **Use default CCs** sets StepRunner-8's factory numbers and MIDI channel 1.
+- **Use default CCs** sets StepRunner-8's factory numbers and MIDI channel 1:
+
+  | Track | Pad | CC 1–5 | CC 6 | CC 7 | CC 8 | Pan |
+  |---|---|---|---|---|---|---|
+  | T1 | A01 | 20–24 | 46 | 54 | 19 | 30 |
+  | T2 | A02 | 25–29 | 47 | 55 | 35 | 31 |
+  | T3 | A03 | 85–89 | 48 | 56 | 41 | 90 |
+  | T4 | A04 | 102–106 | 49 | 57 | 62 | 117 |
+  | T5 | A05 | 107–111 | 50 | 58 | 63 | 118 |
+  | T6 | A06 | 112–116 | 51 | 59 | 12 | 119 |
+  | T7 | A07 | 14–18 | 52 | 60 | 13 | 3 |
+  | T8 | A08 | 80–84 | 53 | 61 | 92 | 9 |
+
 - The **MIDI channel** field at the top right sets the channel for all tracks (the same field as in section 2).
 
 The MPC tells mappings apart by **channel + CC number**. Two knobs may share a CC number only if they are on

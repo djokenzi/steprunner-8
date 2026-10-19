@@ -89,6 +89,8 @@ input[type=checkbox]{accent-color:var(--acc)}
 .hero .brand .logo em{color:var(--acc);font-style:italic}
 .hero .brand .tool{font-size:13px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:#a9adb5}
 .hero .sub{margin-top:10px}
+.v1 .kx{display:none!important}
+#pgrid select,#drgrid select{font-size:13px;padding-left:6px;padding-right:2px;min-width:72px}
 </style>
 </head>
 <body>
@@ -116,6 +118,7 @@ input[type=checkbox]{accent-color:var(--acc)}
     <label class="wide">StepRunner-8 instance<select id="srinst"></select></label>
     <label>MIDI channel<input id="tsch2" type="number" min="1" max="16" value="1" placeholder="mixed" aria-label="MIDI channel for all tracks"></label>
   </div>
+  <div class="info" id="verinfo" style="margin:-4px 0 10px"></div>
   <div class="grid">
     <label class="wide">Program<select id="track"></select></label>
   </div>
@@ -156,7 +159,7 @@ input[type=checkbox]{accent-color:var(--acc)}
     <div class="row" style="margin-top:10px">
       <button id="tsReset">Read CCs and channels from project</button>
       <button id="tsDefault">Use default CCs</button>
-      <span class="info">Default = StepRunner-8 factory numbers, MIDI channel 1 (CC BASE 20, 25, 85, 102, 107, 112, 14, 80; Pan 30, 31, 90, 117, 118, 119, 3, 9)</span>
+      <span class="info">Default = StepRunner-8 factory numbers, MIDI channel 1 (CC BASE 20, 25, 85, 102, 107, 112, 14, 80; CC 6: 46–53; CC 7: 54–61; CC 8: 19, 35, 41, 62, 63, 12, 13, 92; Pan 30, 31, 90, 117, 118, 119, 3, 9)</span>
     </div>
   </details>
 </section>
@@ -272,6 +275,8 @@ async function load(file,handle){
        fw:text.split('\n')[1]||'?',sr:srs,
        trk:(data.tracks||[]).map(t=>{const pm=((t.program||{}).padNoteMap||{}).noteForPad||{},plug=!!(t.program&&t.program.plugin);
          return {name:t.name,route:t.midiInputRoute,notes:[0,1,2,3,4,5,6,7].map(i=>Number.isInteger(pm['value'+i])?pm['value'+i]:plug?i:36+i)}}),pend:{}};
+    S.pnames={};for(const r of S.rows){const q=r.obj.control.targetData[0]||{},m=/^(.*) \((.*)\)$/.exec(r.obj.control.name||'');
+      if(q.instrumentIndex===256&&q.parameter>=4096&&m&&m[1]===q.track)(S.pnames[q.track]=S.pnames[q.track]||{})[q.parameter]=m[2]}
     srFill();srUse(0);
     $('info').textContent=`${S.name} · firmware ${S.fw} · ${gz?'gzip':'uncompressed'} · ${(text.length/1e6).toFixed(1)} MB · drum programs: ${tracks.length} · plugin tracks: ${Object.keys(plug).length}`;
     $('track').innerHTML=tracks.map(t=>`<option value="${esc(t)}">${esc(t)} · drum</option>`).join('')+Object.keys(plug).map(t=>`<option value="${esc(t)}">${esc(t)} · ${esc(plug[t])}</option>`).join('');
@@ -280,7 +285,7 @@ async function load(file,handle){
     {const any=tracks.length+Object.keys(plug).length;msg($('loadmsg'),any?'':'The project has no drum programs or plugin tracks; mappings can only be viewed and deleted.',any?'':'warn')}
     if(S.fw!=='3.9.1.2')msg($('loadmsg'),`The format was verified on firmware 3.9.1.2; this project was saved on ${S.fw}. Try it on a copy first.`,'warn');
     msg($('savemsg'),handle?'':'This browser cannot write over the file (or the file was dropped); use "Download as new file".','warn');
-    msg($('tsmsg'),'');tsMode();noteLbl();render();
+    msg($('tsmsg'),'');srTarget();tsMode();noteLbl();render();
   }catch(e){S=null;for(const id of ['tsSec','ccSec','listSec','saveSec','support'])$(id).hidden=true;$('info').textContent='';msg($('loadmsg'),'Error: '+e.message,'err')}
 }
 
@@ -293,7 +298,7 @@ function render(){
   S.rows.forEach((r,i)=>{
     const t=r.obj.control.targetData[0]||{},m=r.obj.mapping,tr=document.createElement('tr');
     const p=byId.get(t.parameter);
-    const pl=t.instrumentIndex===256&&t.parameter>=4096?(PLUG[S.plug[t.track]]||[])[t.parameter-4096]:null;
+    const pl=t.instrumentIndex===256&&t.parameter>=4096?(((S.pnames||{})[t.track]||{})[t.parameter]||(PLUG[S.plug[t.track]]||[])[t.parameter-4096]):null;
     const where=t.instrumentIndex===256?'plugin':t.instrumentIndex===257?'whole track':'Pad › '+padName(t.instrumentIndex||0);
     const tp=t.instrumentIndex===257?trackParam(t.parameter):null;
     const cells=[t.track,where,t.instrumentIndex===256?(pl||r.obj.control.name):(tp?tp[1]:(p?p[1]:r.obj.control.name)),t.parameter,m.channel];
@@ -344,24 +349,32 @@ async function save(over){
 const TS_BASE=[20,25,85,102,107,112,14,80];
 // Knob 6 (PAN): fixed CC per StepRunner-8 track, independent of CC BASE.
 const PAN_CC=[30,31,90,117,118,119,3,9];
-const ccOf=(bs,t,k)=>k<5?bs[t]+k:PAN_CC[t];
-const KN=[0,1,2,3,4,5];
+// v1.2.0: CC 6 / 7 = 46 + t / 54 + t, CC 8 = CC8_DEF[t]. Knob ids: 0-4 CC 1-5, 5 Pan, 6-8 CC 6-8.
+const CC8_DEF=[19,35,41,62,63,12,13,92];
+const ccOf=(bs,t,k)=>k<5?bs[t]+k:k===5?PAN_CC[t]:k===6?46+t:k===7?54+t:CC8_DEF[t];
+const K9=[0,1,2,3,4,5,6,7,8];          // every knob id (data arrays are indexed by id)
+const ALLK=[0,1,2,3,4,6,7,8,5];        // display order: CC 1-8, then Pan
+const KN_V1=[0,1,2,3,4,5];
+let KN=ALLK;                           // the knobs of the StepRunner-8 version in use (8 CC from v1.2.0, 5 before)
+const KL=k=>k===5?'Pan knob':'CC knob '+(k<5?k+1:k);
+const kx=k=>k>5?' class="kx"':'';
+const KH=k=>k===5?'Pan':'CC '+(k<5?k+1:k);   // short column headers (nine columns must fit)
 // Grupe kako ih MPC prikazuje u MIDI Learn > TARGET za pad drum programa (procitano sa uredjaja, firmware 3.9.1.2).
 const MIXER_IDS=[518,517,526,527,522,523,524,525];
 const TRACK_IDS=new Set([132, 133, 513, 514, 515, 516, 519, 520, 521, 528, 529, 531, 532, 533, 534, 535, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 621, 622, 623, 637, 990, 991, 992, 993, 994, 995, 996, 997, 998, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1039, 1040, 1043, 1044, 1047, 1048, 1051, 1052, 1055, 1056, 1059, 1060, 1063, 1064, 1067, 1068, 1079, 1080, 1081, 1082, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1092, 1093, 1094, 1095, 1096, 1118, 1119, 1120, 1121, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203, 1204, 1205, 1206, 1219, 1220, 1221, 1222, 1223, 1224, 1234, 1235, 1236, 1237, 1241, 1242, 1285, 1286, 1287, 1288, 3081, 3082, 3085, 3086, 3089, 3090, 3093, 3094, 3097, 3098, 3101, 3102, 3105, 3106, 3109, 3110, 3111, 3112, 3113, 3114, 3131, 3132, 3133, 3134, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142, 3143, 3144, 3145, 3146, 3147, 3148, 3149, 3150, 3151, 3152, 3153, 3154, 3155, 3156, 3157, 3158, 3159, 3160, 3161, 3162, 3163, 3164, 3165, 3166, 3167, 3168, 3169, 3170, 3179, 3180, 3181, 3224, 3225, 3226, 3227, 3228, 3229, 3230, 3231, 3232, 3233, 3234, 3235, 3236, 3237, 3238, 3239, 3240, 3241, 3242, 3243, 3244, 3245, 3246, 3247, 3248, 3249, 3250, 3251, 3252, 3253, 3254, 3255, 3256, 3257, 3258, 3259, 3260, 3261, 3262, 3263, 3264, 3265, 3266, 3267, 3268, 3269, 3270, 3271, 3272, 3273, 3274, 3275, 3276, 3277, 3278, 3279, 3404, 3405, 3406, 3407, 3408, 3409, 3410, 3411, 3412, 3413, 3414, 3415, 3416, 3417, 3418, 3419]);
 const GROUPS=['Mixer','Track','Not in the MPC menu for drum programs'];
 const pgrp=i=>MIXER_IDS.includes(i)?0:TRACK_IDS.has(i)?1:2;
-$('knobs').innerHTML=KN.map(k=>`<div class="knob"><b><span class="dial"></span>${k<5?'CC KNOB '+(k+1):'PAN KNOB'}</b>
+$('knobs').innerHTML=ALLK.map(k=>`<div class="knob"><b><span class="dial"></span>${KL(k).toUpperCase()}</b>
   <select id="kn${k}" aria-label="Parameter for knob ${k+1}"><option value="">— not mapped —</option>${GROUPS.map((g,gi)=>`<optgroup label="${g}">${PARAMS.filter(p=>pgrp(p[0])===gi).map(p=>`<option value="${p[0]}">${p[1]} [${p[0]}]</option>`).join('')}</optgroup>`).join('')}</select>
   <div class="info" id="kni${k}"></div></div>`).join('');
 // CC setup: one CC number per track and knob. Defaults = StepRunner-8's factory numbers; replaced by the numbers
 // read from the StepRunner-8 plugin in the project, when there is one.
-const CC_DEF=[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>ccOf(TS_BASE,t,k)));
+const CC_DEF=[0,1,2,3,4,5,6,7].map(t=>K9.map(k=>ccOf(TS_BASE,t,k)));
 let CC_SRC=CC_DEF;   // what "Read CCs from project" goes back to
 const CH_DEF=Array(8).fill(1);let CH_SRC=CH_DEF;
 $('ccgrid').innerHTML='<thead><tr><th></th>'+[0,1,2,3,4,5,6,7].map(t=>`<th>T${t+1} · ${padName(t)}</th>`).join('')+'</tr></thead><tbody>'+
   '<tr class="chrow"><td>MIDI channel</td>'+[0,1,2,3,4,5,6,7].map(t=>`<td><input id="chn${t}" type="number" min="1" max="16" value="1" aria-label="Track ${t+1} MIDI channel"></td>`).join('')+'</tr>'+
-  KN.map(k=>`<tr><td>${k<5?'CC knob '+(k+1):'Pan knob'}</td>`+[0,1,2,3,4,5,6,7].map(t=>`<td><input id="cc${t}_${k}" type="number" min="0" max="127" value="${CC_DEF[t][k]}" aria-label="Track ${t+1}, ${k<5?'CC knob '+(k+1):'Pan knob'} CC number"></td>`).join('')+'</tr>').join('')+'</tbody>';
+  ALLK.map(k=>`<tr${kx(k)}><td>${KL(k)}</td>`+[0,1,2,3,4,5,6,7].map(t=>`<td><input id="cc${t}_${k}" type="number" min="0" max="127" value="${CC_DEF[t][k]}" aria-label="Track ${t+1}, ${KL(k)} CC number"></td>`).join('')+'</tr>').join('')+'</tbody>';
 const ccv=(t,k)=>+$('cc'+t+'_'+k).value;
 const ccAll=()=>[0,1,2,3,4,5,6,7].flatMap(t=>KN.map(k=>ccv(t,k)));
 const chv=t=>+$('chn'+t).value;   // MIDI channel 1..16 of StepRunner-8 track t
@@ -387,15 +400,17 @@ function srReadAll(tracks){   // -> [{name, plugin, cc[8][6], ch[8]}] for every 
       const len=(b[156]<<24|b[157]<<16|b[158]<<8|b[159])>>>0;
       let txt=new TextDecoder('latin1').decode(b.slice(160,160+len));txt=txt.split('\0')[0];
       if(!/^TSq[23]/.test(txt))continue;
-      const base=[...TS_BASE],own=[...Array(8)].map(()=>[0,0,0,0,0]),ch=Array(8).fill(0);
+      const base=[...TS_BASE],own=[...Array(8)].map(()=>Array(8).fill(0)),ch=Array(8).fill(0);let v2=false;
       for(const l of txt.split('\n')){   // only the lines of the pattern playing (no "V../Z.." prefix)
         let m=/^t (\d) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)(?: (\d+))?/.exec(l);
-        if(m&&+m[1]<8){base[+m[1]]=m[9]!==undefined?+m[9]:20;ch[+m[1]]=+m[4];own[+m[1]]=[0,0,0,0,0];continue}
-        m=/^C (\d) (\d+) (\d+) (\d+) (\d+) (\d+)/.exec(l);
-        if(m&&+m[1]<8)own[+m[1]]=[2,3,4,5,6].map(i=>+m[i]);
+        if(m&&+m[1]<8){base[+m[1]]=m[9]!==undefined?+m[9]:20;ch[+m[1]]=+m[4];own[+m[1]]=Array(8).fill(0);continue}
+        m=/^C (\d)((?: \d+){5,8})/.exec(l);
+        if(m&&+m[1]<8){const x=m[2].trim().split(' ').map(Number);own[+m[1]]=K9.slice(0,8).map(j=>x[j]||0);continue}
+        if(/^e /.test(l)&&l.trim().split(/\s+/).length>=16)v2=true;   // v1.2.0 writes six more numbers on every e line
       }
-      const cc=[0,1,2,3,4,5,6,7].map(i=>KN.map(k=>k<5?(own[i][k]?(own[i][k]-1)&127:Math.min(base[i],123)+k):PAN_CC[i]));
-      out.push({name:t.name,plugin:d.name,cc,ch,ti:tracks.indexOf(t),state:pl.state,isSR:d.uid===SR_UID||d.name==='StepRunner-8'});
+      const cc=[0,1,2,3,4,5,6,7].map(i=>K9.map(k=>{if(k===5)return PAN_CC[i];if(k>5&&!v2)return null;const j=k<5?k:k-1;
+        return own[i][j]?(own[i][j]-1)&127:k<5?Math.min(base[i],123)+k:ccOf(TS_BASE,i,k)}));
+      out.push({name:t.name,plugin:d.name,cc,ch,v2,ti:tracks.indexOf(t),state:pl.state,isSR:d.uid===SR_UID||d.name==='StepRunner-8'});
     }catch(e){}
   }
   let slot=0;for(const r of out)if(r.isSR)r.slot=slot++;   // ALSA names follow load order: "StepRunner-8", "StepRunner-8 2", ...
@@ -437,8 +452,18 @@ function srFill(){
   $('srinst').innerHTML=S.sr.length?S.sr.map((r,i)=>`<option value="${i}">${esc(r.name)} · ${esc(r.plugin)} · ${chText(r)}</option>`).join(''):'<option value="-1">none in this project (default CCs)</option>';
   $('srinst').disabled=S.sr.length<2;
 }
+function setVer(v2){   // 8 CC knobs (StepRunner-8 1.2.0 and later) or 5
+  KN=v2?ALLK:KN_V1;
+  for(const id of ['tsSec','ccSec'])$(id).classList.toggle('v1',!v2);
+  $('verinfo').textContent=v2?'StepRunner-8 1.2 or later: 8 CC knobs':'StepRunner-8 1.1 or earlier: 5 CC knobs';
+}
+function srTarget(){   // pick the program that already listens to the chosen StepRunner-8 (its MIDI input is that port)
+  const sr=S.sr[+$('srinst').value];if(!sr||!sr.isSR)return;
+  const t=S.trk.find(x=>x.route&&x.route.inputPort&&x.route.inputPort.deviceName===srPort(sr)&&[...$('track').options].some(o=>o.value===x.name));
+  if(t)$('track').value=t.name;
+}
 function srUse(i){   // load the CC numbers and channel of instance i into CC setup
-  const sr=S.sr[i];
+  const sr=S.sr[i];setVer(sr?sr.v2:true);
   if(!sr){CC_SRC=CC_DEF;CH_SRC=CH_DEF;ccSet(CC_DEF);chSet(CH_DEF);msg($('srinfo'),'No StepRunner-8 in this project: StepRunner-8 default CC numbers are used.','');return}
   CC_SRC=sr.cc;CH_SRC=sr.ch.map(c=>c+1);ccSet(sr.cc);
   chSet(sr.ch.map(c=>c+1));srInfo(i);
@@ -449,8 +474,8 @@ function srInfo(i){   // the message above CC setup, from the instances as they 
   let cls='ok';
   if(S.sr.length>1)txt=`${S.sr.length} StepRunner-8 instances in this project. `+txt;
   // two instances on the same channel with a shared CC number cannot be told apart by MPC
-  const mine=new Set(sr.cc.flatMap((r,t)=>r.map(c=>sr.ch[t]+':'+c)));
-  const clash=S.sr.filter((o,j)=>j!==i&&o.cc.some((r,t)=>r.some(c=>mine.has(o.ch[t]+':'+c)))).map(o=>o.name);
+  const mine=new Set(sr.cc.flatMap((r,t)=>r.filter(c=>c!==null).map(c=>sr.ch[t]+':'+c)));
+  const clash=S.sr.filter((o,j)=>j!==i&&o.cc.some((r,t)=>r.some(c=>c!==null&&mine.has(o.ch[t]+':'+c)))).map(o=>o.name);
   if(clash.length){txt+=` Warning: ${clash.join(', ')} sends some of the same CC numbers on the same channel; MPC cannot tell them apart, so a mapping reacts to both.`;cls='warn'}
   msg($('srinfo'),txt,cls);
 }
@@ -475,23 +500,27 @@ function tsCheck(){
   return '';
 }
 function tsPreview(){
-  for(const k of KN)$('kni'+k).textContent=[0,1,2,3,4,5,6,7].map(t=>padName(t)+' CC'+ccv(t,k)).join(' · ');
+  for(const e of document.querySelectorAll('#drgrid select,#pgrid select'))e.title=e.value?e.selectedOptions[0].textContent:'';   // the full name, when the cell is too narrow
+  for(const k of KN)if($('kni'+k))$('kni'+k).textContent=[0,1,2,3,4,5,6,7].map(t=>padName(t)+' CC'+ccv(t,k)).join(' · ');
   for(let t=0;t<8;t++)for(const k of KN){const e=$('pgc'+t+'_'+k);if(e)e.textContent='CC '+ccv(t,k);$('dkc'+t+'_'+k).textContent='CC '+ccv(t,k)}
   const pa=pairAll();let bad=false;for(let t=0;t<8;t++)for(const k of KN){const b=pa.filter(v=>v===pair(t,k)).length>1;$('cc'+t+'_'+k).classList.toggle('bad',b);bad=bad||b}
   if(bad)$('ccsetup').open=true;
   const e=tsCheck();$('tsApply').disabled=!!e;if(e)msg($('tsmsg'),e,'err');else if($('tsmsg').className.includes('err'))msg($('tsmsg'),'');
 }
 const isPlug=()=>!!(S&&S.plug[$('track').value]);
-const plugNames=()=>PLUG[S.plug[$('track').value]]||[];
-const pgVals=()=>[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>$('pg'+t+'_'+k)?$('pg'+t+'_'+k).value:''));
+// Parameter names: the probed list, with the names MPC itself wrote into this project's mappings on top. Some plugins
+// (DrumSynth) name a parameter after the slot's current model ("6 Noise" is "6 Spike" on another model); same id.
+const plugNames=()=>{const tr=$('track').value,base=PLUG[S.plug[tr]]||[],ov=(S.pnames||{})[tr];
+  return ov?base.map((n,i)=>ov[4096+i]||n):base};
+const pgVals=()=>[0,1,2,3,4,5,6,7].map(t=>K9.map(k=>KN.includes(k)&&$('pg'+t+'_'+k)?$('pg'+t+'_'+k).value:''));
 function pgOptions(group){
   return '<option value="">—</option>'+plugNames().map((n,i)=>[n,i]).filter(([n])=>n&&(!group||n.startsWith(group+' '))).map(([n,i])=>`<option value="${4096+i}">${esc(n)}</option>`).join('');
 }
 function pgBuild(){
-  $('pgrid').innerHTML='<thead><tr><th>Track</th>'+[1,2,3,4,5].map(k=>`<th class="kh"><span class="dial"></span>CC knob ${k}</th>`).join('')+'<th class="kh"><span class="dial"></span>Pan knob</th>'+'</tr></thead><tbody>'+
+  $('pgrid').innerHTML='<thead><tr><th>Track</th>'+ALLK.map(k=>`<th class="kh${k>5?' kx':''}"><span class="dial"></span>${KH(k)}</th>`).join('')+'</tr></thead><tbody>'+
     [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1}</td>`+
-      KN.map(k=>`<td><select id="pg${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${pgOptions('')}</select><span class="cc" id="pgc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
-  for(let t=0;t<8;t++)for(const k of KN)$('pg'+t+'_'+k).onchange=()=>{autofill(t,k);tsPreview()};
+      ALLK.map(k=>`<td${kx(k)}><select id="pg${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${pgOptions('')}</select><span class="cc" id="pgc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
+  for(let t=0;t<8;t++)for(const k of ALLK)$('pg'+t+'_'+k).onchange=()=>{autofill(t,k);tsPreview()};
 }
 // Auto-fill: from the first chosen cell of a column, guess the next tracks' parameters.
 // A number in the name counts up ("Slot 1 Tune" -> "Slot 2 Tune"); without a number, the same name after the first
@@ -516,16 +545,16 @@ function autofill(t0,k){
   if(P==='dk'){for(let t=t0+1;t<8;t++){$('dk'+t+'_'+k).value=v;found++}}   // drum program: the same parameter on the pads below
   else{const seq=afSeq(+v-4096,7-t0);
   for(let j=0;j<7-t0;j++){const i=seq[j];const el=$('pg'+(t0+1+j)+'_'+k);el.value=i!==undefined&&i>=0?String(4096+i):'';if(el.value)found++}}
-  $('afinfo').textContent=`Knob column ${k<5?k+1:'Pan'}: filled ${found} of ${7-t0} tracks below T${t0+1}.`;
+  $('afinfo').textContent=`${KL(k)} column: filled ${found} of ${7-t0} tracks below T${t0+1}.`;
 }
 $('autofill').addEventListener('change',()=>{if(!$('autofill').checked)return;const P=afP();for(const k of KN)for(let t=0;t<8;t++)if($(P+t+'_'+k)&&$(P+t+'_'+k).value){autofill(t,k);break}tsPreview()});
 // ---- drum program, "different parameter per track": one list per track and knob (pad = A01..A08 as T1..T8)
 const DR_OPTS='<option value="">—</option>'+GROUPS.map((g,gi)=>`<optgroup label="${g}">${PARAMS.filter(p=>pgrp(p[0])===gi).map(p=>`<option value="${p[0]}">${esc(p[1])} [${p[0]}]</option>`).join('')}</optgroup>`).join('');
-$('drgrid').innerHTML='<thead><tr><th>Track</th>'+[1,2,3,4,5].map(k=>`<th class="kh"><span class="dial"></span>CC knob ${k}</th>`).join('')+'<th class="kh"><span class="dial"></span>Pan knob</th></tr></thead><tbody>'+
-  [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1} · ${padName(t)}</td>`+KN.map(k=>`<td><select id="dk${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${DR_OPTS}</select><span class="cc" id="dkc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
-for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).addEventListener('change',()=>{autofill(t,k);tsPreview()});
+$('drgrid').innerHTML='<thead><tr><th>Track</th>'+ALLK.map(k=>`<th class="kh${k>5?' kx':''}"><span class="dial"></span>${KH(k)}</th>`).join('')+'</tr></thead><tbody>'+
+  [0,1,2,3,4,5,6,7].map(t=>`<tr><td>T${t+1} · ${padName(t)}</td>`+ALLK.map(k=>`<td${kx(k)}><select id="dk${t}_${k}" aria-label="Track ${t+1}, knob ${k+1}">${DR_OPTS}</select><span class="cc" id="dkc${t}_${k}"></span></td>`).join('')+'</tr>').join('')+'</tbody>';
+for(let t=0;t<8;t++)for(const k of ALLK)$('dk'+t+'_'+k).addEventListener('change',()=>{autofill(t,k);tsPreview()});
 const perTrack=()=>true;   // drum programs: always one parameter per track and knob (auto-fill copies it down)
-const dkVals=()=>[0,1,2,3,4,5,6,7].map(t=>KN.map(k=>$('dk'+t+'_'+k).value));
+const dkVals=()=>[0,1,2,3,4,5,6,7].map(t=>K9.map(k=>KN.includes(k)?$('dk'+t+'_'+k).value:''));
 function drShow(){$('knobs').hidden=perTrack();$('drgridw').hidden=!perTrack()}
 $('drmode').addEventListener('change',()=>{
   if(perTrack()){for(let t=0;t<8;t++)for(const k of KN)$('dk'+t+'_'+k).value=$('kn'+k).value}   // start from the shared choice
@@ -613,15 +642,15 @@ function tsApply(){
     (extra.length?extra.map(x=>x[0].toUpperCase()+x.slice(1)).join('. ')+'. ':'')+'Not saved to the file yet.',warn?'warn':'ok');
   render();
 }
-for(const k of KN)$('kn'+k).addEventListener('change',tsPreview);
+for(const k of ALLK)$('kn'+k).addEventListener('change',tsPreview);
 $('kn5').value='517';for(let t=0;t<8;t++)$('dk'+t+'_5').value='517';
-for(let t=0;t<8;t++)for(const k of KN)$('cc'+t+'_'+k).addEventListener('input',tsPreview);
+for(let t=0;t<8;t++)for(const k of ALLK)$('cc'+t+'_'+k).addEventListener('input',tsPreview);
 for(const id of ['tsch','tsch2'])$(id).addEventListener('input',()=>{const v=+$(id).value;if(Number.isInteger(v)&&v>=1&&v<=16){for(let t=0;t<8;t++)$('chn'+t).value=v;$(id==='tsch'?'tsch2':'tsch').value=v}tsPreview()});
 for(let t=0;t<8;t++){$('chn'+t).addEventListener('input',()=>{chTop();tsPreview()})}
 $('track').addEventListener('change',()=>{if(S){tsMode();noteLbl()}});
 $('tsApply').onclick=tsApply;
 $('tsReset').onclick=()=>{ccSet(CC_SRC);chSet(CH_SRC);tsPreview()};
-$('srinst').addEventListener('change',()=>{srUse(+$('srinst').value);if(S)tsFromProject()});
+$('srinst').addEventListener('change',()=>{srUse(+$('srinst').value);if(S){srTarget();tsMode();noteLbl()}});
 $('tsDefault').onclick=()=>{ccSet(CC_DEF);chSet(CH_DEF);tsPreview()};
 tsPreview();
 
