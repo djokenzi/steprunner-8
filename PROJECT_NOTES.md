@@ -248,6 +248,7 @@ StepRunner-8 continues Trig Seq (`poc/trigseq/`, VST id `TrSq`, last version v2.
 (v1.x and v2.x) is in `PROJECT_HISTORY.md`; here only StepRunner-8 versions.
 
 ### v1.2.0 (in development)
+- Manual screenshots retaken on 2026-10-19 over MPC Remote (new pages: left page 2, TRACK VALUES, EUCLIDIAN B); README lists eight CC locks and the four directions.
 - RND RATCHETS also draws RATCHET RESOLUTION (AUTO, 1/16 .. 1/80) for each selected step; a step that gets one hit gets
   AUTO.
 - PERFORM: STOP CC pad (`pf_stopcc`, appended) in the place of HUMANIZE. While lit, `Seq::emit` drops every CC

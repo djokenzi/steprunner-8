@@ -4,7 +4,7 @@ Version 1.2.0 · [Demo and mapping video on YouTube](https://youtu.be/jZ22XHM5tb
 
 StepRunner-8 is an 8-track, 64-step sequencer for Akai MPC standalone, loaded as a plugin on a plugin track. It makes
 no sound of its own: it sends MIDI to other tracks, usually a drum program. Each step can have a condition, a
-probability and its own values ("locks") for velocity, length, pan and five CCs.
+probability and its own values ("locks") for velocity, length, pan and eight CCs.
 
 **Contents**
 
@@ -209,7 +209,9 @@ PATTERN EDIT holds the settings of the whole pattern:
   track.
 - **▶ / ◀** switch to the second page of random buttons and back: **RND COND / RND TIMING / RND RATCHETS**, as in
   [TRACK EDIT](#5-track-edit), but on every trig of **all 8 tracks**. With CLR LOCKS lit, **CLR COND / CLR TIMING /
-  CLR RATCHETS** also clear all 8 tracks (unlike CLR VEL … CLR CC 5 on page 1, which clear the selected track).
+  CLR RATCHETS** also clear all 8 tracks (unlike CLR VEL … CLR CC 8 on page 1, which clear the selected track).
+
+![The left section, page 2](manual/left-page2.png)
 
 ### Patterns 1–8
 
@@ -249,6 +251,8 @@ The settings of the selected track:
 | **SHIFT ◀ / ▶** | | Moves every step of the track one step earlier / later, with its locks, conditions and timing. Steps wrap round the track's length. On a Euclidean track the rhythm moves too. Works in EUCLIDIAN as well. |
 | **DIRECTION** | FWD, BWD, FBWD, BFWD | Forwards, backwards, or back and forth: FBWD starts forwards, BFWD starts backwards (from the last step) |
 | **SPEED** | 1/8X … 2X | 1X = 16th notes, 2X = 32nds, 1/2X = 8ths … |
+
+![TRACK VALUES](manual/track-values.png)
 
 **TRACK VALUES** shows the knobs of STEP LOCKS in the same places, but for the whole track. **BACK** (where CONDITION
 is on STEP LOCKS) returns to TRACK EDIT. The panel stays open when you switch modes and come back, and it opens from
@@ -362,6 +366,8 @@ Each has the same controls:
 | **Rotate A / B** | Shifts that rhythm by steps |
 | **Length A / B** | Length of that rhythm (1–64). It repeats over the track; if it is longer than the track, the track plays the rhythm's length. |
 | **RANDOM A / B** | Random length, pulses and rotation for that generator; switches it on. The other generator is left as it is. |
+
+![EUCLIDIAN, generator B (page 2)](manual/euclidian-b.png)
 
 When both generators are on, the buttons at the bottom of page 2 decide what happens to the steps (dim while only one is on):
 

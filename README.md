@@ -15,8 +15,8 @@ A short demo, and how to map StepRunner-8 to a drum program:
 ## Features
 
 - 8 tracks × 64 steps (4 pages of 16), notes 36–43 = pads A01–A08 of a drum program by default
-- Per track: length, speed (1/8x … 2x), direction (FWD / BWD / BOTH), MIDI channel, note, velocity, gate, mute
-- Per step: step conditions (1ST, A:B, FILL, PRE, NEI …), probability, velocity / length / pan locks, five CC locks,
+- Per track: length, speed (1/8x … 2x), direction (FWD / BWD / FBWD / BFWD), MIDI channel, note, velocity, gate, mute
+- Per step: step conditions (1ST, A:B, FILL, PRE, NEI …), probability, velocity / length / pan locks, eight CC locks,
   micro-timing and ratchets
 - Euclidean generator per track, random generators for trigs and every lock
 - 8 patterns (cue the next one while playing), pattern length, shuffle, copy / paste of steps, pages, tracks and patterns
