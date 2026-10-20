@@ -118,8 +118,20 @@ Under each menu is the CC number that knob sends.
 
 ![Plugin instrument with auto-fill](mapper/05-plugin-autofill.png)
 
-Parameter lists are built in for these plugins: **DrumSynth**, **6W6**, **8W8**, **9W9**, **Iona**, **CW-78** and
-**TR-MPC**. For any other plugin, the page says there is no parameter list for it yet.
+Parameter lists are built in for these plugins:
+
+- **MPC (AIR):** DrumSynth (Multi, Clap, Crash, HiHat, Kick, Perc, Ride, Snare, Tom), 6W6, 8W8, 9W9, Iona,
+  Bassline, Electric, Fabric, Fabric Electric Piano, Fabric Piano, Fabric Select, Fabric XL, Hype, Jura,
+  Mellotron, Mini D, Odyssey, OPx-4, Organ, Solina, Sub Factory, TubeSynth
+- **Community plugins:** [DRUM] Incipience, [DRUM] Mr Drums, [DRUM] Percolator, Clementine-XT, CW-78, Dexed (DX7),
+  Fretty, Helm, InterzoneXXL, JV-880, LXRXXL, LXRXXL BAZZLINE, LXRXXL ZYNTH, Machinemodule, Maze Voice, Model-72,
+  Monomodule One, Morpho-PE, MPC Plaits, Mutable Vibe MPC, OB-Xd, Odin 2, Omni Sampler, PolyForce, Profit-08,
+  setBfree Organ, Sonix, Sturm-TP, SubForce, TR-MPC
+- **[SYN] plugins:** Aphex, Chordism, Denis, Fizzik, Hank, Hera, Macro Osc, Modal Voice, MonkSynth, Mono Voice,
+  Mr Hyde, Noisemaker, NuSaw, Open303, RaffoSynth, Resonator, Tablor, Wurl
+
+The list for a plugin was read from the version installed when it was made; a newer version of a plugin may have
+added or renamed parameters. For any other plugin, the page says there is no parameter list for it yet.
 
 Some plugins name a parameter after what is loaded in that slot: in DrumSynth, *6 Noise* becomes *6 Spike* when the
 slot uses another model. It is the same parameter either way. Where the project already has a mapping, the Mapper
@@ -145,6 +157,18 @@ Auto-fill starts from the first chosen cell of a column and overwrites the cells
 parameter is found are left empty. A line under the checkbox says how many rows were filled. You can still change any cell by
 hand afterwards. To fill cells one by one without auto-fill, untick the box; ticking it again fills the columns that
 already have a first value at once.
+
+### Keygroup programs
+
+A keygroup program is listed as *keygroup*. All eight StepRunner-8 tracks play into the same program, so the table
+works like the plugin table, with the parameters of the whole program (all its keygroups), grouped the way the MPC's
+MIDI Learn menu shows them:
+
+- **Mixer:** Volume, Pan, Mute, Send 1–4
+- **Track:** all 173 program parameters, in the MPC's menu order: filters 1 and 2, envelopes, LFO 1 and 2 and the
+  global LFOs, velocity and random amounts, tuning, portamento, pitch bend, drift, unison and the harmonizer (Note 1–4).
+
+Each parameter can be picked once, and auto-fill is off. Apply does not change the notes StepRunner-8 plays.
 
 ## 6. CC setup
 
@@ -252,5 +276,8 @@ The rest of the project is left exactly as it was.
   target track were chosen when you clicked Apply.
 - **Two StepRunner-8 instances move the same parameter**: they send the same CC on the same channel. Give each
   instance its own MIDI channel and apply again.
+- **Machinemodule**: a project with a few hundred mappings on Machinemodule froze the MPC while loading; 72 (all
+  knobs of one StepRunner-8) loaded fine. Its SYN1–SYN8 parameters are named after the machine loaded on the track,
+  so the MPC may show other names than the list.
 - **"Save over original" is greyed out**: the browser cannot write to files, or the file was dragged in. Use
   *Download as new file*.
